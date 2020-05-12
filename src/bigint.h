@@ -101,7 +101,7 @@ uint8_t BigIntIsNonZero(const BigInt_t* n);
  * @param n Pointer to number to check
  * @return 0 if n is non-zero, 1 if n is zero
  */
-uint8_t BigIntIsZero(const BigInt_t* n);
+bool BigIntIsZero(const BigInt_t* n);
 
 /**
  * Returns the sign of a number.
