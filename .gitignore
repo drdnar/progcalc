@@ -1,0 +1,6 @@
+bin/*
+obj/*
+*.8xp
+*.bin
+*.obj
+*.src
