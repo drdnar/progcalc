@@ -177,7 +177,7 @@ char* BigIntToStringBin(const BigInt_t* n, char* buffer);
  * @param n BigInt to turn into octal
  * @param buffer 
  */
-char* BigIntToStringHex(const BigInt_t* n, char* buffer);
+char* BigIntToStringOct(const BigInt_t* n, char* buffer);
 
 /**
  * Writes to buffer a string representing a BigInt.
