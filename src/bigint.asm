@@ -19,6 +19,8 @@
 	.public	_BigIntIsZero
 	.public	_BigIntGetSign
 	.public	_BigIntCompare
+	.public	_BigIntBinify
+	.public	_BigIntOctify
 	.public	_BigIntHexify
 	.public	_BigIntShiftLeft
 	.public	_BigIntShiftBitInOnLeft
@@ -37,10 +39,24 @@
 	.public	_BigIntSetBit
 	.public	_BigIntMultiply
 	.public	_BigIntDivide
+	.public	_BigIntToStringBin
+	.public	_BigIntToStringOct
 	.public	_BigIntToStringHex
 	.public	_BigIntToString
 
 .text
+; Some routines jump to the end of a BigInt using LEA, and some routines make a
+; stack local BigInt, so this should be less than 120.
+;
+; GetBit and SetBit assume 8-bit bit index numbers.  If you make this bigger
+; than 32, you'll need to switch to the currently-commented-out code that
+; enables 16-bit indexes.
+;
+; The divide routine assumes 8-bit indexes as well, so it'll need to be
+; reworked.  Maybe make it suck less while you're at it.
+;
+; ToStringOctal's initial digits routine needs to be changed depending on
+; whether the remainder of BIG_INT_SIZE / 3 is zero, one, or two.
 BIG_INT_SIZE := 16
 
 _BigIntTen:
@@ -437,6 +453,59 @@ bicne:
 
 
 ;-------------------------------------------------------------------------------
+_BigIntBinify:
+	pop	de
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	de
+BigIntBinify:
+; Inputs:
+;  - C: byte
+;  - HL: target
+	ld	b,8
+bibloop:
+	ld	a,'0' / 2
+	rl	c
+	rla
+	ld	(hl),a
+	inc	hl
+	djnz	bibloop
+	ld	(hl),0
+	ret
+
+
+;-------------------------------------------------------------------------------
+_BigIntOctify:
+	pop	de
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	de
+BigIntOctify:
+; Inputs:
+;  - C: byte
+;  - HL: target
+	ld	b,3
+	or	a,a
+bioloop:
+	ld	a,'0' / 8
+	rla
+	rl	c
+	rla
+	rl	c
+	rla
+	rl	c
+	ld	(hl),a
+	inc	hl
+	djnz	bioloop
+	ld	(hl),0
+	ret
+
+
+;-------------------------------------------------------------------------------
 _BigIntHexify:
 	pop	bc
 	pop	de
@@ -461,6 +530,7 @@ bihnib:	or	0F0h
 	adc	a,40h
 	ld	(hl),a
 	inc	hl
+	ld	(hl),0
 	ret
 
 
@@ -970,8 +1040,7 @@ bim.knownOverflow:
 	; return .of;
 	ld	a,(ix + bim.of)
 ; Close stack frame
-	ld	hl,bim.localsSize
-	add	hl,sp
+	ld	hl,ix + bim.localsSize
 	ld	sp,hl
 	pop	ix
 	ret
@@ -1033,10 +1102,86 @@ bid.skip:
 	dec	(ix + bid.i)
 	jr	nz,bid.loop
 ; Close stack frame
-	ld	hl,bid.localsSize
-	add	hl,sp
+	lea	hl,ix + bid.localsSize
 	ld	sp,hl
 	pop	ix
+	ret
+
+
+;-------------------------------------------------------------------------------
+_BigIntToStringBin:
+	pop	bc
+	pop	iy
+	pop	hl
+	push	hl
+	push	hl
+	push	bc
+BigIntToStringBin:
+; Inputs:
+;  - IY: number
+;  - HL: ASCII target
+	lea	iy,iy + BIG_INT_SIZE - 1
+	ld	e,BIG_INT_SIZE
+.loop:
+	ld	c,(iy)
+	dec	iy
+	call	BigIntBinify
+	dec	e
+	jr	nz,.loop
+	ret
+
+
+;-------------------------------------------------------------------------------
+_BigIntToStringOct:
+	pop	bc
+	pop	iy
+; If residual octal digits is 1
+	pop	hl
+	push	hl
+; Else
+;	pop	de
+;	push	de
+; End if
+	push	hl
+	push	bc
+BigIntToStringOct:
+; Inputs:
+;  - IY: number
+;  - DE or HL: ASCII target
+; If residual octal digits is 1
+	lea	iy,iy + BIG_INT_SIZE - 4
+	ld	c,(iy + 3)
+	call	BigIntOctify
+	ex	de,hl
+	ld	c,BIG_INT_SIZE / 3
+; If residual octal digits is 2
+;	lea	iy,iy + BIG_INT_SIZE - 2
+;	ld	hl,(iy)
+;	inc	hl
+;	dec.sis	hl
+;	ld	bc,(6 * 256) + (BIG_INT_SIZE / 3)
+;	jr	bitsoinnerloop
+; If residual octal digits is 0
+;	lea	iy,iy + BIG_INT_SIZE - 3
+;	ld	c,BIG_INT_SIZE / 3
+bitsoouterloop:
+	ld	hl,(iy)
+bitsoinnerloop:
+	ld	a,'0' / 8
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	ld	(de),a
+	inc	de
+	djnz	bitsoinnerloop
+	lea	iy,iy - 3
+	dec	c
+	jr	nz,bitsoouterloop
+	ex	de,hl
+	ld	(hl),0
 	ret
 
 
@@ -1059,60 +1204,110 @@ BigIntToStringHex:
 	dec	iy
 	call	BigIntHexify
 	djnz	.loop
-	ld	(hl),0
 	ret
 
 
 ;-------------------------------------------------------------------------------
 _BigIntToString:
+; This optimized routine is courtesy of @jacobly0 .
 bits:
-bits.digits := 0
-bits.n := bits.digits + 1
-bits.q := bits.n + BIG_INT_SIZE
-bits.r := bits.q + BIG_INT_SIZE
-bits.localsSize := bits.r + BIG_INT_SIZE
+; <jacobly> and if you want hints, iyh is digit pair count, iyl is a zero indicator, and c is carry (well remainder I guess)
+; <jacobly> it could be slightly faster with a dedicated skip leading zeros loop at the beginning, but it doesn't affect the input I'm testing so whatever >.>
+; <jacobly> also might be smaller with double pushes and a sla b for the last loop
+; <jacobly> also it occurs to me that my slow division routines might actually be really fast for arbitrary division...
+; <jacobly> since I can amortize the overhead outside the inner loop
+; <jacobly> but then again maybe fast long division would still win at these sizes...
+bits.n := 0
+bits.start := bits.n + BIG_INT_SIZE
+bits.localsSize := bits.start + 3
 bits.arg0 = bits.localsSize + 6
 bits.buffer = bits.arg0 + 3
+; Mateo, I just want you to know that the spaces in here were put there by jacobly.
 	push	ix
-	ld	ix,-bits.localsSize
-	add	ix,sp
-	ld	sp,ix
-	ld	(ix + bits.digits),0
-	ld	hl,(ix + bits.arg0)
-bits.divLoop:
-	inc	(ix + bits.digits)
-	lea	de,ix + bits.n
+	ld	ix, -bits.localsSize
+	add	ix, sp
+	ld	sp, ix
+	ld	hl, (ix + bits.arg0)
+	lea	de, ix + bits.n
 	call	BigIntCopyFromTo
-	pea	ix + bits.r
-	pea	ix + bits.q
-	ld	hl,_BigIntTen
-	push	hl
-	pea	ix + bits.n
-	call	_BigIntDivide
-	pop	hl
-	pop	hl
-	pop	hl
-	pop	hl
-	ld	a,(ix + bits.r)
-	add	a,'0'
-	push	af
-	lea	hl,ix + bits.q
-	push	hl
-	call	BigIntIsNonZero
-	pop	hl
-	jr	nz,bits.divLoop
-	ld	hl,(ix + bits.buffer)
-	ld	b,(ix + bits.digits)
-bits.strLoop:
-	pop	af
-	ld	(hl),a
+	ld	(ix + bits.start), de
+	ld	iyh, 0
+bits.digitsLoop:
+	ld	de, (ix + bits.start)
+	ld	c, 0
+	ld	iyl, c
+bits.divLoop:
+	dec	de
+	ld	a, (de)
+	ld	l, a
+	ld	b, ((1 shl 14) + 99) / 100
+	ld	h, b
+	mlt	bc
+	mlt	hl
+	ld	l, h
+	ld	h, 0
+	add	hl, bc
+	add	hl, hl
+	add	hl, hl
+	ld	c, 100
+	ld	b, h
+	ld	l, c
+	mlt	hl
+	sub	a, l
+	add	a, c
+	jr	c, bits.fixed
+	sub	a, c
+	inc	b
+bits.fixed:
+	dec	b
+	ld	c, a
+	ld	a, b
+	ld	(de), a
+	or	a, iyl
+	ld	iyl, a
+	jr	nz, bits.notZero
+	ld	(ix + bits.start), de
+bits.notZero:
+	ld	a, e
+	cp	a, ixl
+	jr	nz, bits.divLoop
+	ld	a, c
+	ld	b, ((1 shl 10) + 9) / 10
+	mlt	bc
+	srl	b
+	srl	b
+	ld	e, b
+	ld	c, 10
+	mlt	bc
+	sub	a, c
+	ld	d, a
+	push	de
+	inc	iyh
+	ld	a, iyl
+	or	a, a
+	jr	nz, bits.digitsLoop
+	ld	c, '0'
+	ld	b, iyh
+	ld	hl, (ix + bits.buffer)
+	pop	de
+	ld	a, e
+	or	a, a
+	jr	z, bits.asciiEnter
+	db	$3E
+bits.asciiLoop:
+	pop	de
+	ld	a, e
+	add	a, c
+	ld	(hl), a
 	inc	hl
-	djnz	bits.strLoop
-	ld	(hl),0
-	ex	de,hl
-	ld	hl,bits.localsSize
-	add	hl,sp
-	ld	sp,hl
-	ex	de,hl
+bits.asciiEnter:
+	ld	a, d
+	add	a, c
+	ld	(hl), a
+	inc	hl
+	djnz	bits.asciiLoop
+	ld	(hl), 0
+	lea	ix, ix + bits.localsSize
+	ld	sp, ix
 	pop	ix
 	ret

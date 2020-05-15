@@ -142,12 +142,42 @@ uint8_t BigIntMultiply(const BigInt_t* n1, const BigInt_t* n2, BigInt_t* out);
 void BigIntDivide(const BigInt_t* n, const BigInt_t* d, BigInt_t* q, BigInt_t* r);
 
 /**
- * Classic optimized routine.  No null-terminator is written.
+ * Writes a binary ASCII string representation of a byte into a string.
+ * @param n Byte to turn into ASCII
+ * @param buffer Location to write eight chars to.
+ * @return  Pointer to '\0' at end of written string, i.e. buffer + 8
+ */
+char* BigIntBinify(const uint8_t n, char* buffer);
+
+/**
+ * Writes an octal ASCII string representation of a byte into a string.
+ * @param n Byte to turn into ASCII
+ * @param buffer Location to write three chars to.
+ * @return  Pointer to '\0' at end of written string, i.e. buffer + 3
+ */
+char* BigIntOctify(const uint8_t n, char* buffer);
+
+/**
+ * Classic optimized routine.
  * @param n Byte to turn into ASCII hex
- * @param buffer Location to write two chars to.
- * @return Pointer to next byte of buffer, i.e. buffer + 2;
+ * @param buffer Location to write two chars to
+ * @return Pointer to '\0' at end of written string, i.e. buffer + 2
  */
 char* BigIntHexify(const uint8_t n, char* buffer);
+
+/**
+ * Writes to buffer a string representing a BigInt in binary.
+ * @param n BigInt to convert to binary ASCII
+ * @param buffer 
+ */
+char* BigIntToStringBin(const BigInt_t* n, char* buffer);
+
+/**
+ * Writes to buffer a string representing a BigInt in octal.
+ * @param n BigInt to turn into octal
+ * @param buffer 
+ */
+char* BigIntToStringHex(const BigInt_t* n, char* buffer);
 
 /**
  * Writes to buffer a string representing a BigInt.
