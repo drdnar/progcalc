@@ -1122,12 +1122,12 @@ BigIntToStringBin:
 ;  - HL: ASCII target
 	lea	iy,iy + BIG_INT_SIZE - 1
 	ld	e,BIG_INT_SIZE
-.loop:
+bitsb.loop:
 	ld	c,(iy)
 	dec	iy
 	call	BigIntBinify
 	dec	e
-	jr	nz,.loop
+	jr	nz,bitsb.loop
 	ret
 
 
@@ -1199,11 +1199,11 @@ BigIntToStringHex:
 ;  - HL: ASCII target
 	lea	iy,iy + BIG_INT_SIZE - 1
 	ld	b,BIG_INT_SIZE
-.loop:
+bitsh.loop:
 	ld	e,(iy)
 	dec	iy
 	call	BigIntHexify
-	djnz	.loop
+	djnz	bitsh.loop
 	ret
 
 
