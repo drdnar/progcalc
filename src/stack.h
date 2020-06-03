@@ -9,6 +9,8 @@ typedef struct
     BigInt_t* Stack;
 } BigIntStack_t;
 
+#define DEFAULT_STACK_SIZE 128
+
 /**
  * Creates a new stack object.
  * @param maxSize Maximum number of entries to support in stack.
@@ -143,4 +145,4 @@ void BigIntStack_Delete(BigIntStack_t* self, unsigned int n);
  */
 void BigIntStack_DeleteFromBottom(BigIntStack_t* self, unsigned int n);
 
-#endif
+#endif /* BIGINTSTACK_H */

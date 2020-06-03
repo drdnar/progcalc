@@ -9,6 +9,7 @@ NAME        ?= PROGCALC
 COMPRESSED  ?= NO
 ICON        ?= iconc.png
 DESCRIPTION ?= "Programmer's Calculator"
+#OPT_MODE    ?= -Oz
 
 # ----------------------------
 

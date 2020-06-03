@@ -10,30 +10,28 @@
 #include <graphx.h>
 #include <fontlibc.h>
 #include "bigint.h"
+#include "settings.h"
+#include "style.h"
+#include "printbigint.h"
+
+/* 0x12345678901234567890123456789012 */
+BigInt_t n1 = { 0x12, 0x90, 0x78, 0x56, 0x34, 0x12, 0x90, 0x78, 0x56, 0x34, 0x12, 0x90, 0x78, 0x56, 0x34, 0x12, };
 
 
 /* Main Function */
 void main(void) {
-    uint8_t r;
+    Style_Initialize();
+    Settings_Init();
     
-    if (!fontlib_SetFont(fontlib_GetFontByStyle("Courier", 13, 13, 0, 255, 0, 0), 0))
-    {
-        os_ClrHome();
-        os_PutStrFull("Failed to load Courier 13 font.");
-        while (!os_GetCSC());
-        return;
-    }
-    
-    gfx_Begin();
-    /* Erase the screen to black */
-    gfx_FillScreen(gfx_black);
+    Settings_ChangeDisplayBits(SHOW_128);
 
-    fontlib_DrawString("Nothing happens.");
+    fontlib_DrawString("TESTING");
     fontlib_Newline();
+    Format_PrintBin(&n1);
+    Format_PrintHex(&n1);
+    /*fontlib_Newline();*/
     
     /* Pause */
     while (!os_GetCSC());
-
-    /* Finish the graphics */
-    gfx_End();
+    Style_Finalize();
 }
