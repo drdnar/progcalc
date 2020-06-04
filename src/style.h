@@ -34,6 +34,12 @@ typedef struct
 #define CHAR_WIDTH 8
 #define CHAR_HEIGHT 14
 
+#define GROUP_DELIMITER ' '
+/**
+ * Caches the width of a space in the large variable-width font.
+ */
+extern unsigned int GroupDelimiterWidth;
+
 /**
  * Wraps a text window into a single type.
  */
@@ -74,5 +80,20 @@ void Style_SaveTextWindow(CharTextWindow_t* saveTarget);
  * @param window Pointer to text window descriptor
  */
 void Style_RestoreTextWindow(CharTextWindow_t* window);
+
+/**
+ * Changes the current font.
+ */
+void Style_SetLargeFontMono(void);
+
+/**
+ * Changes the current font.
+ */
+void Style_SetLargeFontProp(void);
+
+/**
+ * Changes the current font.
+ */
+void Style_SetSmallFontProp(void);
 
 #endif

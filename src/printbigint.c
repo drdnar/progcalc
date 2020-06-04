@@ -7,7 +7,6 @@ char Format_NumberBuffer[MAX_FORMATTED_NUMBER_SIZE];
 BigInt_t tempn;
 
 
-
 static const CharCoord_t displaySizes[3][4] = 
 {
     // SHOW_32
@@ -33,6 +32,7 @@ static const CharCoord_t displaySizes[3][4] =
     },
 };
 
+
 void Format_ConfigureDisplaySizes(void)
 {
     /* So, uh, I used to have this:
@@ -50,6 +50,33 @@ void Format_ConfigureDisplaySizes(void)
 }
 
 
+static CharTextWindow_t oldWindow;
+
+static void windowize(void)
+{
+    unsigned int x = fontlib_GetCursorX();
+    uint8_t y = fontlib_GetCursorY();
+    Style_SaveTextWindow(&oldWindow);
+    fontlib_SetWindow(x, y, fontlib_GetWindowWidth() - x, fontlib_GetWindowHeight() - y);
+}
+
+
+static void unwindowize(void)
+{
+    uint8_t y = fontlib_GetCursorY();
+    Style_RestoreTextWindow(&oldWindow);
+    fontlib_SetCursorPosition(fontlib_GetCursorX(), y);
+}
+
+
+static void printNumSep(void)
+{
+    Style_SetLargeFontProp();
+    fontlib_DrawGlyph(GROUP_DELIMITER);
+    Style_SetLargeFontMono();
+}
+
+
 static char* printBinCh[] = 
 {
     Format_NumberBuffer + (BIG_INT_SIZE - 4) * 8,
@@ -57,15 +84,12 @@ static char* printBinCh[] =
     Format_NumberBuffer + (BIG_INT_SIZE - 16) * 8,
 };
 
+
 unsigned char Format_PrintBin(BigInt_t* n)
 {
-    /*CharTextWindow_t oldWindow;*/
     unsigned char h, i, j;
     char* ch;
-    unsigned int x = fontlib_GetCursorX();
-    uint8_t y = fontlib_GetCursorY();
-    uint8_t fontHeight = fontlib_GetCurrentFontHeight();
-    /*Style_SaveTextWindow(&oldWindow);*/
+    windowize();
     BigIntToStringBin(n, Format_NumberBuffer);
     /*switch (Settings.DisplayBits)
     {
@@ -87,77 +111,100 @@ unsigned char Format_PrintBin(BigInt_t* n)
     ch = printBinCh[Settings.DisplayBits];
     for (h = Format_BinSize.y; h > 0; h--)
     {
-        fontlib_SetCursorPosition(x, y);
         for (i = 4; i > 0; i--)
         {
             fontlib_DrawStringL(ch, BIN_GROUPING);
             ch = fontlib_GetLastCharacterRead() + 1;
-            /*while (!os_GetCSC());*/
             if (i != 1)
-                fontlib_DrawGlyph(' ');
+                printNumSep();
         }
         fontlib_Newline();
-        y += fontHeight;
     }
 
-    /*Style_RestoreTextWindow(&oldWindow);*/
+    unwindowize();
     return Format_BinSize.y;
 }
 
 
-static uint8_t const printDecCopy[] =
+static size_t const printDecCopy[] =
 {
     4, 8, 16,
 };
 
 /*
-128 -> e38
-64 -> e19
-32 -> e9
+128 -> e38 -> 39 characters
+64 -> e19 -> 20 characters
+32 -> e9 -> 10 characters
 */
-static char const printDecInit[] = "000 000 000 000 000 000 000 000 000 000 000 000 000";
 
-static char* const printDecStart[] =
+static unsigned char const printDecExpectedSize[] =
 {
-    Format_NumberBuffer + sizeof(printDecInit) - 13 - 1,
-    Format_NumberBuffer + sizeof(printDecInit) - 26 - 1,
-    Format_NumberBuffer + sizeof(printDecInit) - 51 - 1,
+    10, 20, 39,
 };
 
-#define formatBufMid (Format_NumberBuffer + MAX_FORMATTED_NUMBER_SIZE / 2)
+static unsigned char const printDecGroups[] =
+{
+    3, 6, 12,
+};
+
+static unsigned char const printDecInitialDigits[] =
+{
+    1, 2, 3,
+};
 
 unsigned char Format_PrintDec(BigInt_t* n)
 {
     unsigned char i, j, expected;
+    unsigned char group, subgroup, actualDigits;
     char* ch, *src;
-    unsigned int copyBytes;
-    unsigned int originalX = fontlib_GetCursorX();
+    size_t copyBytes = printDecCopy[Settings.DisplayBits];
+    windowize();
+
     BigIntToStringBin(n, Format_NumberBuffer);
     BigIntSetToZero(&tempn);
     
-    memcpy(&tempn, n, printDecCopy[Settings.DisplayBits]);
-    strcpy(Format_NumberBuffer, printDecInit);
-    src = BigIntToString(&tempn, formatBufMid);
+    memcpy(&tempn, n, copyBytes);
+
+    src = BigIntToString(&tempn, Format_NumberBuffer);
     /* Somewhat dubious pointer arithmetic, but should be well-defined since
        the output is part of the same array as the input. */
-    copyBytes = src-- - formatBufMid;
-    ch = Format_NumberBuffer + sizeof(printDecInit) - 2;
-    
-    while (copyBytes --> 0)
+    actualDigits = (unsigned char)(src - Format_NumberBuffer);
+    expected = printDecExpectedSize[Settings.DisplayBits];
+    group = printDecGroups[Settings.DisplayBits];
+    subgroup = printDecInitialDigits[Settings.DisplayBits];
+
+    if (Settings.DisplayBits == SHOW_128)
+        /*fontlib_SetCursorPosition(fontlib_GetCursorX() + DEC_GROUPING * CHAR_WIDTH + GroupDelimiterWidth, fontlib_GetCursorY());*/
     {
-        if (*src != '0')
-            src--;
-        *ch-- = *src--;
+        fontlib_DrawString("   ");
+        printNumSep();
     }
-    
-    ch = printDecStart[Settings.DisplayBits];
-    for ( /* Loop initialized above * ; i > 0; i--)
+    while (expected-- > actualDigits)
     {
-        fontlib_DrawStringL(ch, DEC_GROUPING);
-        ch = fontlib_GetLastCharacterRead() + 1;
-        if (i != 1)
-            fontlib_DrawGlyph(' ');
+        fontlib_DrawGlyph('0');
+        if (--subgroup == 0)
+        {
+            subgroup = DEC_GROUPING;
+            if (group-- == 7)
+                fontlib_Newline();
+            else
+                printNumSep();
+        }
     }
+    ch = Format_NumberBuffer;
+    do
+    {
+        fontlib_DrawStringL(ch, subgroup);
+        ch += subgroup;
+        subgroup = DEC_GROUPING;
+        if (group == 7)
+            fontlib_Newline();
+        else if (group)
+            printNumSep();
+    }
+    while (group--);
+
+    unwindowize();
     return Format_DecSize.y;
 }
 
@@ -179,6 +226,7 @@ unsigned char Format_PrintHex(BigInt_t* n)
     /*unsigned int originalX = fontlib_GetCursorX();*/
     unsigned char i, j;
     char* ch;
+    windowize();
     BigIntToStringHex(n, Format_NumberBuffer);
 
     for (i = printHexI[Settings.DisplayBits], ch = printHexCh[Settings.DisplayBits]; i > 0; i--)
@@ -186,8 +234,9 @@ unsigned char Format_PrintHex(BigInt_t* n)
         fontlib_DrawStringL(ch, HEX_GROUPING);
         ch = fontlib_GetLastCharacterRead() + 1;
         if (i != 1)
-            fontlib_DrawGlyph(' ');
+            printNumSep();
     }
     fontlib_Newline();
+    unwindowize();
     return Format_HexSize.y;
 }

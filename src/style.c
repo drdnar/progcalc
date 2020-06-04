@@ -16,6 +16,7 @@ CharCoord_t Format_BinSize;
 fontlib_font_t* DrMono14Bold;
 fontlib_font_t* DrSans14Bold;
 fontlib_font_t* DrSans9Regular;
+unsigned int GroupDelimiterWidth;
 
 
 void ShowErrorAndExit(char* msg)
@@ -36,6 +37,8 @@ void Style_Initialize(void)
         ShowErrorAndExit("Dr. Sans font missing.");
     if (!DrMono14Bold)
         ShowErrorAndExit("Dr. Mono font missing.");
+    fontlib_SetFont(DrSans14Bold, 0);
+    GroupDelimiterWidth = fontlib_GetGlyphWidth(GROUP_DELIMITER);
     fontlib_SetFont(DrMono14Bold, 0);
     gfx_Begin();
     gfx_FillScreen(gfx_black);
@@ -64,4 +67,22 @@ void Style_RestoreTextWindow(CharTextWindow_t* window)
 {
     fontlib_SetWindow(window->X, window->Y, window->Width, window->Height);
     fontlib_SetCursorPosition(window->CursorX, window->CursorY);
+}
+
+
+void Style_SetLargeFontMono(void)
+{
+    fontlib_SetFont(DrMono14Bold, 0);
+}
+
+
+void Style_SetLargeFontProp(void)
+{
+    fontlib_SetFont(DrSans14Bold, 0);
+}
+
+
+void Style_SetSmallFontProp(void)
+{
+    fontlib_SetFont(DrSans9Regular, 0);
 }
