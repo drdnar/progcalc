@@ -10,7 +10,8 @@ typedef enum
     BINARY,
     OCTAL,
     DECIMAL,
-    HEXADECIMAL
+    HEXADECIMAL,
+    NO_BASE = 255
 } Bases_t;
 
 typedef uint8_t Base_t;

@@ -27,9 +27,9 @@ extern Color_t HighlightColor;
  */
 typedef struct
 {
-    unsigned char x;
+    unsigned int x;
     unsigned char y;
-} CharCoord_t;
+} Coord_t;
 
 #define CHAR_WIDTH 8
 #define CHAR_HEIGHT 14
@@ -95,5 +95,10 @@ void Style_SetLargeFontProp(void);
  * Changes the current font.
  */
 void Style_SetSmallFontProp(void);
+
+/**
+ * Changes the current font and ensures baseline alignment with the large font.
+ */
+void Style_SetSmallFontPropAligned(void);
 
 #endif

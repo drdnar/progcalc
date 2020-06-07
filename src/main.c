@@ -32,7 +32,15 @@ void main(void) {
     Format_PrintBin(&n1);
     Format_PrintHex(&n1);
     Format_PrintDec(&n2);
-    /*fontlib_Newline();*/
+    fontlib_Newline();
+    Style_SetSmallFontProp();
+    fontlib_DrawString("bin"); fontlib_Newline();
+    fontlib_DrawString("oct"); fontlib_Newline();
+    fontlib_DrawString("dec"); fontlib_Newline();
+    Style_SetLargeFontProp(); fontlib_DrawString("00:");
+    Style_SetSmallFontPropAligned(); fontlib_DrawString(" hex "); //fontlib_Newline();
+    
+    
     
     /* Pause */
     while (!os_GetCSC());

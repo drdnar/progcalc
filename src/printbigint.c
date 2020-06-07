@@ -7,30 +7,66 @@ char Format_NumberBuffer[MAX_FORMATTED_NUMBER_SIZE];
 BigInt_t tempn;
 
 
-static const CharCoord_t displaySizes[3][4] = 
+static Coord_t displaySizes[3][4] = 
 {
     // SHOW_32
     {
-        {36, 1}, // BINARY
-        {16, 1}, // OCTAL
-        {13, 1}, // DECIMAL
-        { 9, 1}, // HEXADECIMAL
+        {32 * CHAR_WIDTH, 1 * CHAR_HEIGHT}, // BINARY
+        {11 * CHAR_WIDTH, 1 * CHAR_HEIGHT}, // OCTAL
+        {10 * CHAR_WIDTH, 1 * CHAR_HEIGHT}, // DECIMAL
+        { 8 * CHAR_WIDTH, 1 * CHAR_HEIGHT}, // HEXADECIMAL
     },
     // SHOW_64
     {
-        {36, 2}, // BINARY
-        {33, 1}, // OCTAL
-        {28, 1}, // DECIMAL
-        {19, 1}, // HEXADECIMAL
+        {32 * CHAR_WIDTH, 2 * CHAR_HEIGHT}, // BINARY
+        {22 * CHAR_WIDTH, 1 * CHAR_HEIGHT}, // OCTAL
+        {20 * CHAR_WIDTH, 1 * CHAR_HEIGHT}, // DECIMAL
+        {16 * CHAR_WIDTH, 1 * CHAR_HEIGHT}, // HEXADECIMAL
     },
     // SHOW_128
     {
-        {36, 4}, // BINARY
-        {33, 2}, // OCTAL
-        {28, 2}, // DECIMAL
-        {39, 1}, // HEXADECIMAL
+        {32 * CHAR_WIDTH, 4 * CHAR_HEIGHT}, // BINARY
+        {22 * CHAR_WIDTH, 2 * CHAR_HEIGHT}, // OCTAL
+        {21 * CHAR_WIDTH, 2 * CHAR_HEIGHT}, // DECIMAL
+        {32 * CHAR_WIDTH, 1 * CHAR_HEIGHT}, // HEXADECIMAL
     },
 };
+
+
+static unsigned char const groupings[3][4] =
+{
+    // SHOW_32
+    {
+        3, // BINARY
+        3, // OCTAL
+        3, // DECIMAL
+        1, // HEXADECIMAL
+    },
+    // SHOW_64
+    {
+        3, // BINARY
+        7, // OCTAL
+        6, // DECIMAL
+        3, // HEXADECIMAL
+    },
+    // SHOW_128
+    {
+        3, // BINARY
+        7, // OCTAL
+        6, // DECIMAL
+        7, // HEXADECIMAL
+    },
+};
+
+
+void Format_InitDisplaySizes(void)
+{
+    unsigned char i;
+    unsigned char* spacers = &groupings[0][0];
+    Coord_t* coord = &displaySizes[0][0];
+    for (i = 0; i < (SHOW_128 + 1) * (HEXADECIMAL + 1); i++, coord++, spacers++)
+        coord->x += *spacers * GroupDelimiterWidth;
+}
 
 
 void Format_ConfigureDisplaySizes(void)
@@ -42,7 +78,7 @@ void Format_ConfigureDisplaySizes(void)
     Format_HexSize = displaySizes[Settings.DisplayBits][HEXADECIMAL];
     and ZDS generated each array index separately instead of seeing they're related so now I'm doing this.
     */
-    CharCoord_t* ptr = &displaySizes[Settings.DisplayBits][BINARY];
+    Coord_t* ptr = &displaySizes[Settings.DisplayBits][BINARY];
     Format_BinSize = *ptr++;
     Format_OctSize = *ptr++;
     Format_DecSize = *ptr++;
@@ -50,14 +86,44 @@ void Format_ConfigureDisplaySizes(void)
 }
 
 
+unsigned char Format_PrintInBase(BigInt_t* n, Base_t base)
+{
+    switch (base)
+    {
+        case BINARY:
+            return Format_PrintBin(n);
+        case OCTAL:
+            return 0;
+        case DECIMAL:
+            return Format_PrintDec(n);
+        case HEXADECIMAL:
+            return Format_PrintHex(n);
+    }
+    return 0;
+}
+
+
+unsigned char Format_PrintInPrimaryBase(BigInt_t* n)
+{
+    return Format_PrintInBase(n, Settings.PrimaryBase);
+}
+
+
+unsigned char Format_PrintInSecondaryBase(BigInt_t* n)
+{
+    return Format_PrintInBase(n, Settings.SecondaryBase);
+}
+
+
 static CharTextWindow_t oldWindow;
 
-static void windowize(void)
+static void windowize(unsigned int width)
 {
-    unsigned int x = fontlib_GetCursorX();
+    unsigned int x = fontlib_GetCursorX() + fontlib_GetWindowWidth() - width;
     uint8_t y = fontlib_GetCursorY();
     Style_SaveTextWindow(&oldWindow);
     fontlib_SetWindow(x, y, fontlib_GetWindowWidth() - x, fontlib_GetWindowHeight() - y);
+    fontlib_HomeUp();
 }
 
 
@@ -89,7 +155,7 @@ unsigned char Format_PrintBin(BigInt_t* n)
 {
     unsigned char h, i, j;
     char* ch;
-    windowize();
+    windowize(Format_BinSize.x);
     BigIntToStringBin(n, Format_NumberBuffer);
     /*switch (Settings.DisplayBits)
     {
@@ -109,7 +175,7 @@ unsigned char Format_PrintBin(BigInt_t* n)
     for (; i > 0; i--)*/
     /* Array indexing seems to produce less terrible output than if or switch. */
     ch = printBinCh[Settings.DisplayBits];
-    for (h = Format_BinSize.y; h > 0; h--)
+    for (h = Format_BinSize.y / CHAR_HEIGHT; h > 0; h--)
     {
         for (i = 4; i > 0; i--)
         {
@@ -158,7 +224,7 @@ unsigned char Format_PrintDec(BigInt_t* n)
     unsigned char group, subgroup, actualDigits;
     char* ch, *src;
     size_t copyBytes = printDecCopy[Settings.DisplayBits];
-    windowize();
+    windowize(Format_DecSize.x);
 
     BigIntToStringBin(n, Format_NumberBuffer);
     BigIntSetToZero(&tempn);
@@ -174,12 +240,11 @@ unsigned char Format_PrintDec(BigInt_t* n)
     subgroup = printDecInitialDigits[Settings.DisplayBits];
 
     if (Settings.DisplayBits == SHOW_128)
-        /*fontlib_SetCursorPosition(fontlib_GetCursorX() + DEC_GROUPING * CHAR_WIDTH + GroupDelimiterWidth, fontlib_GetCursorY());*/
     {
         fontlib_DrawString("   ");
         printNumSep();
     }
-    while (expected-- > actualDigits)
+    while (expected --> actualDigits)
     {
         fontlib_DrawGlyph('0');
         if (--subgroup == 0)
@@ -223,10 +288,9 @@ static char* printHexCh[] =
 
 unsigned char Format_PrintHex(BigInt_t* n)
 {
-    /*unsigned int originalX = fontlib_GetCursorX();*/
     unsigned char i, j;
     char* ch;
-    windowize();
+    windowize(Format_HexSize.x);
     BigIntToStringHex(n, Format_NumberBuffer);
 
     for (i = printHexI[Settings.DisplayBits], ch = printHexCh[Settings.DisplayBits]; i > 0; i--)
