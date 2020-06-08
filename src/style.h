@@ -70,6 +70,18 @@ void Style_Initialize(void);
 void Style_Finalize(void);
 
 /**
+ * Saves the current cursor.
+ * @param target Pointer to location to save cursor location information.
+ */
+void Style_SaveCursor(Coord_t* target);
+
+/**
+ * Restores the cursor location.
+ * @param target Pointer to cursor location information.
+ */
+void Style_RestoreCursor(Coord_t* coord);
+
+/**
  * Saves the current text window to a variable.
  * @param saveTarget Location to write text window properties
  */

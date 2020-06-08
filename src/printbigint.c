@@ -86,7 +86,13 @@ void Format_ConfigureDisplaySizes(void)
 }
 
 
-unsigned char Format_PrintInBase(BigInt_t* n, Base_t base)
+unsigned char Format_GetNumberHeight(Base_t base)
+{
+    return displaySizes[Settings.DisplayBits][base].y;
+}
+
+
+unsigned int Format_PrintInBase(BigInt_t* n, Base_t base)
 {
     switch (base)
     {
@@ -103,13 +109,13 @@ unsigned char Format_PrintInBase(BigInt_t* n, Base_t base)
 }
 
 
-unsigned char Format_PrintInPrimaryBase(BigInt_t* n)
+unsigned int Format_PrintInPrimaryBase(BigInt_t* n)
 {
     return Format_PrintInBase(n, Settings.PrimaryBase);
 }
 
 
-unsigned char Format_PrintInSecondaryBase(BigInt_t* n)
+unsigned int Format_PrintInSecondaryBase(BigInt_t* n)
 {
     return Format_PrintInBase(n, Settings.SecondaryBase);
 }
@@ -119,11 +125,24 @@ static CharTextWindow_t oldWindow;
 
 static void windowize(unsigned int width)
 {
-    unsigned int x = fontlib_GetCursorX() + fontlib_GetWindowWidth() - width;
+    unsigned int x = fontlib_GetWindowXMin() + fontlib_GetWindowWidth() - width;
     uint8_t y = fontlib_GetCursorY();
     Style_SaveTextWindow(&oldWindow);
     fontlib_SetWindow(x, y, fontlib_GetWindowWidth() - x, fontlib_GetWindowHeight() - y);
     fontlib_HomeUp();
+}
+
+
+static unsigned int PrintBaseLabel(char* text, unsigned char height)
+{
+    unsigned int x;
+    Style_SetSmallFontPropAligned();
+    fontlib_SetLineSpacing(fontlib_GetSpaceAbove(), height - fontlib_GetCurrentFontHeight() + fontlib_GetSpaceBelow());
+    x = fontlib_GetCursorX() - fontlib_GetStringWidth(text);
+    fontlib_SetCursorPosition(x, fontlib_GetCursorY());
+    fontlib_DrawString(text);
+    Style_SetLargeFontMono();
+    return x;
 }
 
 
@@ -151,11 +170,13 @@ static char* printBinCh[] =
 };
 
 
-unsigned char Format_PrintBin(BigInt_t* n)
+unsigned int Format_PrintBin(BigInt_t* n)
 {
     unsigned char h, i, j;
     char* ch;
+    unsigned int xreturn;
     windowize(Format_BinSize.x);
+    xreturn = PrintBaseLabel("bin ", Format_BinSize.y);
     BigIntToStringBin(n, Format_NumberBuffer);
     /*switch (Settings.DisplayBits)
     {
@@ -188,7 +209,7 @@ unsigned char Format_PrintBin(BigInt_t* n)
     }
 
     unwindowize();
-    return Format_BinSize.y;
+    return xreturn;
 }
 
 
@@ -218,14 +239,16 @@ static unsigned char const printDecInitialDigits[] =
     1, 2, 3,
 };
 
-unsigned char Format_PrintDec(BigInt_t* n)
+unsigned int Format_PrintDec(BigInt_t* n)
 {
     unsigned char i, j, expected;
     unsigned char group, subgroup, actualDigits;
     char* ch, *src;
+    unsigned int xreturn;
     size_t copyBytes = printDecCopy[Settings.DisplayBits];
     windowize(Format_DecSize.x);
-
+    xreturn = PrintBaseLabel("dec ", Format_DecSize.y);
+    
     BigIntToStringBin(n, Format_NumberBuffer);
     BigIntSetToZero(&tempn);
     
@@ -270,7 +293,7 @@ unsigned char Format_PrintDec(BigInt_t* n)
     while (group--);
 
     unwindowize();
-    return Format_DecSize.y;
+    return xreturn;
 }
 
 
@@ -286,11 +309,13 @@ static char* printHexCh[] =
     Format_NumberBuffer + (BIG_INT_SIZE - 16) * 2,
 };
 
-unsigned char Format_PrintHex(BigInt_t* n)
+unsigned int Format_PrintHex(BigInt_t* n)
 {
     unsigned char i, j;
     char* ch;
+    unsigned int xreturn;
     windowize(Format_HexSize.x);
+    xreturn = PrintBaseLabel("hex ", Format_HexSize.y);
     BigIntToStringHex(n, Format_NumberBuffer);
 
     for (i = printHexI[Settings.DisplayBits], ch = printHexCh[Settings.DisplayBits]; i > 0; i--)
@@ -302,5 +327,5 @@ unsigned char Format_PrintHex(BigInt_t* n)
     }
     fontlib_Newline();
     unwindowize();
-    return Format_HexSize.y;
+    return xreturn;
 }

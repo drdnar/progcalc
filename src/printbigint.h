@@ -37,46 +37,61 @@ void Format_ConfigureDisplaySizes(void);
  */
 extern char Format_NumberBuffer[];
 
-/**
- * Prints a number in a given base at the current FontLib cursor location using current formatting settings.
- * @param n Pointer to number to display.
- */
-unsigned char Format_PrintInBase(BigInt_t* n, Base_t base);
 
 /**
- * Prints a number in the current primary base at the current FontLib cursor location using current formatting settings.
- * @param n Pointer to number to display.
+ * Returns the height, in pixels, of a formatted number with current formatting settings.
+ * @param base Radix of number
+ * @return Height in pixels
  */
-unsigned char Format_PrintInPrimaryBase(BigInt_t* n);
+unsigned char Format_GetNumberHeight(Base_t base);
 
 /**
- * Prints a number in the current secondary base at the current FontLib cursor location using current formatting settings.
+ * Prints a number, right-aligned, in a given base at the current FontLib cursor location using current formatting settings.
  * @param n Pointer to number to display.
+ * @return X coordinate printing started at.
  */
-unsigned char Format_PrintInSecondaryBase(BigInt_t* n);
+unsigned int Format_PrintInBase(BigInt_t* n, Base_t base);
 
 /**
- * Prints a number in hex at the current FontLib cursor location using current formatting settings.
+ * Prints a number, right-aligned, in the current primary base at the current FontLib cursor location using current formatting settings.
  * @param n Pointer to number to display.
+ * @return X coordinate printing started at.
  */
-unsigned char Format_PrintHex(BigInt_t* n);
+unsigned int Format_PrintInPrimaryBase(BigInt_t* n);
 
 /**
- * Prints a number in decimal at the current FontLib cursor location using current formatting settings.
+ * Prints a number, right-aligned, in the current secondary base at the current FontLib cursor location using current formatting settings.
  * @param n Pointer to number to display.
+ * @return X coordinate printing started at.
  */
-unsigned char Format_PrintDec(BigInt_t* n);
+unsigned int Format_PrintInSecondaryBase(BigInt_t* n);
 
 /**
- * Prints a number in octal at the current FontLib cursor location using current formatting settings.
+ * Prints a number, right-aligned, in hex at the current FontLib cursor location using current formatting settings.
  * @param n Pointer to number to display.
+ * @return X coordinate printing started at.
  */
-unsigned char Format_PrintOct(BigInt_t* n);
+unsigned int Format_PrintHex(BigInt_t* n);
 
 /**
- * Prints a number in binary at the current FontLib cursor location using current formatting settings.
+ * Prints a number, right-aligned, in decimal at the current FontLib cursor location using current formatting settings.
  * @param n Pointer to number to display.
+ * @return X coordinate printing started at.
  */
-unsigned char Format_PrintBin(BigInt_t* n);
+unsigned int Format_PrintDec(BigInt_t* n);
+
+/**
+ * Prints a number, right-aligned, in octal at the current FontLib cursor location using current formatting settings.
+ * @param n Pointer to number to display.
+ * @return X coordinate printing started at.
+ */
+unsigned int Format_PrintOct(BigInt_t* n);
+
+/**
+ * Prints a number, right-aligned, in binary at the current FontLib cursor location using current formatting settings.
+ * @param n Pointer to number to display.
+ * @return X coordinate printing started at.
+ */
+unsigned int Format_PrintBin(BigInt_t* n);
 
 #endif /* FORMATTING_H */

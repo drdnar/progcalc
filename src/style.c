@@ -60,6 +60,20 @@ void Style_Finalize(void)
 }
 
 
+void Style_SaveCursor(Coord_t* target)
+{
+    target->x = fontlib_GetCursorX();
+    target->y = fontlib_GetCursorY();
+}
+
+
+void Style_RestoreCursor(Coord_t* coord)
+{
+    fontlib_SetCursorPosition(coord->x, coord->y);
+}
+
+
+
 void Style_SaveTextWindow(CharTextWindow_t* saveTarget)
 {
     saveTarget->X = fontlib_GetWindowXMin();

@@ -13,6 +13,7 @@
 #include "settings.h"
 #include "style.h"
 #include "printbigint.h"
+#include "rpnui.h"
 
 /* 0x12345678901234567890123456789012 */
 BigInt_t n1 = { 0x12, 0x90, 0x78, 0x56, 0x34, 0x12, 0x90, 0x78, 0x56, 0x34, 0x12, 0x90, 0x78, 0x56, 0x34, 0x12, };
@@ -32,14 +33,15 @@ void main(void) {
     Format_PrintBin(&n1);
     Format_PrintHex(&n1);
     Format_PrintDec(&n2);
-    fontlib_Newline();
+    /*fontlib_Newline();
     Style_SetSmallFontProp();
     fontlib_DrawString("bin"); fontlib_Newline();
     fontlib_DrawString("oct"); fontlib_Newline();
     fontlib_DrawString("dec"); fontlib_Newline();
     Style_SetLargeFontProp(); fontlib_DrawString("00:");
     Style_SetSmallFontPropAligned(); fontlib_DrawString(" hex "); //fontlib_Newline();
-    
+    */
+    Rpn_Main();
     
     
     /* Pause */
