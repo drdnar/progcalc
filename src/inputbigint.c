@@ -21,6 +21,11 @@ static BigInt_t Addend;
 static BigInt_t const Ten = { 0xA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
 
 /**
+ * The largest decimal number than can accept one more nine.
+ */
+static BigInt_t const MaxDecimal = { 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x19 };
+
+/**
  * true if user is entering number, false if not
  */
 static bool EntryActive = false;
@@ -120,8 +125,9 @@ bool GetBigInt_SendKey(sk_key_t k)
             case DECIMAL:
                 if (digit > 9)
                     return false;
-                if (BigIntMultiply(&CurrentInput, &Ten, &temp))
+                if (BigIntCompare(&CurrentInput, &MaxDecimal) > 0)
                     return false;
+                BigIntMultiply(&CurrentInput, &Ten, &temp);
                 if (BigIntAdd(&temp, &Addend))
                     return false;
                 BigIntCopyFromTo(&temp, &CurrentInput);
