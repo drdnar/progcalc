@@ -74,22 +74,6 @@ static bool DrawStackEntry(unsigned int n)
 
 
 /**
- * Redraws the number the user is currently entering.
- */
-static void DrawInput(void)
-{
-    Coord_t cursorHome, nextLoc;
-    fontlib_HomeUp();
-    Style_SaveCursor(&cursorHome);
-    Format_PrintInBase(&CurrentInput, Settings.PrimaryBase);
-    Style_SaveCursor(&nextLoc);
-    Style_RestoreCursor(&cursorHome);
-    fontlib_DrawString("#");
-    Style_RestoreCursor(&nextLoc);
-}
-
-
-/**
  * Redraws the entire stack display.
  */
 static void DrawStack(void)
@@ -98,7 +82,7 @@ static void DrawStack(void)
     Style_SetLargeFontProp();
     Style_RestoreTextWindow(&StackWindow);
     if (EntryMode == ENTRY_INPUT)
-        DrawInput();
+        GetBigInt_Redraw();
     if (EntryMode == ENTRY_NO_INPUT || EntryMode == ENTRY_INPUT)
         index = 0;
     else

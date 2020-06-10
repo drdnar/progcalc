@@ -51,7 +51,7 @@ unsigned char Format_GetNumberHeight(Base_t base);
  * @param n Pointer to number to display.
  * @return X coordinate printing started at.
  */
-unsigned int Format_PrintInBase(BigInt_t* n, Base_t base);
+void Format_PrintInBase(BigInt_t* n, Base_t base);
 
 /**
  * Prints a number, right-aligned, in hex at the current FontLib cursor location using current formatting settings.

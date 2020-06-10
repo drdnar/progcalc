@@ -92,7 +92,7 @@ unsigned char Format_GetNumberHeight(Base_t base)
 }
 
 
-unsigned int Format_PrintInBase(BigInt_t* n, Base_t base)
+void Format_PrintInBase(BigInt_t* n, Base_t base)
 {
     Coord_t home;
     unsigned int x1, x2;
