@@ -6,15 +6,6 @@
 #include "style.h"
 #include "settings.h"
 
-/*
-Should be a main input loop that accepts key strokes for both number entry and events like ENTER and performing a function like addition.
-Routines:
- - BeginEntry: Start entry of number, triggers some layout events
- - AddDigit
- - RemoveDigit
- - EndEntry: Cleans up if necessary
-*/
-
 /**
  * Handles a keypress, performing any actions required.
  * @param k Key code to handle

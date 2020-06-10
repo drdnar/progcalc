@@ -23,6 +23,9 @@ static BigInt_t const Ten = { 0xA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
  */
 static bool EntryActive = false;
 
+/**
+ * Maps key codes to their hexadecimal value.
+ */
 static unsigned char const NumberMap[] = 
 {
     0xFF, /* 0 */
@@ -125,6 +128,7 @@ bool GetBigInt_SendKey(sk_key_t k)
                 BigIntAdd(&CurrentInput, &Addend);
                 break;
         }
+        EntryActive = true;
         return true;
     }
     else if (k == sk_Del)
