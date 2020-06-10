@@ -50,21 +50,6 @@ static CharTextWindow_t StackWindow =
 
 
 /**
- * Draws an item, and also erases the space to the left.
- */
-static void DrawItem(BigInt_t* n, Base_t base)
-{
-    Coord_t home;
-    unsigned int x1, x2;
-    unsigned char y1;
-    Style_SaveCursor(&home);
-    x2 = Format_PrintInBase(n, base);
-    gfx_SetColor(fontlib_GetBackgroundColor());
-    gfx_FillRectangle_NoClip(home.x, home.y, x2 - home.x, fontlib_GetCursorY() - home.y);
-}
-
-
-/**
  * Draws a stack entry and its label prefix.
  * @param n Index of stack entry number to draw
  * @return true if the number fits into the current window, false if number does not fit.
@@ -76,9 +61,9 @@ static bool DrawStackEntry(unsigned int n)
     unsigned int requiredHeight = Format_GetNumberHeight(Settings.PrimaryBase);
     fontlib_Home();
     Style_SaveCursor(&home);
-    if (home.y + requiredHeight > fontlib_GetWindowYMin() + fontlib_GetWindowHeight())
+    if (n >= BigIntStack_GetSize(MainStack) || home.y + requiredHeight > fontlib_GetWindowYMin() + fontlib_GetWindowHeight())
         return false;
-    DrawItem(BigIntStack_Get(MainStack, n, NULL), Settings.PrimaryBase);
+    Format_PrintInBase(BigIntStack_Get(MainStack, n, NULL), Settings.PrimaryBase);
     Style_SaveCursor(&nextLoc);
     Style_RestoreCursor(&home);
     fontlib_DrawUInt(n, 2);
@@ -96,7 +81,7 @@ static void DrawInput(void)
     Coord_t cursorHome, nextLoc;
     fontlib_HomeUp();
     Style_SaveCursor(&cursorHome);
-    DrawItem(&CurrentInput, Settings.PrimaryBase);
+    Format_PrintInBase(&CurrentInput, Settings.PrimaryBase);
     Style_SaveCursor(&nextLoc);
     Style_RestoreCursor(&cursorHome);
     fontlib_DrawString("#");

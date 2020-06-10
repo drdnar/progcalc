@@ -94,30 +94,24 @@ unsigned char Format_GetNumberHeight(Base_t base)
 
 unsigned int Format_PrintInBase(BigInt_t* n, Base_t base)
 {
+    Coord_t home;
+    unsigned int x1, x2;
+    unsigned char y1;
+    Style_SaveCursor(&home);
     switch (base)
     {
         case BINARY:
-            return Format_PrintBin(n);
+            x2 = Format_PrintBin(n);
+        default:
         case OCTAL:
-            return 0;
+            x2 = 0;
         case DECIMAL:
-            return Format_PrintDec(n);
+            x2 = Format_PrintDec(n);
         case HEXADECIMAL:
-            return Format_PrintHex(n);
+            x2 = Format_PrintHex(n);
     }
-    return 0;
-}
-
-
-unsigned int Format_PrintInPrimaryBase(BigInt_t* n)
-{
-    return Format_PrintInBase(n, Settings.PrimaryBase);
-}
-
-
-unsigned int Format_PrintInSecondaryBase(BigInt_t* n)
-{
-    return Format_PrintInBase(n, Settings.SecondaryBase);
+    gfx_SetColor(fontlib_GetBackgroundColor());
+    gfx_FillRectangle_NoClip(home.x, home.y, x2 - home.x, fontlib_GetCursorY() - home.y);
 }
 
 

@@ -46,25 +46,12 @@ extern char Format_NumberBuffer[];
 unsigned char Format_GetNumberHeight(Base_t base);
 
 /**
- * Prints a number, right-aligned, in a given base at the current FontLib cursor location using current formatting settings.
+ * Prints a number, right-aligned, in a given base at the current FontLib cursor location using current formatting settings,
+ * and also erases the space to the left.
  * @param n Pointer to number to display.
  * @return X coordinate printing started at.
  */
 unsigned int Format_PrintInBase(BigInt_t* n, Base_t base);
-
-/**
- * Prints a number, right-aligned, in the current primary base at the current FontLib cursor location using current formatting settings.
- * @param n Pointer to number to display.
- * @return X coordinate printing started at.
- */
-unsigned int Format_PrintInPrimaryBase(BigInt_t* n);
-
-/**
- * Prints a number, right-aligned, in the current secondary base at the current FontLib cursor location using current formatting settings.
- * @param n Pointer to number to display.
- * @return X coordinate printing started at.
- */
-unsigned int Format_PrintInSecondaryBase(BigInt_t* n);
 
 /**
  * Prints a number, right-aligned, in hex at the current FontLib cursor location using current formatting settings.
