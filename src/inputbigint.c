@@ -26,6 +26,16 @@ static BigInt_t const Ten = { 0xA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 static BigInt_t const MaxDecimal = { 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x19 };
 
 /**
+ * Largest possible 32-bit number.
+ */
+static BigInt_t const MaxShow32 = { 0xFF, 0xFF, 0xFF, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+/**
+ * Largest possible 64-bit number.
+ */
+static BigInt_t const MaxShow64 = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+/**
  * true if user is entering number, false if not
  */
 static bool EntryActive = false;
@@ -107,6 +117,7 @@ bool GetBigInt_SendKey(sk_key_t k)
     {
         Addend.d[0] = digit;
         msb = CurrentInput.d[BIG_INT_SIZE - 1];
+        BigIntCopyFromTo(&CurrentInput, &temp2);
         switch (Settings.PrimaryBase)
         {
             case BINARY:
@@ -141,6 +152,12 @@ bool GetBigInt_SendKey(sk_key_t k)
                 BigIntShiftLeft(&CurrentInput);
                 BigIntAdd(&CurrentInput, &Addend);
                 break;
+        }
+        if ((Settings.DisplayBits == SHOW_32 && BigIntCompare(&CurrentInput, &MaxShow32) > 0)
+            || (Settings.DisplayBits == SHOW_64 && BigIntCompare(&CurrentInput, &MaxShow64) > 0))
+        {
+            BigIntCopyFromTo(&temp2, &CurrentInput);
+            return false;
         }
         EntryActive = true;
         GetBigInt_Redraw();

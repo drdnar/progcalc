@@ -9,6 +9,7 @@
 #include "stack.h"
 #include "printbigint.h"
 #include "style.h"
+#include "inputbigint.h"
 
 /**
  * Waiting for user to start typing.

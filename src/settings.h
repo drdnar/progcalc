@@ -44,7 +44,7 @@ void Settings_Init(void);
 /**
  * Changes the number of bits/bytes to display.
  * Triggers any other events that should be triggered when this setting is changed.
- * @param byte Whole number of bytes
+ * @param bytes Member of DisplaySizes_t
  */
 void Settings_ChangeDisplayBits(uint8_t bytes);
 

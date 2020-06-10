@@ -78,7 +78,18 @@ void main(void) {
                 Settings.PrimaryBase = HEXADECIMAL;
                 dirty = true;
                 break;
-
+            case sk_2nd:
+                Settings_ChangeDisplayBits(SHOW_32);
+                dirty = true;
+                break;
+            case sk_Mode:
+                Settings_ChangeDisplayBits(SHOW_64);
+                dirty = true;
+                break;
+            case sk_Alpha:
+                Settings_ChangeDisplayBits(SHOW_128);
+                dirty = true;
+                break;
         }
         if (dirty)
         {
