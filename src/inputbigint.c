@@ -1,7 +1,9 @@
-#include "inputbigint.h"
 #include <tice.h>
 #include <stdbool.h>
-#include <stdlib.h>
+#include <string.h>
+#include <fontlibc.h>
+#include "inputbigint.h"
+#include "printbigint.h"
 
 /**
  * Number currently being entered by user.
@@ -58,7 +60,7 @@ static unsigned char const NumberMap[] =
     0xF, /* sk_Cos              0x1E */
     0xC, /* sk_Prgm             0x1F */
     0xFF, /* sk_Stat             0x20 */
-    0xFF, /* sk_0                0x21 */
+    0, /* sk_0                0x21 */
     1, /* sk_1                0x22 */
     4, /* sk_4                0x23 */
     7, /* sk_7                0x24 */
@@ -94,19 +96,21 @@ void GetBigInt(BigInt_t* n)
 bool GetBigInt_SendKey(sk_key_t k)
 {
     BigInt_t temp, temp2;
+    unsigned char msb;
     unsigned char digit = NumberMap[k];
     if (digit < 16)
     {
         Addend.d[0] = digit;
+        msb = CurrentInput.d[BIG_INT_SIZE - 1];
         switch (Settings.PrimaryBase)
         {
             case BINARY:
-                if (digit > 1)
+                if (digit > 1 || msb > 0x7F)
                     return false;
                 BigIntShiftBitInOnLeft(&CurrentInput, digit);
                 break;
             case OCTAL:
-                if (digit > 7)
+                if (digit > 7 || msb > 0x1F)
                     return false;
                 BigIntShiftLeft(&CurrentInput);
                 BigIntShiftLeft(&CurrentInput);
@@ -116,11 +120,15 @@ bool GetBigInt_SendKey(sk_key_t k)
             case DECIMAL:
                 if (digit > 9)
                     return false;
-                BigIntMultiply(&CurrentInput, &Ten, &temp);
+                if (BigIntMultiply(&CurrentInput, &Ten, &temp))
+                    return false;
+                if (BigIntAdd(&temp, &Addend))
+                    return false;
                 BigIntCopyFromTo(&temp, &CurrentInput);
-                BigIntAdd(&CurrentInput, &Addend);
                 break;
             case HEXADECIMAL:
+                if (msb > 0xF)
+                    return false;
                 BigIntShiftLeft(&CurrentInput);
                 BigIntShiftLeft(&CurrentInput);
                 BigIntShiftLeft(&CurrentInput);
@@ -129,6 +137,7 @@ bool GetBigInt_SendKey(sk_key_t k)
                 break;
         }
         EntryActive = true;
+        GetBigInt_Redraw();
         return true;
     }
     else if (k == sk_Del)

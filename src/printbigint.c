@@ -102,13 +102,17 @@ void Format_PrintInBase(BigInt_t* n, Base_t base)
     {
         case BINARY:
             x2 = Format_PrintBin(n);
+            break;
         default:
         case OCTAL:
             x2 = 0;
+            break;
         case DECIMAL:
             x2 = Format_PrintDec(n);
+            break;
         case HEXADECIMAL:
             x2 = Format_PrintHex(n);
+            break;
     }
     gfx_SetColor(fontlib_GetBackgroundColor());
     gfx_FillRectangle_NoClip(home.x, home.y, x2 - home.x, fontlib_GetCursorY() - home.y);

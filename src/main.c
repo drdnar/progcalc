@@ -15,6 +15,8 @@
 #include "printbigint.h"
 #include "rpnui.h"
 
+#include "inputbigint.h"
+
 /* 0x12345678901234567890123456789012 */
 BigInt_t n1 = { 0x12, 0x90, 0x78, 0x56, 0x34, 0x12, 0x90, 0x78, 0x56, 0x34, 0x12, 0x90, 0x78, 0x56, 0x34, 0x12, };
 /* 0x7890123456789012 */
@@ -23,6 +25,8 @@ BigInt_t n2 = { 0x12, 0x90, 0x78, 0x56, 0x34, 0x12, 0x90, 0x78, 0, 0, 0, 0, 0, 0
 
 /* Main Function */
 void main(void) {
+    sk_key_t k;
+    bool dirty = false;
     Style_Initialize();
     Settings_Init();
     
@@ -41,10 +45,50 @@ void main(void) {
     Style_SetLargeFontProp(); fontlib_DrawString("00:");
     Style_SetSmallFontPropAligned(); fontlib_DrawString(" hex "); //fontlib_Newline();
     */
-    Rpn_Main();
     
+    do
+    {
+        do
+            k = os_GetCSC();
+        while (!k);
+        if (GetBigInt_SendKey(k))
+            continue;
+        switch (k)
+        {
+            case sk_Clear:
+                if (!GetBigInt_IsActive())
+                    break;
+                GetBigInt_Reset();
+                k = 0;
+                dirty = true;
+                break;
+            case sk_Yequ:
+                Settings.PrimaryBase = BINARY;
+                dirty = true;
+                break;
+            /*case sk_Window:
+                Settings.PrimaryBase = OCTAL;
+                dirty = true;
+                break;*/
+            case sk_Zoom:
+                Settings.PrimaryBase = DECIMAL;
+                dirty = true;
+                break;
+            case sk_Trace:
+                Settings.PrimaryBase = HEXADECIMAL;
+                dirty = true;
+                break;
+
+        }
+        if (dirty)
+        {
+            dirty = false;
+            fontlib_ClearWindow();
+            GetBigInt_Redraw();
+        }
+    } while (k != sk_Clear);
     
     /* Pause */
-    while (!os_GetCSC());
+    //while (!os_GetCSC());
     Style_Finalize();
 }
