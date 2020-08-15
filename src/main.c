@@ -32,11 +32,13 @@ void main(void) {
     
     Settings_ChangeDisplayBits(SHOW_128);
 
-    fontlib_DrawString("TESTING");
+    /*fontlib_DrawString("TESTING");
     fontlib_Newline();
     Format_PrintBin(&n1);
     Format_PrintHex(&n1);
-    Format_PrintDec(&n2);
+    Format_PrintDec(&n2);*/
+    
+    Rpn_Reset();
     /*fontlib_Newline();
     Style_SetSmallFontProp();
     fontlib_DrawString("bin"); fontlib_Newline();
@@ -45,6 +47,8 @@ void main(void) {
     Style_SetLargeFontProp(); fontlib_DrawString("00:");
     Style_SetSmallFontPropAligned(); fontlib_DrawString(" hex "); //fontlib_Newline();
     */
+    fontlib_ClearWindow();
+    Rpn_Redraw();
     
     do
     {
@@ -52,9 +56,20 @@ void main(void) {
             k = os_GetCSC();
         while (!k);
         if (GetBigInt_SendKey(k))
+        {
+            Rpn_SetEntryMode(GetBigInt_IsActive());
+            continue;
+        }
+        if (Rpn_SendKey(k))
             continue;
         switch (k)
         {
+            case sk_Del:
+                /* Delete top entry */
+                break;
+            case sk_Enter:
+                /* Duplicate top entry */
+                break;
             case sk_Clear:
                 if (!GetBigInt_IsActive())
                     break;
@@ -95,7 +110,7 @@ void main(void) {
         {
             dirty = false;
             fontlib_ClearWindow();
-            GetBigInt_Redraw();
+            Rpn_Redraw();
         }
     } while (k != sk_Clear);
     

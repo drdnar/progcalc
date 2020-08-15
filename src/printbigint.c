@@ -121,12 +121,26 @@ void Format_PrintInBase(BigInt_t* n, Base_t base)
 
 static CharTextWindow_t oldWindow;
 
+
+/**
+ * Creates a temporary text window of a given width, right-aligned to current window.
+ * @param width Width of new window.
+ */
 static void windowize(unsigned int width)
 {
+/* TODO: Not sure which way to do this is better.
     unsigned int x = fontlib_GetWindowXMin() + fontlib_GetWindowWidth() - width;
     uint8_t y = fontlib_GetCursorY();
     Style_SaveTextWindow(&oldWindow);
     fontlib_SetWindow(x, y, fontlib_GetWindowWidth() - x, fontlib_GetWindowHeight() - y);
+    fontlib_HomeUp();
+*/
+    unsigned int x;
+    uint8_t y;
+    Style_SaveTextWindow(&oldWindow);
+    x = oldWindow.X + oldWindow.Width - width;
+    y = oldWindow.CursorY;
+    fontlib_SetWindow(x, y, oldWindow.Width - x, oldWindow.Height - y);
     fontlib_HomeUp();
 }
 
@@ -144,11 +158,18 @@ static unsigned int PrintBaseLabel(char* text, unsigned char height)
 }
 
 
+/**
+ * Restores text window settings saved by earlier call to windowize().
+ * Cursor row will be preserved, but column will be restored to previous cursor column.
+ */
 static void unwindowize(void)
 {
     uint8_t y = fontlib_GetCursorY();
     Style_RestoreTextWindow(&oldWindow);
+/* TODO: Not sure which way is better.
     fontlib_SetCursorPosition(fontlib_GetCursorX(), y);
+*/
+    fontlib_SetCursorPosition(oldWindow.CursorX, y);
 }
 
 
@@ -290,6 +311,7 @@ unsigned int Format_PrintDec(BigInt_t* n)
     }
     while (group--);
 
+    fontlib_Newline();
     unwindowize();
     return xreturn;
 }
@@ -313,7 +335,11 @@ unsigned int Format_PrintHex(BigInt_t* n)
     char* ch;
     unsigned int xreturn;
     windowize(Format_HexSize.x);
-    xreturn = PrintBaseLabel("hex ", Format_HexSize.y);
+    if (Settings.DisplayBits < SHOW_128)
+        xreturn = PrintBaseLabel("hex ", Format_HexSize.y);
+    else
+        xreturn = PrintBaseLabel("0x", Format_HexSize.y);
+    
     BigIntToStringHex(n, Format_NumberBuffer);
 
     for (i = printHexI[Settings.DisplayBits], ch = printHexCh[Settings.DisplayBits]; i > 0; i--)

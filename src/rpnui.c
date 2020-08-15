@@ -14,15 +14,15 @@
 /**
  * Waiting for user to start typing.
  */
-#define ENTRY_NO_INPUT 0
+#define RPN_NO_INPUT 0
 /**
  * User has started typing a number.
  */
-#define ENTRY_INPUT 1
+#define RPN_INPUT 1
 /**
  * User is scrolling around the stack.
  */
-#define ENTRY_SCROLL 2
+#define RPN_SCROLL 2
 
 /**
  * Current input mode.
@@ -39,6 +39,11 @@ static BigIntStack_t* MainStack = NULL;
  */
 static BigInt_t CurrentInput;
 
+static BigInt_t Temp0;
+static BigInt_t Temp1;
+static BigInt_t Temp2;
+static BigInt_t Temp3;
+
 /**
  * Default window for showing stack and user entry.
  */
@@ -48,6 +53,34 @@ static CharTextWindow_t StackWindow =
     LCD_WIDTH, LCD_HEIGHT,
     0, 0
 };
+
+
+/**
+ * Acquires the user's current input and flushes the input buffer.
+ */
+static void AcquireInput(void)
+{
+    if (!GetBigInt_IsActive())
+        return;
+    EntryMode = RPN_NO_INPUT;
+    GetBigInt(&CurrentInput);
+    GetBigInt_Reset();
+    BigIntStack_Push(MainStack, &CurrentInput);
+}
+
+
+/**
+ * Sets up the stack for a binary (two argument) operation.
+ * Temp1 will contain the second argument.
+ */
+static bool EnsureBinaryOp(void)
+{
+    if (BigIntStack_GetSize(MainStack) < 2)
+        return false;
+    BigIntStack_Exchange(MainStack);
+    BigIntStack_Pop(MainStack, &Temp1);
+    return true;
+}
 
 
 /**
@@ -74,20 +107,17 @@ static bool DrawStackEntry(unsigned int n)
 }
 
 
-/**
- * Redraws the entire stack display.
- */
-static void DrawStack(void)
+void Rpn_Redraw(void)
 {
     unsigned int index;
     Style_SetLargeFontProp();
     Style_RestoreTextWindow(&StackWindow);
-    if (EntryMode == ENTRY_INPUT)
+    if (EntryMode == RPN_INPUT)
         GetBigInt_Redraw();
-    if (EntryMode == ENTRY_NO_INPUT || EntryMode == ENTRY_INPUT)
+    if (EntryMode == RPN_NO_INPUT || EntryMode == RPN_INPUT)
         index = 0;
     else
-        /* SCROLLING NOT YET IMPLEMENTED */
+        /* TODO: SCROLLING NOT YET IMPLEMENTED */
         index = 0;
     if (BigIntStack_GetSize(MainStack))
         do
@@ -95,15 +125,74 @@ static void DrawStack(void)
         while (DrawStackEntry(index++));
     else
         fontlib_DrawString("(Stack is empty.)");
+    while (fontlib_GetCursorY() > StackWindow.Y)
+        fontlib_Newline();
 }
 
 
-void Rpn_Main(void)
+void Rpn_SetEntryMode(bool mode)
 {
-    EntryMode = ENTRY_NO_INPUT;
+    if (mode)
+    {
+        if (EntryMode == RPN_INPUT)
+            return;
+        /* else */
+        /* Handle starting entry */
+        EntryMode = RPN_INPUT;
+        Rpn_Redraw();
+    }
+    else
+    {
+        if (EntryMode == RPN_NO_INPUT)
+            return;
+        /* else */
+        /* Handle stopping entry */
+        EntryMode = RPN_NO_INPUT;
+        Rpn_Redraw();
+    }
+    
+}
+
+
+void Rpn_Reset(void)
+{
+    EntryMode = RPN_NO_INPUT;
     if (MainStack == NULL)
         MainStack = BigIntStack_ctor(99);
-    DrawStack();
-    
-        
+    Rpn_Redraw();
+}
+
+
+bool Rpn_SendKey(sk_key_t k)
+{
+    switch (k)
+    {
+        case sk_Enter:
+            AcquireInput();
+            Rpn_Redraw();
+            return true;
+        case sk_Add:
+            AcquireInput();
+            if (!EnsureBinaryOp())
+                return false;
+            BigIntAdd(BigIntStack_Peek(MainStack), &Temp1);
+            Rpn_Redraw();
+            return true;
+        case sk_Sub:
+            AcquireInput();
+            if (!EnsureBinaryOp())
+                return false;
+            BigIntSubtract(BigIntStack_Peek(MainStack), &Temp1);
+            Rpn_Redraw();
+            return true;
+        case sk_Mul:
+            AcquireInput();
+            if (!EnsureBinaryOp())
+                return false;
+            BigIntMultiply(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2);
+            BigIntStack_Push(MainStack, &Temp2);
+            Rpn_Redraw();
+            return true;
+    }
+    return false;
 }
