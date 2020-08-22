@@ -58,33 +58,21 @@ void main(void) {
         if (GetBigInt_SendKey(k))
         {
             Rpn_SetEntryMode(GetBigInt_IsActive());
+            k = 0;
             continue;
         }
         if (Rpn_SendKey(k))
             continue;
         switch (k)
         {
-            case sk_Del:
-                /* Delete top entry */
-                break;
-            case sk_Enter:
-                /* Duplicate top entry */
-                break;
-            case sk_Clear:
-                if (!GetBigInt_IsActive())
-                    break;
-                GetBigInt_Reset();
-                k = 0;
-                dirty = true;
-                break;
             case sk_Yequ:
                 Settings.PrimaryBase = BINARY;
                 dirty = true;
                 break;
-            /*case sk_Window:
+            case sk_Window:
                 Settings.PrimaryBase = OCTAL;
                 dirty = true;
-                break;*/
+                break;
             case sk_Zoom:
                 Settings.PrimaryBase = DECIMAL;
                 dirty = true;

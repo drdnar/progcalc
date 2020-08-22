@@ -123,8 +123,13 @@ void Rpn_Redraw(void)
         do
             ;
         while (DrawStackEntry(index++));
-    else
+    else if (EntryMode == RPN_NO_INPUT)
+    {
+        Style_SetLargeFontProp();
         fontlib_DrawString("(Stack is empty.)");
+        fontlib_Newline();
+    }
+    
     while (fontlib_GetCursorY() > StackWindow.Y)
         fontlib_Newline();
 }
@@ -165,9 +170,15 @@ void Rpn_Reset(void)
 
 bool Rpn_SendKey(sk_key_t k)
 {
+    bool r;
     switch (k)
     {
+        case sk_Del:
+            r = !!BigIntStack_Pop(MainStack, NULL);
+            Rpn_Redraw();
+            return r;
         case sk_Enter:
+            /* Duplicate top entry if entry not active */
             AcquireInput();
             Rpn_Redraw();
             return true;
@@ -190,6 +201,14 @@ bool Rpn_SendKey(sk_key_t k)
             if (!EnsureBinaryOp())
                 return false;
             BigIntMultiply(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2);
+            BigIntStack_Push(MainStack, &Temp2);
+            Rpn_Redraw();
+            return true;
+        case sk_Div:
+            AcquireInput();
+            if (!EnsureBinaryOp())
+                return false;
+            BigIntDivide(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2, &Temp3);
             BigIntStack_Push(MainStack, &Temp2);
             Rpn_Redraw();
             return true;

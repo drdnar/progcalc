@@ -488,7 +488,9 @@ BigIntOctify:
 ; Inputs:
 ;  - C: byte
 ;  - HL: target
+	; This rotates C nine times instead of special-casing the first digit.
 	ld	b,3
+	; This ensures a zero is the first bit rolled in.
 	or	a,a
 bioloop:
 	ld	a,'0' / 8
@@ -1135,7 +1137,7 @@ bitsb.loop:
 _BigIntToStringOct:
 	pop	bc
 	pop	iy
-; If residual octal digits is 1
+; If residual octal bytes is 1
 	pop	hl
 	push	hl
 ; Else
@@ -1148,23 +1150,24 @@ BigIntToStringOct:
 ; Inputs:
 ;  - IY: number
 ;  - DE or HL: ASCII target
-; If residual octal digits is 1
+; If residual octal bytes is 1
 	lea	iy,iy + BIG_INT_SIZE - 4
 	ld	c,(iy + 3)
 	call	BigIntOctify
 	ex	de,hl
 	ld	c,BIG_INT_SIZE / 3
-; If residual octal digits is 2
+; If residual octal bytes is 2
 ;	lea	iy,iy + BIG_INT_SIZE - 2
 ;	ld	hl,(iy)
 ;	inc	hl
 ;	dec.sis	hl
 ;	ld	bc,(6 * 256) + (BIG_INT_SIZE / 3)
 ;	jr	bitsoinnerloop
-; If residual octal digits is 0
+; If residual octal bytes is 0
 ;	lea	iy,iy + BIG_INT_SIZE - 3
 ;	ld	c,BIG_INT_SIZE / 3
 bitsoouterloop:
+	ld	b,24 / 3
 	ld	hl,(iy)
 bitsoinnerloop:
 	ld	a,'0' / 8

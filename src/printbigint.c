@@ -26,7 +26,7 @@ static Coord_t displaySizes[3][4] =
     // SHOW_128
     {
         {32 * CHAR_WIDTH, 4 * CHAR_HEIGHT}, // BINARY
-        {22 * CHAR_WIDTH, 2 * CHAR_HEIGHT}, // OCTAL
+        {24 * CHAR_WIDTH, 2 * CHAR_HEIGHT}, // OCTAL
         {21 * CHAR_WIDTH, 2 * CHAR_HEIGHT}, // DECIMAL
         {32 * CHAR_WIDTH, 1 * CHAR_HEIGHT}, // HEXADECIMAL
     },
@@ -95,7 +95,7 @@ unsigned char Format_GetNumberHeight(Base_t base)
 void Format_PrintInBase(BigInt_t* n, Base_t base)
 {
     Coord_t home;
-    unsigned int x1, x2;
+    unsigned int x1, x2 = 0;
     unsigned char y1;
     Style_SaveCursor(&home);
     switch (base)
@@ -103,9 +103,8 @@ void Format_PrintInBase(BigInt_t* n, Base_t base)
         case BINARY:
             x2 = Format_PrintBin(n);
             break;
-        default:
         case OCTAL:
-            x2 = 0;
+            x2 = Format_PrintOct(n);
             break;
         case DECIMAL:
             x2 = Format_PrintDec(n);
@@ -232,10 +231,19 @@ unsigned int Format_PrintBin(BigInt_t* n)
 }
 
 
-static size_t const printDecCopy[] =
+static size_t const printPartialCopy[] =
 {
     4, 8, 16,
 };
+
+/**
+ * Copies part of a number into a temporary buffer for formatting.
+ */
+static void partialCopy(BigInt_t* n)
+{
+    BigIntSetToZero(&tempn);
+    memcpy(&tempn, n, printPartialCopy[Settings.DisplayBits]);
+}
 
 /*
 128 -> e38 -> 39 characters
@@ -264,14 +272,10 @@ unsigned int Format_PrintDec(BigInt_t* n)
     unsigned char group, subgroup, actualDigits;
     char* ch, *src;
     unsigned int xreturn;
-    size_t copyBytes = printDecCopy[Settings.DisplayBits];
     windowize(Format_DecSize.x);
     xreturn = PrintBaseLabel("dec ", Format_DecSize.y);
     
-    BigIntToStringBin(n, Format_NumberBuffer);
-    BigIntSetToZero(&tempn);
-    
-    memcpy(&tempn, n, copyBytes);
+    partialCopy(n);
 
     src = BigIntToString(&tempn, Format_NumberBuffer);
     /* Somewhat dubious pointer arithmetic, but should be well-defined since
@@ -353,3 +357,75 @@ unsigned int Format_PrintHex(BigInt_t* n)
     unwindowize();
     return xreturn;
 }
+
+
+/**
+ * If used with integer arguments, this will compute ceil(x / y).
+ * In other words, it divides and rounds up.
+ * This will cause problems if you do something degenerate like use zero in the numerator with unsigned numbers..
+ * So don't use it at runtime.
+ */
+#define CEIL_DIV(x, y) ((((x) - 1) / (y)) + 1)
+
+static char* printOctCh[] = 
+{
+    Format_NumberBuffer + CEIL_DIV(BIG_INT_SIZE * 8, 3) - CEIL_DIV(32, 3),
+    Format_NumberBuffer + CEIL_DIV(BIG_INT_SIZE * 8, 3) - CEIL_DIV(64, 3),
+    Format_NumberBuffer + CEIL_DIV(BIG_INT_SIZE * 8, 3) - CEIL_DIV(128, 3),
+};
+
+static unsigned char octFirstGroupDigits[] =
+{
+    2, 1, 1
+};
+
+unsigned int Format_PrintOct(BigInt_t* n)
+{
+    /* Here's the formatting we're going for:
+                        37 777 777 777
+         1 777 777 777 777 777 777 777
+             3 777 777 777 777 777 777
+       777 777 777 777 777 777 777 777 */
+    unsigned char bits, g, h, lines;
+    char* ch;
+    unsigned int xreturn;
+    lines = 1;
+    bits = Settings.DisplayBits;
+    windowize(Format_OctSize.x);
+    xreturn = PrintBaseLabel("oct ", Format_OctSize.y);
+    
+    partialCopy(n);
+    
+    BigIntToStringOct(&tempn, Format_NumberBuffer);
+
+    g = groupings[bits][OCTAL];
+    if (bits == SHOW_128)
+    {
+        lines = 2;
+        fontlib_DrawString("     ");
+        printNumSep();
+        g = 6;
+    }
+    
+    /* I stopped being clever when I wrote this routine and didn't bother with DrawStringL. */
+    h = octFirstGroupDigits[bits];
+    ch = printOctCh[bits];
+    do
+    {
+        fontlib_DrawGlyph(*ch);
+        if (!(--h))
+        {
+            if (g--)
+                printNumSep();
+            else if (--lines)
+                fontlib_Newline();
+            h = 3;
+        }
+    }
+    while (*(++ch));
+    fontlib_Newline();
+
+    unwindowize();
+    return xreturn;
+}
+

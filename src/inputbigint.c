@@ -185,6 +185,13 @@ bool GetBigInt_SendKey(sk_key_t k)
         GetBigInt_Redraw();
         return true;
     }
+    else if (k == sk_Clear)
+    {
+        if (!EntryActive)
+            return false;
+        GetBigInt_Reset();
+        return true;
+    }
     return false;
 }
 
