@@ -253,6 +253,40 @@ uint8_t BigIntGetBit(const BigInt_t* n, unsigned int b);
  */
 uint8_t BigIntSetBit(BigInt_t* n, unsigned int b, uint8_t v);
 
+/**
+ * Performs bitwise AND and overwrites the first with the result
+ * @param n1 Pointer to first number
+ * @param n2 Pointer to second number
+ */
+void BigIntAnd(BigInt_t* n1, const BigInt_t* n2);
+
+/**
+ * Performs bitwise OR and overwrites the first with the result
+ * @param n1 Pointer to first number
+ * @param n2 Pointer to second number
+ */
+void BigIntOr(BigInt_t* n1, const BigInt_t* n2);
+
+/**
+ * Performs bitwise XOR and overwrites the first with the result
+ * @param n1 Pointer to first number
+ * @param n2 Pointer to second number
+ */
+void BigIntXor(BigInt_t* n1, const BigInt_t* n2);
+
+/**
+ * Performs bitwise NOT, overwriting the input
+ * @param n1 Pointer to number
+ */
+void BigIntNot(BigInt_t* n1);
+
+/**
+ * Performs bitwise NAND and overwrites the first with the result
+ * @param n1 Pointer to first number
+ * @param n2 Pointer to second number
+ */
+void BigIntNand(BigInt_t* n1, const BigInt_t* n2);
+
 #ifdef __cplusplus
 }
 #endif
