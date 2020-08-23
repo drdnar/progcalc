@@ -54,10 +54,37 @@ typedef struct
 } CharTextWindow_t;
 
 /**
+ * How many seconds to wait before dimming the screen.
+ */
+#define APD_DIM_TIME 60
+/**
+ * How many seconds to wait before quitting so the OS can do its APD thing.
+ */
+#define APD_QUIT_TIME 120
+
+/**
  * Displays an error message on the homescreen, and then exits.
  * @param msg String to display.
  */
 void ShowErrorAndExit(char* msg);
+
+/**
+ * Checks whether the device is an 83 Premium CE with the different key layout.
+ * @return Hopefully returns true if the device is an 83 Premium CE.
+ */
+bool Is83Premium();
+
+/**
+ * Prints a string, centering it in the current text window.
+ */
+void Style_PrintCentered(const char* string);
+
+
+/**
+ * Prints a string right-aligned.
+ */
+void Style_PrintRight(const char* string);
+
 
 /**
  * Initializes stuff related to graphics and layout.

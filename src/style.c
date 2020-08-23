@@ -3,7 +3,9 @@
 #include <tice.h>
 #include <stdlib.h>
 #include "printbigint.h"
+#include "ez80.h"
 
+void ExitClean(void);
 
 Color_t BgColor = 0xFF;
 Color_t FgColor = 0x00;
@@ -30,6 +32,59 @@ void ShowErrorAndExit(char* msg)
     while (!os_GetCSC());
     exit(1);
 }
+
+
+bool Is83Premium()
+{
+    return os_GetSystemInfo()->hardwareType;
+}
+
+
+void Style_PrintCentered(const char* string)
+{
+    fontlib_SetCursorPosition(fontlib_GetWindowWidth() / 2 + fontlib_GetWindowXMin() - (fontlib_GetStringWidth(string) / 2), fontlib_GetCursorY());
+    fontlib_DrawString(string);
+}
+
+
+void Style_PrintRight(const char* string)
+{
+    fontlib_SetCursorPosition(fontlib_GetWindowWidth() + fontlib_GetWindowXMin() - fontlib_GetStringWidth(string), fontlib_GetCursorY());
+    fontlib_DrawString(string);
+}
+
+
+/**
+ * Waits for the user to press any key (except ON).
+ * @note This runs an APD timer and may terminate the program.
+ * @return The key code of the key pressed.
+ */
+sk_key_t GetCSC_Wait()
+{
+    sk_key_t key;
+    unsigned int timer = GetRtcSecondsPlus(APD_DIM_TIME);
+    bool dimmed = false;
+    ClearOnKeyPressed();
+    do
+    {
+        if (GetRtcSeconds() == timer)
+        {
+            if (!dimmed)
+            {
+                dimmed = true;
+                Lcd_Dim();
+                timer = GetRtcSecondsPlus(APD_QUIT_TIME);
+            }
+            else
+                ExitClean();
+        }
+        key = GetCSC_APD();
+    }
+    while (!key);
+    Lcd_Bright();
+    return key;
+}
+
 
 
 void Style_Initialize(void)
