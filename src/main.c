@@ -31,7 +31,7 @@ void main(void) {
     do
     {
         do
-            k = os_GetCSC();
+            k = GetKey();
         while (!k);
         if (GetBigInt_SendKey(k))
         {

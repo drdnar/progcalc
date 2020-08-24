@@ -6,10 +6,10 @@
 	.def _Lcd_Bright
 	.def _GetRtcSeconds
 	.def _GetRtcSecondsPlus
-	.def _GetCSC_APD
+	.def _GetCSC_Breakable
 	.def _CheckIfOnKeyPressed
 	.def _ClearOnKeyPressed
-;	.ref _ExitClean
+	.ref _ExitClean
 
 _GetCSC                    = 002014Ch
 _RestoreLCDBrightness      = 0021AB8h
@@ -43,7 +43,7 @@ _GetRtcSeconds:
 	ld	de, (rtc_Minutes)
 	ld	hl, (hl)
 	cp	l
-	jr	nz, _get_rtc_seconds
+	jr	nz, _GetRtcSeconds
 	ld	d, 60
 	mlt	de
 	add	hl, de
@@ -55,7 +55,7 @@ _GetRtcSecondsPlus:
 ; offset.  If the resulting time passes the end of the hour, wraps the time
 ; around.
 ; Used by APD routines.
-	call	_get_rtc_seconds
+	call	_GetRtcSeconds
 	pop	bc
 	pop	de
 	push	de
@@ -70,7 +70,7 @@ _GetRtcSecondsPlus:
 
 
 ;-------------------------------------------------------------------------------
-_GetCSC_APD:
+_GetCSC_Breakable:
 ; Wraps GetCSC with two differences:
 ;  - Assumes you're using this in an input loop, so it does EI \ HALT to save a
 ;    tiny bit of power.

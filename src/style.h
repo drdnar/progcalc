@@ -1,9 +1,12 @@
 #ifndef STYLE_H
 #define STYLE_H
 
+#include <tice.h>
 #include <graphx.h>
 
 typedef uint8_t Color_t;
+
+typedef uint8_t Key_t;
 
 /**
  * Main text background color.
@@ -23,13 +26,18 @@ extern Color_t ZeroColor;
 extern Color_t HighlightColor;
 
 /**
- * Defines a coordinate for text laid out in constant-size cells.
+ * Defines a coordinate.
  */
 typedef struct
 {
     unsigned int x;
     unsigned char y;
 } Coord_t;
+
+/**
+ * For GetKey, controls where the cursor will show up when enabled.
+ */
+extern Coord_t CursorLocation;
 
 #define CHAR_WIDTH 8
 #define CHAR_HEIGHT 14
@@ -72,19 +80,30 @@ void ShowErrorAndExit(char* msg);
  * Checks whether the device is an 83 Premium CE with the different key layout.
  * @return Hopefully returns true if the device is an 83 Premium CE.
  */
-bool Is83Premium();
+bool Is83Premium(void);
+
+/**
+ * Waits for the user to press any key (except ON).
+ * @note This runs an APD timer and may terminate the program.
+ * @return The key code of the key pressed.
+ */
+sk_key_t GetCSC_APD(void);
+
+/**
+ * Wraps GetCSC, translating 2nd keypresses.
+ * The arrow 2nd indicator will appear at CursorLocation.
+ */
+Key_t GetKey(void);
 
 /**
  * Prints a string, centering it in the current text window.
  */
 void Style_PrintCentered(const char* string);
 
-
 /**
  * Prints a string right-aligned.
  */
 void Style_PrintRight(const char* string);
-
 
 /**
  * Initializes stuff related to graphics and layout.

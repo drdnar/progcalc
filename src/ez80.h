@@ -30,7 +30,7 @@ unsigned int GetRtcSecondsPlus(unsigned int offset);
  *  - Assumes you're using this in an input loop, so it does EI \ HALT to save a tiny bit of power.
  *  - If the ON key has been pressed and the user then presses CLEAR, aborts the program immediately.
  */
-unsigned char GetCSC_APD(void);
+unsigned char GetCSC_Breakable(void);
 
 /**
  * Returns 1 if the ON key has been pressed since the last time the
