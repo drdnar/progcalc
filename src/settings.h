@@ -39,7 +39,12 @@ extern Settings_t Settings;
 /**
  * Performs initialization of settings at program startup.
  */
-void Settings_Init(void);
+void Settings_Initialize(void);
+
+/**
+ * Performs clean-up of settings, namely saving them back to an appvar.
+ */
+void Settings_Finalize(void);
 
 /**
  * Changes the number of bits/bytes to display.

@@ -6,8 +6,6 @@
 
 typedef uint8_t Color_t;
 
-typedef uint8_t Key_t;
-
 /**
  * Main text background color.
  */
@@ -62,38 +60,10 @@ typedef struct
 } CharTextWindow_t;
 
 /**
- * How many seconds to wait before dimming the screen.
- */
-#define APD_DIM_TIME 60
-/**
- * How many seconds to wait before quitting so the OS can do its APD thing.
- */
-#define APD_QUIT_TIME 120
-
-/**
  * Displays an error message on the homescreen, and then exits.
  * @param msg String to display.
  */
 void ShowErrorAndExit(char* msg);
-
-/**
- * Checks whether the device is an 83 Premium CE with the different key layout.
- * @return Hopefully returns true if the device is an 83 Premium CE.
- */
-bool Is83Premium(void);
-
-/**
- * Waits for the user to press any key (except ON).
- * @note This runs an APD timer and may terminate the program.
- * @return The key code of the key pressed.
- */
-sk_key_t GetCSC_APD(void);
-
-/**
- * Wraps GetCSC, translating 2nd keypresses.
- * The arrow 2nd indicator will appear at CursorLocation.
- */
-Key_t GetKey(void);
 
 /**
  * Prints a string, centering it in the current text window.

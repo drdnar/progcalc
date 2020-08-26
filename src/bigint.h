@@ -287,6 +287,14 @@ void BigIntNot(BigInt_t* n1);
  */
 void BigIntNand(BigInt_t* n1, const BigInt_t* n2);
 
+/**
+ * Converts a BigInt to a native int.
+ * If the result is greater than 0xFFFFFF, then 0xFFFFFF is returned.
+ * @param n Pointer to number to convert
+ * @return Converted number
+ */
+uint24_t BigIntToNativeInt(const BigInt_t* n);
+
 #ifdef __cplusplus
 }
 #endif

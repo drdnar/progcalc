@@ -1,10 +1,12 @@
 #include "settings.h"
 #include "printbigint.h"
 
+#define SETTINGS_FILE_HEADER "Programmer's Calculator settings"
+
 Settings_t Settings;
 
 
-void Settings_Init(void)
+void Settings_Initialize(void)
 {
     Settings.PrimaryBase = HEXADECIMAL;
     Settings.SecondaryBase = DECIMAL;
@@ -14,6 +16,7 @@ void Settings_Init(void)
     Settings.AlwaysShowHex = false;
     Settings_ChangeDisplayBits(SHOW_64);
 }
+
 
 /*    uint8_t DisplayBits;
     Base_t PrimaryBase;
@@ -29,4 +32,10 @@ void Settings_ChangeDisplayBits(uint8_t bytes)
         return;
     Settings.DisplayBits = bytes;
     Format_ConfigureDisplaySizes();
+}
+
+
+void Settings_Finalize(void)
+{
+    /* At some point, add some code here to save settings back to an appvar. */
 }

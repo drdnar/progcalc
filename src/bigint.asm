@@ -19,6 +19,7 @@
 	.public	_BigIntIsZero
 	.public	_BigIntGetSign
 	.public	_BigIntCompare
+	.public	_BigIntToNativeInt
 	.public	_BigIntBinify
 	.public	_BigIntOctify
 	.public	_BigIntHexify
@@ -1313,4 +1314,26 @@ bits.asciiEnter:
 	lea	ix, ix + bits.localsSize
 	ld	sp, ix
 	pop	ix
+	ret
+
+
+;-------------------------------------------------------------------------------
+_BigIntToNativeInt:
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	de,(hl)
+	inc	hl
+	inc	hl
+	inc	hl
+	xor	a
+	ld	b,BIG_INT_SIZE - 3
+bitnil:
+	or	a,(hl)
+	inc	hl
+	djnz	bitnil
+	ex	de,hl
+	ret	z
+	ld	hl,-1
 	ret

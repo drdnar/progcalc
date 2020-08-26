@@ -62,7 +62,7 @@ static unsigned char const groupings[3][4] =
 void Format_InitDisplaySizes(void)
 {
     unsigned char i;
-    unsigned char* spacers = &groupings[0][0];
+    const unsigned char* spacers = &groupings[0][0];
     Coord_t* coord = &displaySizes[0][0];
     for (i = 0; i < (SHOW_128 + 1) * (HEXADECIMAL + 1); i++, coord++, spacers++)
         coord->x += *spacers * GroupDelimiterWidth;

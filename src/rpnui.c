@@ -9,6 +9,7 @@
 #include "stack.h"
 #include "printbigint.h"
 #include "style.h"
+#include "ui.h"
 #include "inputbigint.h"
 
 /**
@@ -58,17 +59,22 @@ static CharTextWindow_t StackWindow =
 /**
  * Acquires the user's current input and flushes the input buffer.
  */
-static void AcquireInput(void)
+static bool AcquireInput(void)
 {
     if (!GetBigInt_IsActive())
-        return;
+        return false;
     EntryMode = RPN_NO_INPUT;
     GetBigInt(&CurrentInput);
     GetBigInt_Reset();
     BigIntStack_Push(MainStack, &CurrentInput);
+    return true;
 }
 
 
+/**
+ * Caches a pointer to the top of the stack after EnsureBinaryOp().
+ */
+static BigInt_t* topOfStack;
 /**
  * Sets up the stack for a binary (two argument) operation.
  * Temp1 will contain the second argument.
@@ -79,6 +85,7 @@ static bool EnsureBinaryOp(void)
         return false;
     BigIntStack_Exchange(MainStack);
     BigIntStack_Pop(MainStack, &Temp1);
+    topOfStack = BigIntStack_Peek(MainStack);
     return true;
 }
 
@@ -171,47 +178,120 @@ void Rpn_Reset(void)
 bool Rpn_SendKey(sk_key_t k)
 {
     bool r;
+    signed char x;
+    unsigned int i;
+    if (k == sk_Enter)
+    {
+        r = AcquireInput();
+        Rpn_Redraw();
+        return r;
+    }
+    if (BigIntStack_IsEmpty(MainStack))
+        return false;
     switch (k)
     {
         case sk_Del:
             r = !!BigIntStack_Pop(MainStack, NULL);
             Rpn_Redraw();
             return r;
-        case sk_Enter:
-            /* Duplicate top entry if entry not active */
-            AcquireInput();
-            Rpn_Redraw();
-            return true;
+        case sk_Ins:
+            if (EntryMode == RPN_NO_INPUT)
+                if (BigIntStack_GetSize(MainStack) > 0)
+                    BigIntStack_Push(MainStack, topOfStack);
+                else
+                    return false;
+            else
+                return false;
+            break;
+        case sk_Chs:
+            BigIntNegate(BigIntStack_Peek(MainStack));
+            break;
+        case sk_DecPnt:
+            BigIntNot(BigIntStack_Peek(MainStack));
+            break;
         case sk_Add:
-            AcquireInput();
-            if (!EnsureBinaryOp())
-                return false;
-            BigIntAdd(BigIntStack_Peek(MainStack), &Temp1);
-            Rpn_Redraw();
-            return true;
         case sk_Sub:
-            AcquireInput();
-            if (!EnsureBinaryOp())
-                return false;
-            BigIntSubtract(BigIntStack_Peek(MainStack), &Temp1);
-            Rpn_Redraw();
-            return true;
         case sk_Mul:
-            AcquireInput();
-            if (!EnsureBinaryOp())
-                return false;
-            BigIntMultiply(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2);
-            BigIntStack_Push(MainStack, &Temp2);
-            Rpn_Redraw();
-            return true;
         case sk_Div:
+        case sk_Square:
+        case sk_Log:
+        case sk_Ln:
+        case sk_Power:
+        case sk_Tan:
+        case sk_2nd_Power:
+        case sk_2nd_Tan:
+        case sk_2nd_Div:
+        case sk_2nd_Mul:
             AcquireInput();
             if (!EnsureBinaryOp())
                 return false;
-            BigIntDivide(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2, &Temp3);
-            BigIntStack_Push(MainStack, &Temp2);
-            Rpn_Redraw();
-            return true;
+            switch (k)
+            {
+                case sk_Add:
+                    BigIntAdd(topOfStack, &Temp1);
+                    break;
+                case sk_Sub:
+                    BigIntSubtract(topOfStack, &Temp1);
+                    break;
+                case sk_Mul:
+                    BigIntMultiply(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2);
+                    BigIntStack_Push(MainStack, &Temp2);
+                    break;
+                case sk_Div:
+                    BigIntDivide(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2, &Temp3);
+                    BigIntStack_Push(MainStack, &Temp2);
+                    break;
+                case sk_2nd_Div:
+                    BigIntDivide(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2, &Temp3);
+                    BigIntStack_Push(MainStack, &Temp3);
+                    break;
+                case sk_2nd_Mul:
+                    BigIntDivide(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2, &Temp3);
+                    BigIntStack_Push(MainStack, &Temp3);
+                    BigIntStack_Push(MainStack, &Temp2);
+                    break;
+                case sk_Square:
+                    i = BigIntToNativeInt(&Temp1);
+                    if (i > BIG_INT_SIZE * 8)
+                        BigIntSetToZero(topOfStack);
+                    else
+                        while (i --> 0)
+                            BigIntShiftLeft(topOfStack);
+                    break;
+                case sk_Log:
+                    i = BigIntToNativeInt(&Temp1);
+                    if (i > BIG_INT_SIZE * 8)
+                        BigIntSetToZero(topOfStack);
+                    else
+                        while (i --> 0)
+                            BigIntShiftRight(topOfStack);
+                    break;
+                case sk_Ln:
+                    i = BigIntToNativeInt(&Temp1);
+                    if (i > BIG_INT_SIZE * 8)
+                        BigIntSetToZero(topOfStack);
+                    else
+                        while (i --> 0)
+                            BigIntSignedShiftRight(topOfStack);
+                    break;
+                case sk_Power:
+                    BigIntAnd(topOfStack, &Temp1);
+                    break;
+                case sk_Tan:
+                    BigIntOr(topOfStack, &Temp1);
+                    break;
+                case sk_2nd_Power:
+                    BigIntNand(topOfStack, &Temp1);
+                    break;
+                case sk_2nd_Tan:
+                    BigIntOr(topOfStack, &Temp1);
+                    BigIntNot(topOfStack);
+                    break;
+            }
+            break;
+        default:
+            return false;
     }
-    return false;
+    Rpn_Redraw();
+    return true;
 }
