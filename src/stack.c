@@ -112,7 +112,7 @@ void BigIntStack_RotateUp(BigIntStack_t* this)
     BigInt_t temp;
     if (this->Size <= 1)
         return;
-    BigIntStack_Pop(this, &temp);
+    BigIntCopyFromTo(this->Stack + this->Size - 1, &temp);
     memmove(this->Stack + 1, this->Stack, (this->Size - 1) * sizeof(BigInt_t));
     BigIntCopyFromTo(&temp, this->Stack);
 }
@@ -138,7 +138,7 @@ void BigIntStack_Exchange(BigIntStack_t* this)
     top = BigIntStack_Peek(this);
     BigIntCopyFromTo(top, &temp);
     BigIntCopyFromTo(top - 1, top);
-    BigIntCopyFromTo(&temp, top);
+    BigIntCopyFromTo(&temp, top - 1);
 }
 
 

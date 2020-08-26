@@ -197,7 +197,7 @@ bool Rpn_SendKey(sk_key_t k)
         case sk_Ins:
             if (EntryMode == RPN_NO_INPUT)
                 if (BigIntStack_GetSize(MainStack) > 0)
-                    BigIntStack_Push(MainStack, topOfStack);
+                    BigIntStack_Push(MainStack, BigIntStack_Peek(MainStack));
                 else
                     return false;
             else
@@ -208,6 +208,15 @@ bool Rpn_SendKey(sk_key_t k)
             break;
         case sk_DecPnt:
             BigIntNot(BigIntStack_Peek(MainStack));
+            break;
+        case sk_Comma:
+            BigIntStack_Exchange(MainStack);
+            break;
+        case sk_LParen:
+            BigIntStack_RotateDown(MainStack);
+            break;
+        case sk_RParen:
+            BigIntStack_RotateUp(MainStack);
             break;
         case sk_Add:
         case sk_Sub:

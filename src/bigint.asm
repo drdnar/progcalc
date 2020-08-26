@@ -672,7 +672,6 @@ BigIntShiftRight:
 	xor	a,a
 bisruiploop:
 	dec	hl
-bisripentry:
 	rr	(hl)
 	djnz	bisruiploop
 	adc	a,a
@@ -688,12 +687,12 @@ _BigIntSignedShiftRight:
 BigIntSignedShiftRight:
 ; Input:
 ;  - HL
+	xor	a,a
 	ld	bc,BIG_INT_SIZE - 1
 	add	hl,bc
 	ld	b,c
 	sra	(hl)
-	xor	a,a
-	jr	bisripentry
+	jr	bisruiploop
 ;-------------------------------------------------------------------------------
 _BigIntShiftBitInOnRight:
 	pop	bc
