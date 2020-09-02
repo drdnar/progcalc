@@ -28,7 +28,7 @@
 /**
  * Current input mode.
  */
-static unsigned char EntryMode;
+static unsigned char InputMode;
 
 /**
  * Main RPN stack.
@@ -48,12 +48,17 @@ static BigInt_t Temp3;
 /**
  * Default window for showing stack and user entry.
  */
-static CharTextWindow_t StackWindow =
+CharTextWindow_t Rpn_Window =
 {
     0, 0,
     LCD_WIDTH, LCD_HEIGHT,
     0, 0
 };
+
+/**
+ * Caches the height of a single stack entry.
+ */
+static unsigned char EntryHeight;
 
 
 /**
@@ -63,7 +68,7 @@ static bool AcquireInput(void)
 {
     if (!GetBigInt_IsActive())
         return false;
-    EntryMode = RPN_NO_INPUT;
+    InputMode = RPN_NO_INPUT;
     GetBigInt(&CurrentInput);
     GetBigInt_Reset();
     BigIntStack_Push(MainStack, &CurrentInput);
@@ -83,7 +88,7 @@ static bool EnsureBinaryOp(void)
 {
     if (BigIntStack_GetSize(MainStack) < 2)
         return false;
-    BigIntStack_Exchange(MainStack);
+//    BigIntStack_Exchange(MainStack);
     BigIntStack_Pop(MainStack, &Temp1);
     topOfStack = BigIntStack_Peek(MainStack);
     return true;
@@ -99,29 +104,41 @@ static bool DrawStackEntry(unsigned int n)
 {
     Coord_t home, nextLoc;
     /* Force promotion so there's no overflow issues. */
-    unsigned int requiredHeight = Format_GetNumberHeight(Settings.PrimaryBase);
+    signed int printY;
     fontlib_Home();
     Style_SaveCursor(&home);
-    if (n >= BigIntStack_GetSize(MainStack) || home.y + requiredHeight > fontlib_GetWindowYMin() + fontlib_GetWindowHeight())
+    printY = home.y - EntryHeight;
+    if (n >= BigIntStack_GetSize(MainStack) || printY < Rpn_Window.Y)
         return false;
+    home.y = (unsigned char)printY;
+    Style_RestoreCursor(&home);
     Format_PrintInBase(BigIntStack_Get(MainStack, n, NULL), Settings.PrimaryBase);
     Style_SaveCursor(&nextLoc);
     Style_RestoreCursor(&home);
     fontlib_DrawUInt(n, 2);
     fontlib_DrawGlyph(':');
-    Style_RestoreCursor(&nextLoc);
+    if (Settings.SecondaryBase != NO_BASE)
+    {
+        Style_RestoreCursor(&nextLoc);
+        Format_PrintInBase(BigIntStack_Get(MainStack, n, NULL), Settings.SecondaryBase);
+    }
+    Style_RestoreCursor(&home);
     return true;
 }
 
 
 void Rpn_Redraw(void)
 {
+    Coord_t upperLeft;
     unsigned int index;
     Style_SetLargeFontProp();
-    Style_RestoreTextWindow(&StackWindow);
-    if (EntryMode == RPN_INPUT)
+    Style_RestoreTextWindow(&Rpn_Window);
+    fontlib_SetCursorPosition(Rpn_Window.X, Rpn_Window.Y + Rpn_Window.Height);
+    /* Cache height of an entry. TODO: This might NOT actually be helpful to cache here. */
+    EntryHeight = Format_GetNumberHeight(Settings.PrimaryBase) + Format_GetNumberHeight(Settings.SecondaryBase);
+    /*if (InputMode == RPN_INPUT) Shouldn't be necessary to make this conditional, as the redraw routine already checks this? */
         GetBigInt_Redraw();
-    if (EntryMode == RPN_NO_INPUT || EntryMode == RPN_INPUT)
+    if (InputMode == RPN_NO_INPUT || InputMode == RPN_INPUT)
         index = 0;
     else
         /* TODO: SCROLLING NOT YET IMPLEMENTED */
@@ -130,36 +147,38 @@ void Rpn_Redraw(void)
         do
             ;
         while (DrawStackEntry(index++));
-    else if (EntryMode == RPN_NO_INPUT)
+    else if (InputMode == RPN_NO_INPUT)
     {
         Style_SetLargeFontProp();
+        fontlib_SetCursorPosition(Rpn_Window.X, fontlib_GetCursorY() - fontlib_GetCurrentFontHeight());
         fontlib_DrawString("(Stack is empty.)");
         fontlib_Newline();
     }
-    
-    while (fontlib_GetCursorY() > StackWindow.Y)
-        fontlib_Newline();
+    /* Erase remaining portion of window. */
+    Style_SaveCursor(&upperLeft);
+    gfx_SetColor(fontlib_GetBackgroundColor());
+    gfx_FillRectangle_NoClip(Rpn_Window.X, Rpn_Window.Y, Rpn_Window.Width, upperLeft.y - Rpn_Window.Y);
 }
 
 
-void Rpn_SetEntryMode(bool mode)
+void Rpn_SetInputMode(bool mode)
 {
     if (mode)
     {
-        if (EntryMode == RPN_INPUT)
+        if (InputMode == RPN_INPUT)
             return;
         /* else */
         /* Handle starting entry */
-        EntryMode = RPN_INPUT;
+        InputMode = RPN_INPUT;
         Rpn_Redraw();
     }
     else
     {
-        if (EntryMode == RPN_NO_INPUT)
+        if (InputMode == RPN_NO_INPUT)
             return;
         /* else */
         /* Handle stopping entry */
-        EntryMode = RPN_NO_INPUT;
+        InputMode = RPN_NO_INPUT;
         Rpn_Redraw();
     }
     
@@ -168,7 +187,7 @@ void Rpn_SetEntryMode(bool mode)
 
 void Rpn_Reset(void)
 {
-    EntryMode = RPN_NO_INPUT;
+    InputMode = RPN_NO_INPUT;
     if (MainStack == NULL)
         MainStack = BigIntStack_ctor(99);
     Rpn_Redraw();
@@ -195,7 +214,7 @@ bool Rpn_SendKey(sk_key_t k)
             Rpn_Redraw();
             return r;
         case sk_Ins:
-            if (EntryMode == RPN_NO_INPUT)
+            if (InputMode == RPN_NO_INPUT)
                 if (BigIntStack_GetSize(MainStack) > 0)
                     BigIntStack_Push(MainStack, BigIntStack_Peek(MainStack));
                 else
@@ -293,8 +312,7 @@ bool Rpn_SendKey(sk_key_t k)
                     BigIntNand(topOfStack, &Temp1);
                     break;
                 case sk_2nd_Tan:
-                    BigIntOr(topOfStack, &Temp1);
-                    BigIntNot(topOfStack);
+                    BigIntXor(topOfStack, &Temp1);
                     break;
             }
             break;

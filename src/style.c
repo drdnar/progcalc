@@ -53,7 +53,7 @@ void Style_Initialize(void)
     fontlib_SetFont(DrMono14Bold, 0);
     LastFontHeight = 14;
     CursorLocation.x = LCD_WIDTH - fontlib_GetGlyphWidth(CALC1252_CURSOR_2ND_CHAR);
-    CursorLocation.y = LCD_HEIGHT - 14;
+    CursorLocation.y = 0;
     Format_InitDisplaySizes();
     gfx_Begin();
     gfx_FillScreen(gfx_black);

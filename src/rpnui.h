@@ -2,6 +2,12 @@
 #define RPN_UI_H
 #include <stdbool.h>
 #include <tice.h>
+#include "style.h"
+
+/**
+ * Specifies the screen space available for the RPN UI.
+ */
+extern CharTextWindow_t Rpn_Window;
 
 /**
  * Handles a keypress, performing any actions required.
@@ -25,7 +31,7 @@ void Rpn_Reset(void);
  * If stack scrolling is active, then stack scrolling is exited.
  * @param mode True if the user is entering a number, false if not.
  */
-void Rpn_SetEntryMode(bool mode);
+void Rpn_SetInputMode(bool mode);
 
 
 #endif /* RPN_UI_H */

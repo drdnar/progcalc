@@ -51,6 +51,8 @@ extern unsigned int GroupDelimiterWidth;
  */
 typedef struct
 {
+    /* I wrote some code that depends on this mirroring the structure of Coord_t
+     * so changing this struct may require other refactoring. */
     unsigned int X;
     unsigned char Y;
     unsigned int Width;

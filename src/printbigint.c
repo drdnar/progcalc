@@ -88,6 +88,8 @@ void Format_ConfigureDisplaySizes(void)
 
 unsigned char Format_GetNumberHeight(Base_t base)
 {
+    if (base == NO_BASE)
+        return 0;
     return displaySizes[Settings.DisplayBits][base].y;
 }
 

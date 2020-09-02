@@ -4,6 +4,10 @@
 #include <fontlibc.h>
 #include "inputbigint.h"
 #include "printbigint.h"
+#include "bigint.h"
+#include "style.h"
+#include "settings.h"
+#include "rpnui.h"
 
 /**
  * Number currently being entered by user.
@@ -105,6 +109,20 @@ static unsigned char const NumberMap[] =
 void GetBigInt(BigInt_t* n)
 {
     BigIntCopyFromTo(&CurrentInput, n);
+}
+
+
+/**
+ * Caches the correct window settings for the input routines.
+ */
+static CharTextWindow_t window;
+
+void GetBigInt_Reposition(void)
+{
+    window.X = Rpn_Window.X;
+    window.Width = Rpn_Window.Width;
+    window.Height = Format_GetNumberHeight(Settings.PrimaryBase);
+    window.Y = Rpn_Window.Y + Rpn_Window.Height - window.Height;
 }
 
 
@@ -211,13 +229,16 @@ void GetBigInt_Reset(void)
 
 void GetBigInt_Redraw(void)
 {
-    Coord_t nextLoc;
+    CharTextWindow_t oldWindow;
     if (!EntryActive)
         return;
+    Style_SaveTextWindow(&oldWindow);
+    Style_RestoreTextWindow(&window);
     fontlib_HomeUp();
     Format_PrintInBase(&CurrentInput, Settings.PrimaryBase);
-    Style_SaveCursor(&nextLoc);
     fontlib_HomeUp();
     fontlib_DrawString("#");
-    Style_RestoreCursor(&nextLoc);
+    Style_RestoreTextWindow(&oldWindow);
+    /* This is an evil typecast that arises from me still sometimes thinking like an assembly programmer. */
+    Style_RestoreCursor((Coord_t*)(&window));
 }

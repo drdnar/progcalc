@@ -1,5 +1,6 @@
 #include "settings.h"
 #include "printbigint.h"
+#include "inputbigint.h"
 
 #define SETTINGS_FILE_HEADER "Programmer's Calculator settings"
 
@@ -9,7 +10,7 @@ Settings_t Settings;
 void Settings_Initialize(void)
 {
     Settings.PrimaryBase = HEXADECIMAL;
-    Settings.SecondaryBase = DECIMAL;
+    Settings.SecondaryBase = NO_BASE;
     Settings.AlwaysShowBin = false;
     Settings.AlwaysShowOct = false;
     Settings.AlwaysShowDec = false;
@@ -32,6 +33,18 @@ void Settings_ChangeDisplayBits(uint8_t bytes)
         return;
     Settings.DisplayBits = bytes;
     Format_ConfigureDisplaySizes();
+    GetBigInt_Reposition();
+}
+
+
+void Settings_ChangePrimaryBase(uint8_t base)
+{
+    if (base == Settings.PrimaryBase)
+        return;
+    if (base == Settings.SecondaryBase)
+        Settings.SecondaryBase = Settings.PrimaryBase;
+    Settings.PrimaryBase = base;
+    GetBigInt_Reposition();
 }
 
 

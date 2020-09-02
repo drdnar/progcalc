@@ -131,9 +131,7 @@ int8_t BigIntCompare(const BigInt_t* n1, const BigInt_t* n2);
 uint8_t BigIntMultiply(const BigInt_t* n1, const BigInt_t* n2, BigInt_t* out);
 
 /**
- * Divides two BigInts.
- * q = int(n / d)
- * r = n % d
+ * Divides two BigInts. q = int(n / d), r = n % d
  * @param n Pointer to numerator/dividend
  * @param d Pointer to denominator/divisor
  * @param q Pointer to BigInt to write quotient to

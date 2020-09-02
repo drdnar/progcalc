@@ -53,4 +53,11 @@ void Settings_Finalize(void);
  */
 void Settings_ChangeDisplayBits(uint8_t bytes);
 
+/**
+ * Changes the primary base to display numbers in.
+ * Triggers any other events that should be triggered when this setting is changed.
+ * @param base Base ID
+ */
+void Settings_ChangePrimaryBase(uint8_t base);
+
 #endif /* SETTINGS_H */

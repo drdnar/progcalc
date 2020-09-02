@@ -37,7 +37,7 @@ void main(void) {
         while (!k);
         if (GetBigInt_SendKey(k))
         {
-            Rpn_SetEntryMode(GetBigInt_IsActive());
+            Rpn_SetInputMode(GetBigInt_IsActive());
             continue;
         }
         if (Rpn_SendKey(k))

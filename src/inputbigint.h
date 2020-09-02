@@ -3,8 +3,6 @@
 #include <stdbool.h>
 #include <tice.h>
 #include "bigint.h"
-#include "style.h"
-#include "settings.h"
 
 /**
  * Handles a keypress, performing any actions required.
@@ -24,8 +22,14 @@ bool GetBigInt_IsActive(void);
 void GetBigInt_Reset(void);
 
 /**
+ * Adjusts the positioning logic to new input settings.
+ */
+void GetBigInt_Reposition(void);
+
+/**
  * Redraws the user's current entry.
  * May draw nothing.
+ * @note Assumes the current text window is set up properly.
  */
 void GetBigInt_Redraw(void);
 
