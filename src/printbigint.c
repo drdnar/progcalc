@@ -116,7 +116,7 @@ void Format_PrintInBase(BigInt_t* n, Base_t base)
             break;
     }
     gfx_SetColor(fontlib_GetBackgroundColor());
-    gfx_FillRectangle_NoClip(home.x, home.y, x2 - home.x, fontlib_GetCursorY() - home.y);
+    gfx_FillRectangle_NoClip(home.x, home.y, x2 - home.x, fontlib_GetCursorY() - home.y + fontlib_GetCurrentFontHeight());
 }
 
 
@@ -141,7 +141,7 @@ static void windowize(unsigned int width)
     Style_SaveTextWindow(&oldWindow);
     x = oldWindow.X + oldWindow.Width - width;
     y = oldWindow.CursorY;
-    fontlib_SetWindow(x, y, oldWindow.Width - x, oldWindow.Height - y);
+    fontlib_SetWindow(x, y, oldWindow.Width - x, oldWindow.Y + oldWindow.Height - y);
     fontlib_HomeUp();
 }
 
@@ -225,7 +225,8 @@ unsigned int Format_PrintBin(BigInt_t* n)
             if (i != 1)
                 printNumSep();
         }
-        fontlib_Newline();
+        if (h > 1)
+            fontlib_Newline();
     }
 
     unwindowize();
@@ -317,7 +318,6 @@ unsigned int Format_PrintDec(BigInt_t* n)
     }
     while (group--);
 
-    fontlib_Newline();
     unwindowize();
     return xreturn;
 }
@@ -355,7 +355,6 @@ unsigned int Format_PrintHex(BigInt_t* n)
         if (i != 1)
             printNumSep();
     }
-    fontlib_Newline();
     unwindowize();
     return xreturn;
 }
@@ -425,7 +424,6 @@ unsigned int Format_PrintOct(BigInt_t* n)
         }
     }
     while (*(++ch));
-    fontlib_Newline();
 
     unwindowize();
     return xreturn;

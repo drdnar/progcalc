@@ -138,24 +138,28 @@ void Rpn_Redraw(void)
     EntryHeight = Format_GetNumberHeight(Settings.PrimaryBase) + Format_GetNumberHeight(Settings.SecondaryBase);
     /*if (InputMode == RPN_INPUT) Shouldn't be necessary to make this conditional, as the redraw routine already checks this? */
         GetBigInt_Redraw();
+    Style_SaveCursor(&upperLeft);
     if (InputMode == RPN_NO_INPUT || InputMode == RPN_INPUT)
         index = 0;
     else
         /* TODO: SCROLLING NOT YET IMPLEMENTED */
         index = 0;
     if (BigIntStack_GetSize(MainStack))
+    {
         do
             ;
         while (DrawStackEntry(index++));
+        Style_SaveCursor(&upperLeft);
+    }
     else if (InputMode == RPN_NO_INPUT)
     {
         Style_SetLargeFontProp();
-        fontlib_SetCursorPosition(Rpn_Window.X, fontlib_GetCursorY() - fontlib_GetCurrentFontHeight());
+        upperLeft.y = fontlib_GetCursorY() - fontlib_GetCurrentFontHeight();
+        fontlib_SetCursorPosition(Rpn_Window.X, upperLeft.y);
         fontlib_DrawString("(Stack is empty.)");
         fontlib_Newline();
     }
     /* Erase remaining portion of window. */
-    Style_SaveCursor(&upperLeft);
     gfx_SetColor(fontlib_GetBackgroundColor());
     gfx_FillRectangle_NoClip(Rpn_Window.X, Rpn_Window.Y, Rpn_Window.Width, upperLeft.y - Rpn_Window.Y);
 }
