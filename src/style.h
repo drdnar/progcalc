@@ -19,6 +19,14 @@ extern Color_t FgColor;
  */
 extern Color_t ZeroColor;
 /**
+ * Background color of the status bar.
+ */
+extern Color_t StatusBarBgColor;
+/**
+ * Foreground color of the status bar.
+ */
+extern Color_t StatusBarFgColor;
+/**
  * Color of highlighted backgrounds.
  */
 extern Color_t HighlightColor;
@@ -39,6 +47,9 @@ extern Coord_t CursorLocation;
 
 #define CHAR_WIDTH 8
 #define CHAR_HEIGHT 14
+
+#define BIG_FONT_HEIGHT 14
+#define SMALL_FONT_HEIGHT 10
 
 #define GROUP_DELIMITER ' '
 /**
@@ -125,6 +136,11 @@ void Style_SetLargeFontProp(void);
  * Changes the current font.
  */
 void Style_SetSmallFontProp(void);
+
+/**
+ * Changes the current font.
+ */
+void Style_SetSmallFontPropBold(void);
 
 /**
  * Changes the current font and ensures baseline alignment with the large font.

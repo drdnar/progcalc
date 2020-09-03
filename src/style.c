@@ -12,6 +12,8 @@ void ExitClean(void);
 Color_t BgColor = 0xFF;
 Color_t FgColor = 0x00;
 Color_t ZeroColor = 0x56;
+Color_t StatusBarBgColor = 1;
+Color_t StatusBarFgColor = 0xFF;
 
 Coord_t Format_HexSize;
 Coord_t Format_DecSize;
@@ -21,6 +23,7 @@ Coord_t Format_BinSize;
 fontlib_font_t* DrMono14Bold;
 fontlib_font_t* DrSans14Bold;
 fontlib_font_t* DrSans10Regular;
+fontlib_font_t* DrSans10Bold;
 unsigned int GroupDelimiterWidth;
 unsigned char Baseline14;
 unsigned char Baseline10;
@@ -42,7 +45,8 @@ void Style_Initialize(void)
     DrMono14Bold = fontlib_GetFontByStyle("DrMono", 14, 14, FONTLIB_BOLD, FONTLIB_BOLD, 0, 0);
     DrSans10Regular = fontlib_GetFontByStyle("DrSans", 10, 10, FONTLIB_NORMAL, FONTLIB_NORMAL, 0, 0);
     DrSans14Bold = fontlib_GetFontByStyle("DrSans", 14, 14, FONTLIB_BOLD, FONTLIB_BOLD, 0, 0);
-    if (!DrSans14Bold || !DrSans10Regular)
+    DrSans10Bold = fontlib_GetFontByStyle("DrSans", 10, 10, FONTLIB_NORMAL, FONTLIB_BOLD, 0, 0);
+    if (!DrSans14Bold || !DrSans10Regular || !DrSans10Bold)
         ShowErrorAndExit("Dr. Sans font missing.");
     if (!DrMono14Bold)
         ShowErrorAndExit("Dr. Mono font missing.");
@@ -57,6 +61,7 @@ void Style_Initialize(void)
     Format_InitDisplaySizes();
     gfx_Begin();
     gfx_FillScreen(gfx_black);
+    lcd_Palette[1] = 0xA94A;
 }
 
 
@@ -115,7 +120,6 @@ void Style_RestoreTextWindow(CharTextWindow_t* window)
 void Style_SetLargeFontMono(void)
 {
     fontlib_SetFont(DrMono14Bold, 0);
-    fontlib_SetLineSpacing(0, 0);
     LastFontHeight = 14;
 }
 
@@ -123,7 +127,6 @@ void Style_SetLargeFontMono(void)
 void Style_SetLargeFontProp(void)
 {
     fontlib_SetFont(DrSans14Bold, 0);
-    fontlib_SetLineSpacing(0, 0);
     LastFontHeight = 14;
 }
 
@@ -131,7 +134,12 @@ void Style_SetLargeFontProp(void)
 void Style_SetSmallFontProp(void)
 {
     fontlib_SetFont(DrSans10Regular, 0);
-    fontlib_SetLineSpacing(0, 0);
+}
+
+
+void Style_SetSmallFontPropBold(void)
+{
+    fontlib_SetFont(DrSans10Bold, 0);
 }
 
 

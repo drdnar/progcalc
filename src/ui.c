@@ -73,6 +73,7 @@ Key_t GetKey(void)
             if (second)
             {
                 Style_RestoreCursor(&CursorLocation);
+                Style_SetLargeFontProp();
                 fontlib_DrawGlyph(CALC1252_CURSOR_2ND_CHAR);
             }
             else

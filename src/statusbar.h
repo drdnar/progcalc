@@ -1,0 +1,32 @@
+#ifndef STATUS_BAR_H
+#define STATUS_BAR_H
+#include <stdbool.h>
+#include "style.h"
+
+/**
+ * Specifies the area where the status bar will appear.
+ */
+extern CharTextWindow_t StatusBar_Window;
+
+/**
+ * Fully redraws the status bar.
+ */
+void StatusBar_Draw(void);
+
+/**
+ * Turns on the status bar.
+ */
+void StatusBar_Enable(void);
+
+/**
+ * Turns off the status bar.
+ */
+void StatusBar_Disable(void);
+
+/** 
+ * Returns whether the status bar is active.
+ * @return True if the status bar should be drawn.
+ */
+bool StatusBar_IsEnabled(void);
+
+#endif /* STATUS_BAR_H */

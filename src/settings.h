@@ -11,7 +11,7 @@ typedef enum
     OCTAL,
     DECIMAL,
     HEXADECIMAL,
-    NO_BASE = 255
+    NO_BASE
 } Bases_t;
 
 typedef uint8_t Base_t;
@@ -32,6 +32,7 @@ typedef struct
     bool AlwaysShowDec;
     bool AlwaysShowOct;
     bool AlwaysShowBin;
+    bool StatusBarEnabled;
 } Settings_t;
 
 extern Settings_t Settings;
@@ -59,5 +60,25 @@ void Settings_ChangeDisplayBits(uint8_t bytes);
  * @param base Base ID
  */
 void Settings_ChangePrimaryBase(uint8_t base);
+
+/**
+ * Returns a string that gives the short name of a base.
+ */
+char* GetBaseShortName(Base_t base);
+
+/**
+ * Returns a string that gives the short name of a base, in ALL CAPS.
+ */
+char* GetBaseShortCapsName(Base_t base);
+
+/**
+ * Returns a string that gives the long name of a base.
+ */
+char* GetBaseLongName(Base_t base);
+
+/**
+ * Converts a DisplayBits const into a string.
+ */
+char* GetDisplayBitsName(uint8_t bytes);
 
 #endif /* SETTINGS_H */

@@ -270,8 +270,12 @@ bool Rpn_SendKey(sk_key_t k)
             default:
                 /* If scrolling is active, then don't allow other actions. */
                 return false;
-
         }
+        if (ScrollIndex == 0)
+            if (GetBigInt_IsActive())
+                InputMode = RPN_INPUT;
+            else
+                InputMode = RPN_NO_INPUT;
     }
     else
     {

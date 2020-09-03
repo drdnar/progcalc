@@ -37,7 +37,6 @@ void Format_ConfigureDisplaySizes(void);
  */
 extern char Format_NumberBuffer[];
 
-
 /**
  * Returns the height, in pixels, of a formatted number with current formatting settings.
  * @param base Radix of number

@@ -146,14 +146,25 @@ static void windowize(unsigned int width)
 }
 
 
-static unsigned int PrintBaseLabel(char* text, unsigned char height)
+static unsigned int PrintBaseLabel(Base_t base, unsigned char height)
 {
+    char* baseName;
+    bool altHex = false;
     unsigned int x;
+    if (base == HEXADECIMAL && Settings.DisplayBits >= SHOW_128)
+    {
+        altHex = true;
+        baseName = "0x";
+    }
+    else
+        baseName = GetBaseShortName(base);
     Style_SetSmallFontPropAligned();
     fontlib_SetLineSpacing(fontlib_GetSpaceAbove(), height - fontlib_GetCurrentFontHeight() + fontlib_GetSpaceBelow());
-    x = fontlib_GetCursorX() - fontlib_GetStringWidth(text);
+    x = fontlib_GetCursorX() - fontlib_GetStringWidth(baseName) - (altHex ? 0 : fontlib_GetGlyphWidth(' '));
     fontlib_SetCursorPosition(x, fontlib_GetCursorY());
-    fontlib_DrawString(text);
+    fontlib_DrawString(baseName);
+    if (!altHex)
+        fontlib_DrawGlyph(' ');
     Style_SetLargeFontMono();
     return x;
 }
@@ -196,7 +207,7 @@ unsigned int Format_PrintBin(BigInt_t* n)
     char* ch;
     unsigned int xreturn;
     windowize(Format_BinSize.x);
-    xreturn = PrintBaseLabel("bin ", Format_BinSize.y);
+    xreturn = PrintBaseLabel(BINARY, Format_BinSize.y);
     BigIntToStringBin(n, Format_NumberBuffer);
     /*switch (Settings.DisplayBits)
     {
@@ -276,7 +287,7 @@ unsigned int Format_PrintDec(BigInt_t* n)
     char* ch, *src;
     unsigned int xreturn;
     windowize(Format_DecSize.x);
-    xreturn = PrintBaseLabel("dec ", Format_DecSize.y);
+    xreturn = PrintBaseLabel(DECIMAL, Format_DecSize.y);
     
     partialCopy(n);
 
@@ -341,11 +352,7 @@ unsigned int Format_PrintHex(BigInt_t* n)
     char* ch;
     unsigned int xreturn;
     windowize(Format_HexSize.x);
-    if (Settings.DisplayBits < SHOW_128)
-        xreturn = PrintBaseLabel("hex ", Format_HexSize.y);
-    else
-        xreturn = PrintBaseLabel("0x", Format_HexSize.y);
-    
+    xreturn = PrintBaseLabel(HEXADECIMAL, Format_HexSize.y);
     BigIntToStringHex(n, Format_NumberBuffer);
 
     for (i = printHexI[Settings.DisplayBits], ch = printHexCh[Settings.DisplayBits]; i > 0; i--)
@@ -393,7 +400,7 @@ unsigned int Format_PrintOct(BigInt_t* n)
     lines = 1;
     bits = Settings.DisplayBits;
     windowize(Format_OctSize.x);
-    xreturn = PrintBaseLabel("oct ", Format_OctSize.y);
+    xreturn = PrintBaseLabel(OCTAL, Format_OctSize.y);
     
     partialCopy(n);
     

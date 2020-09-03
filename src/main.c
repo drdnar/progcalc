@@ -15,8 +15,8 @@
 #include "ui.h"
 #include "printbigint.h"
 #include "rpnui.h"
-
 #include "inputbigint.h"
+#include "statusbar.h"
 
 /* Main Function */
 void main(void) {
@@ -29,6 +29,7 @@ void main(void) {
     Rpn_Reset();
     fontlib_ClearWindow();
     Rpn_Redraw();
+    StatusBar_Draw();
 
     do
     {
@@ -78,6 +79,7 @@ void main(void) {
             dirty = false;
             fontlib_ClearWindow();
             Rpn_Redraw();
+            StatusBar_Draw();
         }
     } while (k != sk_Quit);
     
