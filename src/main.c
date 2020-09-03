@@ -45,19 +45,19 @@ void main(void) {
         switch (k)
         {
             case sk_Window:
-                Settings.PrimaryBase = BINARY;
+                Settings_ChangePrimaryBase(BINARY);
                 dirty = true;
                 break;
             case sk_Zoom:
-                Settings.PrimaryBase = OCTAL;
+                Settings_ChangePrimaryBase(OCTAL);
                 dirty = true;
                 break;
             case sk_Trace:
-                Settings.PrimaryBase = DECIMAL;
+                Settings_ChangePrimaryBase(DECIMAL);
                 dirty = true;
                 break;
             case sk_Graph:
-                Settings.PrimaryBase = HEXADECIMAL;
+                Settings_ChangePrimaryBase(HEXADECIMAL);
                 dirty = true;
                 break;
             case sk_Alpha:

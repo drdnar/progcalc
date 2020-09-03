@@ -232,12 +232,21 @@ void GetBigInt_Redraw(void)
     CharTextWindow_t oldWindow;
     if (!EntryActive)
         return;
+
+    /* TODO: Taking out the code that futzes with the window here fixes the issue, so find out why. 
+    If gfx_SetColor(fontlib_GetBackgroundColor()); on line 118 of printbigint.c is changed to display color 123, it becomes clear that
+    when printing here, it's not correctly erasing stuff when pritning a number to the bottom of the screen.
+    */
     Style_SaveTextWindow(&oldWindow);
-    Style_RestoreTextWindow(&window);
-    fontlib_HomeUp();
+    //Style_RestoreTextWindow(&window);
+    //gfx_SetColor(123);
+    //gfx_FillRectangle_NoClip(window.X, window.Y, window.Width, window.Height);
+    //fontlib_HomeUp();
+    fontlib_SetCursorPosition(window.X, window.Y);
     Format_PrintInBase(&CurrentInput, Settings.PrimaryBase);
-    fontlib_HomeUp();
-    fontlib_DrawString("#");
+    //fontlib_HomeUp();
+    fontlib_SetCursorPosition(window.X, window.Y);
+    fontlib_DrawString("#  ");
     Style_RestoreTextWindow(&oldWindow);
     /* This is an evil typecast that arises from me still sometimes thinking like an assembly programmer. */
     Style_RestoreCursor((Coord_t*)(&window));
