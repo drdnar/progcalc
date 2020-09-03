@@ -46,6 +46,11 @@ static BigInt_t Temp2;
 static BigInt_t Temp3;
 
 /**
+ * Current index stack is scrolled to.
+ */
+static unsigned int ScrollIndex = 0;
+
+/**
  * Default window for showing stack and user entry.
  */
 CharTextWindow_t Rpn_Window =
@@ -142,8 +147,10 @@ void Rpn_Redraw(void)
     if (InputMode == RPN_NO_INPUT || InputMode == RPN_INPUT)
         index = 0;
     else
+    {
         /* TODO: SCROLLING NOT YET IMPLEMENTED */
-        index = 0;
+        index = ScrollIndex;
+    }
     if (BigIntStack_GetSize(MainStack))
     {
         do
@@ -189,6 +196,12 @@ void Rpn_SetInputMode(bool mode)
 }
 
 
+bool Rpn_IsScrollingActive(void)
+{
+    return InputMode == RPN_SCROLL;
+}
+
+
 void Rpn_Reset(void)
 {
     InputMode = RPN_NO_INPUT;
@@ -198,12 +211,25 @@ void Rpn_Reset(void)
 }
 
 
+/**
+ * Scrolls to the almost-last entry depending on screen space available.
+ */
+static void scrollLast(void)
+{
+    unsigned int windowSize = Rpn_Window.Height;
+    if (GetBigInt_IsActive())
+        windowSize -= GetBigInt_Window.Height;
+    ScrollIndex = BigIntStack_GetSize(MainStack) - (windowSize / EntryHeight);
+    InputMode = RPN_SCROLL;
+}
+
+
 bool Rpn_SendKey(sk_key_t k)
 {
     bool r;
     signed char x;
     unsigned int i;
-    if (k == sk_Enter)
+    if (k == sk_Enter && InputMode != RPN_SCROLL)
     {
         r = AcquireInput();
         Rpn_Redraw();
@@ -211,117 +237,167 @@ bool Rpn_SendKey(sk_key_t k)
     }
     if (BigIntStack_IsEmpty(MainStack))
         return false;
-    switch (k)
+    if (Rpn_IsScrollingActive())
     {
-        case sk_Del:
-            r = !!BigIntStack_Pop(MainStack, NULL);
-            Rpn_Redraw();
-            return r;
-        case sk_Ins:
-            if (InputMode == RPN_NO_INPUT)
-                if (BigIntStack_GetSize(MainStack) > 0)
-                    BigIntStack_Push(MainStack, BigIntStack_Peek(MainStack));
+        switch (k)
+        {
+            case sk_Up:
+                if (ScrollIndex == 0)
+                    return false;
+                ScrollIndex--;
+                break;
+            case sk_Down:
+                if (ScrollIndex == BigIntStack_GetSize(MainStack) - 1)
+                    return false;
+                ScrollIndex++;
+                break;
+            case sk_2nd_Down:
+                scrollLast();
+                break;
+            case sk_Clear:
+            case sk_2nd_Clear:
+            case sk_2nd_Up:
+            case sk_Del:
+            case sk_Ins:
+            case sk_Mode:
+            case sk_Enter:
+                ScrollIndex = 0;
+                if (GetBigInt_IsActive())
+                    InputMode = RPN_INPUT;
+                else
+                    InputMode = RPN_NO_INPUT;
+                break;
+            default:
+                /* If scrolling is active, then don't allow other actions. */
+                return false;
+
+        }
+    }
+    else
+    {
+        switch (k)
+        {
+            case sk_Del:
+                r = !!BigIntStack_Pop(MainStack, NULL);
+                Rpn_Redraw();
+                return r;
+            case sk_Ins:
+                if (InputMode == RPN_NO_INPUT)
+                    if (BigIntStack_GetSize(MainStack) > 0)
+                        BigIntStack_Push(MainStack, BigIntStack_Peek(MainStack));
+                    else
+                        return false;
                 else
                     return false;
-            else
+                break;
+            case sk_Down:
+                if (BigIntStack_GetSize(MainStack) < 2)
+                    return false;
+                InputMode = RPN_SCROLL;
+                ScrollIndex = 1;
+                break;
+            case sk_2nd_Down:
+                if (BigIntStack_GetSize(MainStack) < 2)
+                    return false;
+                scrollLast();
+                break;
+            case sk_Chs:
+                BigIntNegate(BigIntStack_Peek(MainStack));
+                break;
+            case sk_DecPnt:
+                BigIntNot(BigIntStack_Peek(MainStack));
+                break;
+            case sk_Comma:
+                BigIntStack_Exchange(MainStack);
+                break;
+            case sk_LParen:
+                BigIntStack_RotateDown(MainStack);
+                break;
+            case sk_RParen:
+                BigIntStack_RotateUp(MainStack);
+                break;
+            case sk_Add:
+            case sk_Sub:
+            case sk_Mul:
+            case sk_Div:
+            case sk_Square:
+            case sk_Log:
+            case sk_Ln:
+            case sk_Power:
+            case sk_Tan:
+            case sk_2nd_Power:
+            case sk_2nd_Tan:
+            case sk_2nd_Div:
+            case sk_2nd_Mul:
+                AcquireInput();
+                if (!EnsureBinaryOp())
+                    return false;
+                switch (k)
+                {
+                    case sk_Add:
+                        BigIntAdd(topOfStack, &Temp1);
+                        break;
+                    case sk_Sub:
+                        BigIntSubtract(topOfStack, &Temp1);
+                        break;
+                    case sk_Mul:
+                        BigIntMultiply(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2);
+                        BigIntStack_Push(MainStack, &Temp2);
+                        break;
+                    case sk_Div:
+                        BigIntDivide(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2, &Temp3);
+                        BigIntStack_Push(MainStack, &Temp2);
+                        break;
+                    case sk_2nd_Div:
+                        BigIntDivide(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2, &Temp3);
+                        BigIntStack_Push(MainStack, &Temp3);
+                        break;
+                    case sk_2nd_Mul:
+                        BigIntDivide(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2, &Temp3);
+                        BigIntStack_Push(MainStack, &Temp3);
+                        BigIntStack_Push(MainStack, &Temp2);
+                        break;
+                    case sk_Square:
+                        i = BigIntToNativeInt(&Temp1);
+                        if (i > BIG_INT_SIZE * 8)
+                            BigIntSetToZero(topOfStack);
+                        else
+                            while (i --> 0)
+                                BigIntShiftLeft(topOfStack);
+                        break;
+                    case sk_Log:
+                        i = BigIntToNativeInt(&Temp1);
+                        if (i > BIG_INT_SIZE * 8)
+                            BigIntSetToZero(topOfStack);
+                        else
+                            while (i --> 0)
+                                BigIntShiftRight(topOfStack);
+                        break;
+                    case sk_Ln:
+                        i = BigIntToNativeInt(&Temp1);
+                        if (i > BIG_INT_SIZE * 8)
+                            BigIntSetToZero(topOfStack);
+                        else
+                            while (i --> 0)
+                                BigIntSignedShiftRight(topOfStack);
+                        break;
+                    case sk_Power:
+                        BigIntAnd(topOfStack, &Temp1);
+                        break;
+                    case sk_Tan:
+                        BigIntOr(topOfStack, &Temp1);
+                        break;
+                    case sk_2nd_Power:
+                        BigIntNand(topOfStack, &Temp1);
+                        break;
+                    case sk_2nd_Tan:
+                        BigIntXor(topOfStack, &Temp1);
+                        break;
+                }
+                break;
+            default:
                 return false;
-            break;
-        case sk_Chs:
-            BigIntNegate(BigIntStack_Peek(MainStack));
-            break;
-        case sk_DecPnt:
-            BigIntNot(BigIntStack_Peek(MainStack));
-            break;
-        case sk_Comma:
-            BigIntStack_Exchange(MainStack);
-            break;
-        case sk_LParen:
-            BigIntStack_RotateDown(MainStack);
-            break;
-        case sk_RParen:
-            BigIntStack_RotateUp(MainStack);
-            break;
-        case sk_Add:
-        case sk_Sub:
-        case sk_Mul:
-        case sk_Div:
-        case sk_Square:
-        case sk_Log:
-        case sk_Ln:
-        case sk_Power:
-        case sk_Tan:
-        case sk_2nd_Power:
-        case sk_2nd_Tan:
-        case sk_2nd_Div:
-        case sk_2nd_Mul:
-            AcquireInput();
-            if (!EnsureBinaryOp())
-                return false;
-            switch (k)
-            {
-                case sk_Add:
-                    BigIntAdd(topOfStack, &Temp1);
-                    break;
-                case sk_Sub:
-                    BigIntSubtract(topOfStack, &Temp1);
-                    break;
-                case sk_Mul:
-                    BigIntMultiply(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2);
-                    BigIntStack_Push(MainStack, &Temp2);
-                    break;
-                case sk_Div:
-                    BigIntDivide(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2, &Temp3);
-                    BigIntStack_Push(MainStack, &Temp2);
-                    break;
-                case sk_2nd_Div:
-                    BigIntDivide(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2, &Temp3);
-                    BigIntStack_Push(MainStack, &Temp3);
-                    break;
-                case sk_2nd_Mul:
-                    BigIntDivide(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2, &Temp3);
-                    BigIntStack_Push(MainStack, &Temp3);
-                    BigIntStack_Push(MainStack, &Temp2);
-                    break;
-                case sk_Square:
-                    i = BigIntToNativeInt(&Temp1);
-                    if (i > BIG_INT_SIZE * 8)
-                        BigIntSetToZero(topOfStack);
-                    else
-                        while (i --> 0)
-                            BigIntShiftLeft(topOfStack);
-                    break;
-                case sk_Log:
-                    i = BigIntToNativeInt(&Temp1);
-                    if (i > BIG_INT_SIZE * 8)
-                        BigIntSetToZero(topOfStack);
-                    else
-                        while (i --> 0)
-                            BigIntShiftRight(topOfStack);
-                    break;
-                case sk_Ln:
-                    i = BigIntToNativeInt(&Temp1);
-                    if (i > BIG_INT_SIZE * 8)
-                        BigIntSetToZero(topOfStack);
-                    else
-                        while (i --> 0)
-                            BigIntSignedShiftRight(topOfStack);
-                    break;
-                case sk_Power:
-                    BigIntAnd(topOfStack, &Temp1);
-                    break;
-                case sk_Tan:
-                    BigIntOr(topOfStack, &Temp1);
-                    break;
-                case sk_2nd_Power:
-                    BigIntNand(topOfStack, &Temp1);
-                    break;
-                case sk_2nd_Tan:
-                    BigIntXor(topOfStack, &Temp1);
-                    break;
-            }
-            break;
-        default:
-            return false;
+        }
     }
     Rpn_Redraw();
     return true;

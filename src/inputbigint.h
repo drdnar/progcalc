@@ -3,6 +3,12 @@
 #include <stdbool.h>
 #include <tice.h>
 #include "bigint.h"
+#include "style.h"
+
+/**
+ * Caches the correct window settings for the input routines.
+ */
+extern CharTextWindow_t GetBigInt_Window;
 
 /**
  * Handles a keypress, performing any actions required.

@@ -33,5 +33,9 @@ void Rpn_Reset(void);
  */
 void Rpn_SetInputMode(bool mode);
 
+/**
+ * Returns whether the UI is in stack scrolling mode.
+ */
+bool Rpn_IsScrollingActive(void);
 
 #endif /* RPN_UI_H */

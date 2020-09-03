@@ -112,17 +112,14 @@ void GetBigInt(BigInt_t* n)
 }
 
 
-/**
- * Caches the correct window settings for the input routines.
- */
-static CharTextWindow_t window;
+CharTextWindow_t GetBigInt_Window;
 
 void GetBigInt_Reposition(void)
 {
-    window.X = Rpn_Window.X;
-    window.Width = Rpn_Window.Width;
-    window.Height = Format_GetNumberHeight(Settings.PrimaryBase);
-    window.Y = Rpn_Window.Y + Rpn_Window.Height - window.Height;
+    GetBigInt_Window.X = Rpn_Window.X;
+    GetBigInt_Window.Width = Rpn_Window.Width;
+    GetBigInt_Window.Height = Format_GetNumberHeight(Settings.PrimaryBase);
+    GetBigInt_Window.Y = Rpn_Window.Y + Rpn_Window.Height - GetBigInt_Window.Height;
 }
 
 
@@ -205,7 +202,7 @@ bool GetBigInt_SendKey(sk_key_t k)
     }
     else if (k == sk_Clear)
     {
-        if (!EntryActive)
+        if (!EntryActive || Rpn_IsScrollingActive())
             return false;
         GetBigInt_Reset();
         return true;
@@ -233,12 +230,12 @@ void GetBigInt_Redraw(void)
     if (!EntryActive)
         return;
     Style_SaveTextWindow(&oldWindow);
-    Style_RestoreTextWindow(&window);
+    Style_RestoreTextWindow(&GetBigInt_Window);
     fontlib_HomeUp();
     Format_PrintInBase(&CurrentInput, Settings.PrimaryBase);
     fontlib_HomeUp();
     fontlib_DrawString("#");
     Style_RestoreTextWindow(&oldWindow);
     /* This is an evil typecast that arises from me still sometimes thinking like an assembly programmer. */
-    Style_RestoreCursor((Coord_t*)(&window));
+    Style_RestoreCursor((Coord_t*)(&GetBigInt_Window));
 }
