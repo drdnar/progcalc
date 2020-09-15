@@ -1,0 +1,44 @@
+output: c
+  include-file: gfx.h
+  palettes:
+    - Palette_Global
+  converts:
+    - Image_Battery
+
+palette: Palette_Global
+  images: automatic
+  # Black
+  fixed-color: { index: 0, r: 0, g: 0, b: 0 }
+  # Status bar background
+  fixed-color: { index: 1, r: 81, g: 85, b: 81 }
+  # Gray
+  fixed-color: { index: 2, r: 160, g: 160, b: 160 }
+  # Highlight color
+  fixed-color: { index: 3, r: 255, g: 255, b: 128 }
+  # Template battery outline
+  fixed-color: { index: 4, r: 0, g: 0, b: 96 }
+  # Battery level pip 1
+  fixed-color: { index: 5, r: 192, g: 255, b: 192 }
+  # Battery level pip 2
+  fixed-color: { index: 6, r: 96, g: 255, b: 96 }
+  # Battery level pip 3
+  fixed-color: { index: 7, r: 0, g: 255, b: 0 }
+  # Battery level pip color
+  fixed-color: { index: 8, r: 0, g: 158, b: 0 }
+  # Normal battery outline
+  fixed-color: { index: 9, r: 199, g: 195, b: 199 }
+  # Charging battery
+  fixed-color: { index: 10, r: 255, g: 142, b: 32 }
+  # Red battery
+  fixed-color: { index: 11, r: 255, g: 0, b: 0 }
+  # Normal background
+  fixed-color: { index: 12, r: 255, g: 255, b: 255 }
+  # Transparent color
+  fixed-color: { index: 13, r: 240, g: 240, b: 128 }
+
+
+convert: Image_Battery
+  palette: Palette_Global
+  images:
+    - battery_icon.png
+  transparent-color-index: 14

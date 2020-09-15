@@ -5,3 +5,5 @@ obj/*
 *.obj
 *.src
 .vscode/
+src/gfx/*.h
+src/gfx/*.c

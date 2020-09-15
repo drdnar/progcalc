@@ -6,30 +6,103 @@
 
 typedef uint8_t Color_t;
 
-/**
- * Main text background color.
- */
-extern Color_t BgColor;
+
+
+
 /**
  * Main text color.
  */
-extern Color_t FgColor;
+#define COLOR_FOREGROUND 0
 /**
- * Color of leading zeros.
+ * Main text background color.
  */
-extern Color_t ZeroColor;
-/**
- * Background color of the status bar.
- */
-extern Color_t StatusBarBgColor;
-/**
- * Foreground color of the status bar.
- */
-extern Color_t StatusBarFgColor;
+#define COLOR_BACKGROUND 12
 /**
  * Color of highlighted backgrounds.
  */
-extern Color_t HighlightColor;
+#define COLOR_HIGHLIGHT 3
+/**
+ * Transparency color
+ */
+#define COLOR_TRANSPARENT 13
+/**
+ * Color of leading zeros.
+ */
+#define COLOR_ZERO 2
+/**
+ * Background color of the status bar.
+ */
+#define COLOR_STATUS_BAR_BACKGROUND 1
+/**
+ * Foreground color of the status bar.
+ */
+#define COLOR_STATUS_BAR_FOREGROUND COLOR_BACKGROUND
+/**
+ * Battery outline index
+ */
+#define COLOR_BATTERY_OUTLINE 4
+/**
+ * Color of an empty battery level pip
+ */
+#define COLOR_BATTERY_EMPTY_PIP COLOR_BACKGROUND
+/**
+ * Battery level 1
+ */
+#define COLOR_BATTERY_LEVEL_1 5
+/**
+ * Battery level 2
+ */
+#define COLOR_BATTERY_LEVEL_2 6
+/**
+ * Battery level 3
+ */
+#define COLOR_BATTERY_LEVEL_3 7
+/**
+ * Battery level pip
+ */
+#define COLOR_BATTERY_PIP 8
+/**
+ * Normal battery outline color
+ */
+#define COLOR_BATTERY_NORMAL 9
+/**
+ * Charging battery color
+ */
+#define COLOR_BATTERY_CHARGING 10
+/**
+ * Discharged battery color
+ */
+#define COLOR_BATTERY_DISCHARGED 11
+
+
+/**
+ * Main text background color.
+ *
+enum { BgColor = 7 };
+/**
+ * Main text color.
+ *
+enum { FgColor = 0 };
+/**
+ * Color of leading zeros.
+ *
+enum { ZeroColor = 2 };
+/**
+ * Background color of the status bar.
+ *
+enum { StatusBarBgColor = 1 };
+/**
+ * Foreground color of the status bar.
+ *
+enum { StatusBarFgColor = 7 };
+/**
+ * Color of highlighted backgrounds.
+ *
+enum { HighlightColor = 8 };
+
+enum { BatteryOutlineColor = 3 };
+*/
+
 
 /**
  * Defines a coordinate.

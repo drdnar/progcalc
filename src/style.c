@@ -6,14 +6,9 @@
 #include "printbigint.h"
 #include "ez80.h"
 #include "calc1252.h"
+#include "gfx/gfx.h"
 
 void ExitClean(void);
-
-Color_t BgColor = 0xFF;
-Color_t FgColor = 0x00;
-Color_t ZeroColor = 0x56;
-Color_t StatusBarBgColor = 1;
-Color_t StatusBarFgColor = 0xFF;
 
 Coord_t Format_HexSize;
 Coord_t Format_DecSize;
@@ -60,8 +55,9 @@ void Style_Initialize(void)
     CursorLocation.y = 0;
     Format_InitDisplaySizes();
     gfx_Begin();
-    gfx_FillScreen(gfx_black);
-    lcd_Palette[1] = 0xA94A;
+    gfx_SetPalette(Palette_Global, sizeof_Palette_Global, 0);
+    gfx_SetTransparentColor(COLOR_TRANSPARENT);
+    gfx_FillScreen(COLOR_ZERO);
 }
 
 

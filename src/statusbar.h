@@ -29,4 +29,15 @@ void StatusBar_Disable(void);
  */
 bool StatusBar_IsEnabled(void);
 
+/**
+ * Updates the battery level display.
+ */
+void StatusBar_UpdateBatteryLevel(void);
+
+/**
+ * Checks if the calculator is currently charging.
+ * @return Either 0 or a non-zero number (not necessarily only 0 or 1).
+ */
+#define boot_IsCharging ((unsigned char (*)(void))0x3CC)
+
 #endif /* STATUS_BAR_H */

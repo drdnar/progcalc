@@ -95,6 +95,7 @@ Key_t GetKey(void)
 void Ui_Initialize(void)
 {
     formerCursor = gfx_MallocSprite(fontlib_GetGlyphWidth(CALC1252_CURSOR_2ND_CHAR), INDICATOR_HEIGHT);
+    lcd_Palette[COLOR_BATTERY_OUTLINE] = lcd_Palette[COLOR_HIGHLIGHT];
 }
 
 
