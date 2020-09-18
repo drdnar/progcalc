@@ -5,10 +5,10 @@
 	.def _Lcd_Dim
 	.def _Lcd_Bright
 	.def _GetRtcSeconds
-	.def _GetRtcSecondsPlus
 	.def _GetCSC_Breakable
 	.def _CheckIfOnKeyPressed
 	.def _ClearOnKeyPressed
+	.def _RtcTimer_Expired
 	.ref _ExitClean
 
 _GetCSC                    = 002014Ch
@@ -50,24 +50,33 @@ _GetRtcSeconds:
 	ret
 
 
-_GetRtcSecondsPlus:
-; Returns the number of seconds elapsed since the start of the hour, plus an
-; offset.  If the resulting time passes the end of the hour, wraps the time
-; around.
-; Used by APD routines.
+_RtcTimer_Expired:
 	call	_GetRtcSeconds
+	ex	de, hl
 	pop	bc
-	pop	de
-	push	de
+	pop	hl
+	push	hl
 	push	bc
-	add	hl, de
-	ld	de, 3600
-	or	a
-	sbc	hl, de
+	ld	bc, 3600	; 0xE10
+	xor	a
+	sbc	hl, bc
+	add	hl, bc
+	ex	de, hl
+	jr	c, rtcCheckNoWrap
+	ld	b, 7		; BC = 0x710
+	; NC reset from above
+	sbc	hl, bc
+	add	hl, bc
 	ret	nc
-	add	hl, de
+	ld	b, 0Eh		; BC = 0xE10 again
+	add	hl, bc
+rtcCheckNoWrap:
+	xor	a
+	sbc	hl, de
+	ccf
+	adc	a, a
 	ret
-
+	
 
 ;-------------------------------------------------------------------------------
 _GetCSC_Breakable:

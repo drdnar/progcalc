@@ -51,8 +51,6 @@ void Style_Initialize(void)
     GroupDelimiterWidth = fontlib_GetGlyphWidth(GROUP_DELIMITER);
     fontlib_SetFont(DrMono14Bold, 0);
     LastFontHeight = 14;
-    CursorLocation.x = LCD_WIDTH - fontlib_GetGlyphWidth(CALC1252_CURSOR_2ND_CHAR);
-    CursorLocation.y = 0;
     Format_InitDisplaySizes();
     gfx_Begin();
     gfx_SetPalette(Palette_Global, sizeof_Palette_Global, 0);

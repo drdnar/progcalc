@@ -7,6 +7,7 @@
 #include "printbigint.h"
 #include "ez80.h"
 #include "calc1252.h"
+#include "statusbar.h"
 
 Coord_t CursorLocation/* = {0, 0}*/;
 
@@ -26,22 +27,23 @@ bool Is83Premium(void)
 sk_key_t GetCSC_APD(void)
 {
     sk_key_t key;
-    unsigned int timer = GetRtcSecondsPlus(APD_DIM_TIME);
+    unsigned int timer = RtcTimer_Start(APD_DIM_TIME);
     bool dimmed = false;
     ClearOnKeyPressed();
     do
     {
-        if (GetRtcSeconds() == timer)
+        if (RtcTimer_Expired(timer))
         {
             if (!dimmed)
             {
                 dimmed = true;
                 Lcd_Dim();
-                timer = GetRtcSecondsPlus(APD_QUIT_TIME);
+                timer = RtcTimer_Start(APD_QUIT_TIME);
             }
             else
                 ExitClean();
         }
+        StatusBar_UpdateBatteryLevel();
         key = GetCSC_Breakable();
     }
     while (!key);
@@ -94,6 +96,9 @@ Key_t GetKey(void)
 
 void Ui_Initialize(void)
 {
+    Style_SetLargeFontProp();
+    CursorLocation.x = LCD_WIDTH - fontlib_GetGlyphWidth(CALC1252_CURSOR_2ND_CHAR);
+    CursorLocation.y = 0;
     formerCursor = gfx_MallocSprite(fontlib_GetGlyphWidth(CALC1252_CURSOR_2ND_CHAR), INDICATOR_HEIGHT);
     lcd_Palette[COLOR_BATTERY_OUTLINE] = lcd_Palette[COLOR_HIGHLIGHT];
 }

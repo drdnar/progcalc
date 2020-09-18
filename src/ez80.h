@@ -18,12 +18,17 @@ void Lcd_Bright(void);
 unsigned int GetRtcSeconds(void);
 
 /**
- * Returns the number of seconds elapsed since the start of the hour, plus an
- * offset.  If the resulting time passes the end of the hour, wraps the time
- * around.
- * Used by APD routines.
+ * Starts a timer, to expire after a given number of seconds have elapsed.
+ * @param duration Number of seconds later for timer to expire
+ * @return Check value to pass to RtcTimer_Expired
  */
-unsigned int GetRtcSecondsPlus(unsigned int offset);
+#define RtcTimer_Start(duration) (GetRtcSeconds() + duration)
+
+/**
+ * Checks if a timer has expired, including a bit of wiggle room.
+ * @return True if timer has expired, false if not.
+ */
+unsigned char RtcTimer_Expired(unsigned int);
 
 /**
  * Wraps GetCSC with two differences:

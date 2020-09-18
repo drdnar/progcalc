@@ -7,8 +7,6 @@
 typedef uint8_t Color_t;
 
 
-
-
 /**
  * Main text color.
  */
@@ -73,35 +71,6 @@ typedef uint8_t Color_t;
  * Discharged battery color
  */
 #define COLOR_BATTERY_DISCHARGED 11
-
-
-/**
- * Main text background color.
- *
-enum { BgColor = 7 };
-/**
- * Main text color.
- *
-enum { FgColor = 0 };
-/**
- * Color of leading zeros.
- *
-enum { ZeroColor = 2 };
-/**
- * Background color of the status bar.
- *
-enum { StatusBarBgColor = 1 };
-/**
- * Foreground color of the status bar.
- *
-enum { StatusBarFgColor = 7 };
-/**
- * Color of highlighted backgrounds.
- *
-enum { HighlightColor = 8 };
-
-enum { BatteryOutlineColor = 3 };
-*/
 
 
 /**

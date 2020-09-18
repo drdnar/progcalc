@@ -22,14 +22,6 @@ void Settings_Initialize(void)
 }
 
 
-/*    uint8_t DisplayBits;
-    Base_t PrimaryBase;
-    Base_t SecondaryBase;
-    bool AlwaysShowHex;
-    bool AlwaysShowDec;
-    bool AlwaysShowOct;
-    bool AlwaysShowBin;*/
-
 void Settings_ChangeDisplayBits(uint8_t bytes)
 {
     if (bytes == Settings.DisplayBits)

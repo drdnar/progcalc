@@ -2,6 +2,7 @@
 #include <tice.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "statusbar.h"
 #include "settings.h"
 #include "rpnui.h"
@@ -16,6 +17,42 @@ CharTextWindow_t StatusBar_Window =
     LCD_WIDTH, 0,
     0, 0
 };
+
+
+static uint16_t batteryPips[7];
+
+static uint8_t batteryLevel;
+static uint8_t batteryCharging;
+static unsigned int batteryTimer = 0x0FFF;
+
+static void drawBatteryIcon(void)
+{
+    if (batteryCharging)
+        lcd_Palette[COLOR_BATTERY_OUTLINE] = lcd_Palette[COLOR_BATTERY_CHARGING];
+    else if (batteryLevel < 2)
+        lcd_Palette[COLOR_BATTERY_OUTLINE] = lcd_Palette[COLOR_BATTERY_DISCHARGED];
+    else
+        lcd_Palette[COLOR_BATTERY_OUTLINE] = lcd_Palette[COLOR_BATTERY_NORMAL];
+    memcpy(&lcd_Palette[COLOR_BATTERY_LEVEL_1], &batteryPips[batteryLevel], sizeof(uint16_t) * 3);
+    gfx_TransparentSprite_NoClip(battery_icon, StatusBar_Window.X + StatusBar_Window.Width - battery_icon_width - 1, StatusBar_Window.Y + 1);
+}
+
+static bool updateBatteryLevel(void)
+{
+    unsigned char level = batteryLevel;
+    unsigned char charging = batteryCharging;
+    batteryLevel = boot_GetBatteryStatus();
+    batteryCharging = boot_IsCharging();
+    batteryTimer = RtcTimer_Start(10);
+    return level != batteryLevel || charging != batteryCharging;
+}
+
+void StatusBar_UpdateBatteryLevel(void)
+{
+    if (RtcTimer_Expired(batteryTimer))
+        if (updateBatteryLevel())
+            drawBatteryIcon();
+}
 
 
 static CharTextWindow_t oldWindow;
@@ -52,26 +89,8 @@ void StatusBar_Draw(void)
     fontlib_SetForegroundColor(COLOR_FOREGROUND);
     fontlib_SetBackgroundColor(COLOR_BACKGROUND);
     Style_RestoreTextWindow(&oldWindow);
-    StatusBar_UpdateBatteryLevel();
-}
-
-
-static uint16_t batteryPips[7];
-
-void StatusBar_UpdateBatteryLevel(void)
-{
-    unsigned char level = boot_GetBatteryStatus();
-    unsigned char charging = boot_IsCharging();
-//    if (level == 0 && !charging)
-//        ExitClean();
-    if (charging)
-        lcd_Palette[COLOR_BATTERY_OUTLINE] = lcd_Palette[COLOR_BATTERY_CHARGING];
-    else if (level < 2)
-        lcd_Palette[COLOR_BATTERY_OUTLINE] = lcd_Palette[COLOR_BATTERY_DISCHARGED];
-    else
-        lcd_Palette[COLOR_BATTERY_OUTLINE] = lcd_Palette[COLOR_BATTERY_NORMAL];
-    memcpy(&lcd_Palette[COLOR_BATTERY_LEVEL_1], &batteryPips[level], sizeof(uint16_t) * 3);
-    gfx_TransparentSprite_NoClip(battery_icon, StatusBar_Window.X + StatusBar_Window.Width - battery_icon_width - 1, StatusBar_Window.Y + 1);
+    updateBatteryLevel();
+    drawBatteryIcon();
 }
 
 
@@ -87,7 +106,7 @@ void StatusBar_Enable(void)
         *p++ = lcd_Palette[COLOR_BATTERY_EMPTY_PIP];
     for (i = 0; i < 3; i++)
         *p++ = lcd_Palette[COLOR_BATTERY_PIP];
-    
+    updateBatteryLevel();
 }
 
 

@@ -30,7 +30,8 @@ void StatusBar_Disable(void);
 bool StatusBar_IsEnabled(void);
 
 /**
- * Updates the battery level display.
+ * Updates the battery level display if the battery has changed.
+ * This internally uses the RTC to determine how often to poll the battery.
  */
 void StatusBar_UpdateBatteryLevel(void);
 
