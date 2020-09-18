@@ -89,7 +89,6 @@ void StatusBar_Draw(void)
     fontlib_SetForegroundColor(COLOR_FOREGROUND);
     fontlib_SetBackgroundColor(COLOR_BACKGROUND);
     Style_RestoreTextWindow(&oldWindow);
-    updateBatteryLevel();
     drawBatteryIcon();
 }
 

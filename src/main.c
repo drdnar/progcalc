@@ -25,7 +25,6 @@ void main(void) {
     Style_Initialize();
     Ui_Initialize();
     Settings_Initialize();
-    Settings_ChangeDisplayBits(SHOW_128);
     Rpn_Reset();
     fontlib_ClearWindow();
     Rpn_Redraw();
