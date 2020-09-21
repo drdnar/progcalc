@@ -76,6 +76,9 @@ Key_t GetKey(void)
             {
                 Style_RestoreCursor(&CursorLocation);
                 Style_SetLargeFontProp();
+                /* Since the battery icon is updated by changing its palette entries,
+                 * there's no need to worry about the 2nd indicator being overwritten
+                 * when the battery icon is updated.*/
                 fontlib_DrawGlyph(CALC1252_CURSOR_2ND_CHAR);
             }
             else

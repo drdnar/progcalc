@@ -22,7 +22,6 @@ fontlib_font_t* DrSans10Bold;
 unsigned int GroupDelimiterWidth;
 unsigned char Baseline14;
 unsigned char Baseline10;
-unsigned char LastFontHeight;
 
 
 void ShowErrorAndExit(char* msg)
@@ -50,7 +49,6 @@ void Style_Initialize(void)
     fontlib_SetFont(DrSans14Bold, 0);
     GroupDelimiterWidth = fontlib_GetGlyphWidth(GROUP_DELIMITER);
     fontlib_SetFont(DrMono14Bold, 0);
-    LastFontHeight = 14;
     Format_InitDisplaySizes();
     gfx_Begin();
     gfx_SetPalette(Palette_Global, sizeof_Palette_Global, 0);
@@ -114,14 +112,12 @@ void Style_RestoreTextWindow(CharTextWindow_t* window)
 void Style_SetLargeFontMono(void)
 {
     fontlib_SetFont(DrMono14Bold, 0);
-    LastFontHeight = 14;
 }
 
 
 void Style_SetLargeFontProp(void)
 {
     fontlib_SetFont(DrSans14Bold, 0);
-    LastFontHeight = 14;
 }
 
 
@@ -142,4 +138,27 @@ void Style_SetSmallFontPropAligned(void)
     unsigned char dh = DrSans14Bold->baseline_height - DrSans10Regular->baseline_height;
     fontlib_SetFont(DrSans10Regular, 0);
     fontlib_SetLineSpacing(dh, DrSans14Bold->height - dh - DrSans10Regular->height);
+}
+
+
+void Style_SetFont(uint8_t fontId)
+{
+    switch (fontId)
+    {
+        case FONT_LARGE_PROP:
+            Style_SetLargeFontProp();
+            break;
+        case FONT_LARGE_MONO:
+            Style_SetLargeFontMono();
+            break;
+        case FONT_SMALL_PROP:
+            Style_SetSmallFontProp();
+            break;
+        case FONT_SMALL_PROP_BOLD:
+            Style_SetSmallFontPropBold();
+            break;
+        case FONT_SMALL_PROP_ALIGNED:
+            Style_SetSmallFontPropAligned();
+            break;
+    }
 }

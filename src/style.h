@@ -6,6 +6,15 @@
 
 typedef uint8_t Color_t;
 
+enum FontId
+{
+    FONT_LARGE_PROP,
+    FONT_LARGE_MONO,
+    FONT_SMALL_PROP,
+    FONT_SMALL_PROP_BOLD,
+    FONT_SMALL_PROP_ALIGNED
+};
+
 
 /**
  * Main text color.
@@ -188,5 +197,11 @@ void Style_SetSmallFontPropBold(void);
  * Changes the current font and ensures baseline alignment with the large font.
  */
 void Style_SetSmallFontPropAligned(void);
+
+/**
+ * Switches to a font given its ID.
+ * @param fontId A member of the FontId enum.
+ */
+void Style_SetFont(uint8_t fontId);
 
 #endif
