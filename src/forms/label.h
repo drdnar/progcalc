@@ -1,6 +1,5 @@
 #ifndef LABEL_H
 #define LABEL_H
-#include "widget.h"
 
 typedef struct Label_def
 {

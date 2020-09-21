@@ -1,6 +1,5 @@
 #ifndef CHECKBOX_H
 #define CHECKBOX_H
-#include "widget.h"
 
 typedef struct
 {
@@ -29,6 +28,5 @@ typedef struct
      */
     Widget_t GenericData;
 } Checkbox_t;
-
 
 #endif /* CHECKBOX_H */

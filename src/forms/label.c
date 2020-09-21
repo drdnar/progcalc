@@ -1,23 +1,23 @@
+#define WIDGET Label
+#include "widget.h"
 #include "label.h"
 #include <fontlibc.h>
 
-#define this ((Label_t*)self)
-#define thisData ((Label_def*)this->GenericData.Definition)
-
-
 static const Widget_vtable vtable =
 {
+    sizeof(Widget_vtable),
+    false,
     &GetNextItem,
     &ctor,
-    &Dummy_dtor,
-    &Dummy_MoveTo,
+    &GenericWidget_dtor,
+    &GenericWidget_MoveTo,
     /* Paint */
     &Paint,
     /* Focus */
-    &DummyFailure_Event,
+    &GenericWidget_FailureEvent,
     /* Unfocus */
-    &DummySuccess_Event,
-    &Dummy_SendInput
+    &GenericWidget_SuccessEvent,
+    &GenericWidget_SendInput
 };
 
 
@@ -29,22 +29,22 @@ static Widget_def* GetNextItem(Widget_def* Template)
 
 static Widget_t* ctor(Widget_def* Template, Widget_t* parent)
 {
-    Label_t* label = (Label_t*)malloc(sizeof(Label_t));
+    Label_t* label = (WIDGET_t*)malloc(sizeof(WIDGET_t));
     label->GenericData.TypeId = LABEL;
     label->GenericData.vtable = &vtable;
     label->GenericData.Definition = Template;
     label->GenericData.Parent = parent;
-    Style_SetFont(((Label_def*)Template)->Font);
+    Style_SetFont(((WIDGET_def*)Template)->Font);
     label->GenericData.Height = fontlib_GetCurrentFontHeight();
-    label->GenericData.Width = fontlib_GetStringWidth(((Label_def*)Template)->Text);
+    label->GenericData.Width = fontlib_GetStringWidth(((WIDGET_def*)Template)->Text);
     return (Widget_t*)label;
 }
 
 
 static int24_t Paint(Widget_t* self)
 {
-    Style_SetFont(thisData->Font);
+    Style_SetFont(definition->Font);
     fontlib_SetCursorPosition(self->X, self->Y);
-    fontlib_DrawString(thisData->Text);
+    fontlib_DrawString(definition->Text);
     return 0;
 }

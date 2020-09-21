@@ -93,6 +93,14 @@ typedef struct Widget_t
 typedef struct Widget_vtable
 {
     /**
+     * Size of this vtable.
+     */
+    size_t Length;
+    /**
+     * True if this vtable is dynamically allocated.
+     */
+    bool IsDynamic;
+    /**
      * Finds out where the next widget definition is.
      * @param Template Pointer to template data block
      * @return Pointer to next widget.
@@ -198,44 +206,53 @@ typedef struct
 }*/
 
 /**
- * Generic destructor for widgets that need no special treatment.
+ * Duplicates a vtable into RAM.
+ * This allows a widget to change its vtable if needs to be able to do so.
  */
-void Dummy_dtor(Widget_t* self);
+Widget_vtable* Clone_Widget_vtable(Widget_vtable* vtable);
+
+/**
+ * Generic destructor for widgets that need no special treatment.
+ * This will free the widget's data, and if the widget's vtable is marked as dynamic,
+ * this will free the vtable, too.
+ * @warning If multiple instances can share a dynamic vtable, do not use this.
+ */
+void GenericWidget_dtor(Widget_t* self);
 
 /**
  * Generic MoveTo routine for widgets that need to do nothing other than set their
  * X and Y coordinates.
  */
-uint8_t Dummy_MoveTo(Widget_t* self, uint24_t x, uint8_t y);
+uint8_t GenericWidget_MoveTo(Widget_t* self, uint24_t x, uint8_t y);
 
 /**
  * Generic do-nothing event handler.
  * @return Always returns zero.
  */
-int24_t DummySuccess_Event(Widget_t* self);
+int24_t GenericWidget_SuccessEvent(Widget_t* self);
 
 /**
  * Generic do-nothing event handler.
  * @return Always returns one.
  */
-int24_t DummyFailure_Event(Widget_t* self);
+int24_t GenericWidget_FailureEvent(Widget_t* self);
 
 /**
  * Generic focus routine that just sets the focus variable and repaints the widget.
  * @return Always returns 0.
  */
-int24_t Dummy_Focus(Widget_t* self);
+int24_t GenericWidget_Focus(Widget_t* self);
 
 /**
  * Generic unfocus routine that just resets the focus variable and repaints the widget.
  * @return Always returns 0.
  */
-int24_t Dummy_Unfocus(Widget_t* self);
+int24_t GenericWidget_Unfocus(Widget_t* self);
 
 /**
  * Generic do-nothing input handler.
  * @return Always returns zero.
  */
-int24_t Dummy_SendInput(Widget_t* self, int24_t messageId);
+int24_t GenericWidget_SendInput(Widget_t* self, int24_t messageId);
 
 #endif /* FORMS_H */
