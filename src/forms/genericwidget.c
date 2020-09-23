@@ -1,7 +1,7 @@
 #include "forms.h"
 #include <string.h>
 
-Widget_vtable* Clone_Widget_vtable(Widget_vtable* src)
+Widget_vtable* Clone_Widget_vtable(const Widget_vtable* src)
 {
     Widget_vtable* vtable = malloc(src->Length);
     memcpy(vtable, src, src->Length);

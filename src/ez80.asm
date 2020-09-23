@@ -10,6 +10,8 @@
 	.def _ClearOnKeyPressed
 	.def _RtcTimer_Expired
 	.ref _ExitClean
+	.def _CallIfNotNull8
+	.def _CallIfNotNull24
 
 _GetCSC                    = 002014Ch
 _RestoreLCDBrightness      = 0021AB8h
@@ -19,6 +21,31 @@ rtc_Seconds = 0F30000h
 rtc_Minutes = 0F30004h
 
 .text
+
+
+;-------------------------------------------------------------------------------
+_CallIfNotNull8:
+_CallIfNotNull24:
+; Allows C code to attempt to call a potentially NULL callback.
+; CONTAINS SMC
+	; Shuffle the stack.
+	pop	de
+	ld	hl, retPoint + 2
+	ld	(hl), de
+	dec	hl
+	dec	hl
+	ex	(sp), hl
+	; Return 0 in both A and HL if HL is NULL
+	xor	a
+	ex	de, hl
+	sbc	hl, hl
+	adc	hl, de
+	ret	z
+	jp	(hl)
+retPoint:
+	; Push a garbage value to the stack to keep things balanced.
+	push	hl
+	jp	0
 
 
 ;-------------------------------------------------------------------------------

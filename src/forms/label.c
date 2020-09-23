@@ -1,43 +1,48 @@
 #define WIDGET Label
-#include "widget.h"
+#define TYPEID LABEL
+#include "widget.inc.h"
 #include "label.h"
 #include <fontlibc.h>
 
-static const Widget_vtable vtable =
+static const WIDGET_vtable vtable =
 {
-    sizeof(Widget_vtable),
-    false,
-    &GetNextItem,
-    &ctor,
-    &GenericWidget_dtor,
-    &GenericWidget_MoveTo,
-    /* Paint */
-    &Paint,
-    /* Focus */
-    &GenericWidget_FailureEvent,
-    /* Unfocus */
-    &GenericWidget_SuccessEvent,
-    &GenericWidget_SendInput
+    /* Widget */
+    {
+        sizeof(WIDGET_vtable),
+        false,
+        &GetNextItem,
+        &WIDGET_ctor,
+        &GenericWidget_dtor,
+        &GenericWidget_MoveTo,
+        &Paint,
+        /* Focus */
+        &GenericWidget_FailureEvent,
+        /* Unfocus */
+        &GenericWidget_SuccessEvent,
+        &GenericWidget_SendInput
+    }
 };
 
 
-static Widget_def* GetNextItem(Widget_def* Template)
+static Widget_def* GetNextItem(const Widget_def* Template)
 {
-    return (Widget_def*)((Label_t*)Template + 1);
+    return (Widget_def*)((WIDGET_t*)Template + 1);
 }
 
 
-static Widget_t* ctor(Widget_def* Template, Widget_t* parent)
+Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def** next)
 {
-    Label_t* label = (WIDGET_t*)malloc(sizeof(WIDGET_t));
-    label->GenericData.TypeId = LABEL;
-    label->GenericData.vtable = &vtable;
-    label->GenericData.Definition = Template;
-    label->GenericData.Parent = parent;
+    WIDGET_t* widget = (WIDGET_t*)malloc(sizeof(WIDGET_t));
+    widget->Widget.TypeId = TYPEID;
+    widget->Widget.vtable = (Widget_vtable*)&vtable;
+    widget->Widget.Definition = Template;
+    widget->Widget.Parent = parent;
     Style_SetFont(((WIDGET_def*)Template)->Font);
-    label->GenericData.Height = fontlib_GetCurrentFontHeight();
-    label->GenericData.Width = fontlib_GetStringWidth(((WIDGET_def*)Template)->Text);
-    return (Widget_t*)label;
+    widget->Widget.Height = fontlib_GetCurrentFontHeight();
+    widget->Widget.Width = fontlib_GetStringWidth(((WIDGET_def*)Template)->Text);
+    if (next != NULL)
+        *next = (Widget_def*)((WIDGET_t*)Template + 1);
+    return (Widget_t*)widget;
 }
 
 

@@ -22,18 +22,25 @@
 /**
  * Pointer to this widget's unchanging data, such as text it displays.
  */
-#define definition ((WIDGET_def*)this->GenericData.Definition)
+#define definition ((WIDGET_def*)this->Widget.Definition)
+/**
+ * The Template variable, but typecast to this widget's type.
+ */
+#define template ((WIDGET_def*)Template)
 /**
  * Type name of this widget's expanded vtabel, if applicable.
  */
 #define WIDGET_vtable EXPAND_ARGUMENT(WIDGET) ## _vtable
+/**
+ * Name of this widget's public constructor.
+ */
+#define WIDGET_ctor EXPAND_ARGUMENT(WIDGET) ## _ctor
 
 static Widget_def* GetNextItem(Widget_def* Template);
-static Widget_t* ctor(Widget_def* Template, Widget_t* parent);
+static Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def** next);
 static void dtor(Widget_t* self);
 static uint8_t MoveTo(Widget_t* self, uint24_t X, uint8_t Y);
 static int24_t Paint(Widget_t* self);
 static int24_t Focus(Widget_t* self);
 static int24_t Unfocus(Widget_t* self);
-static int24_t Paint(Widget_t* self);
 static int24_t SendInput(Widget_t* self, int24_t messageId);

@@ -1,46 +1,49 @@
 #define WIDGET Checkbox
-#include "widget.h"
+#define TYPEID CHECKBOX
+#include "widget.inc.h"
 #include "checkbox.h"
 #include "../calc1252.h"
 #include <fontlibc.h>
 #include "../ui.h"
 
-static const Widget_vtable vtable =
+static const WIDGET_vtable vtable =
 {
-    sizeof(Widget_vtable),
-    false,
-    &GetNextItem,
-    &ctor,
-    &GenericWidget_dtor,
-    &GenericWidget_MoveTo,
-    /* Paint */
-    &Paint,
-    /* Focus */
-    &GenericWidget_Focus,
-    /* Unfocus */
-    &GenericWidget_Unfocus,
-    &SendInput
+    /* Widget */
+    {
+        sizeof(WIDGET_vtable),
+        false,
+        &GetNextItem,
+        &WIDGET_ctor,
+        &GenericWidget_dtor,
+        &GenericWidget_MoveTo,
+        &Paint,
+        &GenericWidget_Focus,
+        &GenericWidget_Unfocus,
+        &SendInput
+    }
 };
 
 
-static Widget_def* GetNextItem(Widget_def* Template)
+static Widget_def* GetNextItem(const Widget_def* Template)
 {
-    return (Widget_def*)((Checkbox_t*)Template + 1);
+    return (Widget_def*)((WIDGET_t*)Template + 1);
 }
 
 
-static Widget_t* ctor(Widget_def* Template, Widget_t* parent)
+Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def** next)
 {
-    Checkbox_t* checkbox = (WIDGET_t*)malloc(sizeof(WIDGET_t));
-    checkbox->GenericData.TypeId = CHECKBOX;
-    checkbox->GenericData.vtable = &vtable;
-    checkbox->GenericData.Definition = Template;
-    checkbox->GenericData.Parent = parent;
+    WIDGET_t* widget = (WIDGET_t*)malloc(sizeof(WIDGET_t));
+    widget->Widget.TypeId = TYPEID;
+    widget->Widget.vtable = (Widget_vtable*)&vtable;
+    widget->Widget.Definition = Template;
+    widget->Widget.Parent = parent;
     Style_SetFont(((WIDGET_def*)Template)->Font);
-    checkbox->GenericData.Height = fontlib_GetCurrentFontHeight();
-    checkbox->GenericData.Width = fontlib_GetStringWidth(((WIDGET_def*)Template)->Text)
+    widget->Widget.Height = fontlib_GetCurrentFontHeight();
+    widget->Widget.Width = fontlib_GetStringWidth(((WIDGET_def*)Template)->Text)
         + fontlib_GetStringWidth(CALC1252_CURSOR_RIGHT " " CALC1252_RADIO_UNCHECKED "  " CALC1252_CURSOR_LEFT);
-    return (Widget_t*)checkbox;
+    if (next != NULL)
+        *next = (Widget_def*)((WIDGET_t*)Template + 1);
+    return (Widget_t*)widget;
 }
 
 
@@ -49,7 +52,7 @@ static int24_t Paint(Widget_t* self)
     char ch;
     Style_SetFont(definition->Font);
     fontlib_SetCursorPosition(self->X, self->Y);
-    if (this->GenericData.HasFocus)
+    if (this->Widget.HasFocus)
         ch = CALC1252_CURSOR_RIGHT_CHAR;
     else
         ch = CALC1252_CURSOR_BLANK_CHAR;
@@ -62,7 +65,7 @@ static int24_t Paint(Widget_t* self)
     fontlib_DrawGlyph(ch);
     fontlib_DrawString(definition->Text);
     fontlib_DrawGlyph(' ');
-    if (this->GenericData.HasFocus)
+    if (this->Widget.HasFocus)
         ch = CALC1252_CURSOR_LEFT_CHAR;
     else
         ch = CALC1252_CURSOR_BLANK_CHAR;

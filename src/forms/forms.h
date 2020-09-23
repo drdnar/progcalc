@@ -105,14 +105,15 @@ typedef struct Widget_vtable
      * @param Template Pointer to template data block
      * @return Pointer to next widget.
      */
-    Widget_def* (*GetNextItem)(Widget_def* Template);
+    Widget_def* (*GetNextItem)(const Widget_def* Template);
     /**
      * Constructor for a widget.
      * @param Template Pointer to the widget's template (i.e. constant data used in the form.
      * @param parent Pointer to the widget's actual parent, used for layout
+     * @param next Optional pointer to variable to store a pointer to the item after Template
      * @return Pointer to an instantiated widget.
      */
-    Widget_t* (*ctor)(Widget_def* Template, Widget_t* parent);
+    Widget_t* (*ctor)(const Widget_def* Template, Widget_t* parent, Widget_def** next);
     /**
      * Destructor method.
      * @param self Pointer to self.
@@ -162,7 +163,7 @@ typedef struct
     /**
      * Block of data common to all widget definitions.
      */
-    Widget_def GenericData;
+    Widget_def Widget;
     /**
      * Number of child items present.
      * This should be greater than zero.
@@ -209,7 +210,7 @@ typedef struct
  * Duplicates a vtable into RAM.
  * This allows a widget to change its vtable if needs to be able to do so.
  */
-Widget_vtable* Clone_Widget_vtable(Widget_vtable* vtable);
+Widget_vtable* Clone_Widget_vtable(const Widget_vtable* vtable);
 
 /**
  * Generic destructor for widgets that need no special treatment.
