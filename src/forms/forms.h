@@ -6,9 +6,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "../ui.h"
-#include "../style.h"
-#include "../settings.h"
 
 
 /* _def means item is a data definition
@@ -17,12 +14,11 @@
 typedef enum
 {
     NO_WIDGET,
-    DIALOG,
+//    DIALOG,
     ROW_LIST,
     ROW_ITEMS,
     LABEL,
     CHECKBOX,
-    ENUM_SELECTOR,
     BUTTON
 } WidgetIds;
 
@@ -174,37 +170,6 @@ typedef struct
      */
     Widget_def Child;
 } RowItems_def;
-/*
-typedef struct
-{
-    
-} RowItems_t;
-
-typedef struct
-{
-    
-} RowList_def;
-
-typedef struct
-{
-    
-} RowList_t;
-
-typedef struct
-{
-    
-} Dialog_def;
-
-typedef struct
-{
-    
-} Dialog_t;
-*/
-
-/*struct
-{
-    unsigned char x;
-}*/
 
 /**
  * Duplicates a vtable into RAM.

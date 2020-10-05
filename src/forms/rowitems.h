@@ -17,6 +17,9 @@ enum
     ROW_ITEMS_RIGHT
 };
 
+/**
+ * Describes a widget template.
+ */
 typedef struct RowItems_def
 {
     /**
@@ -38,6 +41,9 @@ typedef struct RowItems_def
     Widget_def FirstChild;
 } RowItems_def;
 
+/**
+ * Represents an instantiated widget.
+ */
 typedef struct RowItems_t
 {
     /**
@@ -54,7 +60,10 @@ typedef struct RowItems_t
     Widget_t* Children[1];
 } RowItems_t;
 
-typedef struct RowItems_vtable
+/**
+ * List of methods available for this widget class.
+ */
+typedef struct RowItems_vtable_t
 {
     /**
      * Data common to all widget vtables.
@@ -68,7 +77,13 @@ typedef struct RowItems_vtable
      * @return Returns 0 on success.
      */
     uint8_t (*SetWidth)(Widget_t* self, uint24_t width);
-} RowItems_vtable;
+} RowItems_vtable_t;
+
+/**
+ * Reference to the master vtable for this widget type.
+ * This is public only because it needs to be visible for widget templates to reference.
+ */
+extern const RowItems_vtable_t RowItems_vtable;
 
 /**
  * Public constructor.

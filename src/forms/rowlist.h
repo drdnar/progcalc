@@ -2,6 +2,9 @@
 #define ROW_LIST_H
 #include "forms.h"
 
+/**
+ * Describes a widget template.
+ */
 typedef struct RowList_def
 {
     /**
@@ -19,6 +22,9 @@ typedef struct RowList_def
     Widget_def FirstChild;
 } RowList_def;
 
+/**
+ * Represents an instantiated widget.
+ */
 typedef struct RowList_t
 {
     /**
@@ -35,13 +41,22 @@ typedef struct RowList_t
     Widget_t* Children[1];
 } RowList_t;
 
-typedef struct RowList_vtable
+/**
+ * List of methods available for this widget class.
+ */
+typedef struct RowList_vtable_t
 {
     /**
      * Data common to all widget vtables.
      */
     Widget_vtable Widget;
-} RowList_vtable;
+} RowList_vtable_t;
+
+/**
+ * Reference to the master vtable for this widget type.
+ * This is public only because it needs to be visible for widget templates to reference.
+ */
+extern const RowList_vtable_t RowList_vtable;
 
 /**
  * Public constructor.

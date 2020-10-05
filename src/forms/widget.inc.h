@@ -30,11 +30,17 @@
 /**
  * Type name of this widget's expanded vtabel, if applicable.
  */
+#define WIDGET_vtable_t EXPAND_ARGUMENT(WIDGET) ## _vtable_t
+/**
+ * Name of this widget's actual vtable.
+ * This must be global in scope so it can be referenced.
+ */
 #define WIDGET_vtable EXPAND_ARGUMENT(WIDGET) ## _vtable
 /**
  * Name of this widget's public constructor.
  */
 #define WIDGET_ctor EXPAND_ARGUMENT(WIDGET) ## _ctor
+
 
 static Widget_def* GetNextItem(Widget_def* Template);
 static Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def** next);

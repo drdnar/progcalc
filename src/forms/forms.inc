@@ -1,34 +1,61 @@
+; Macro courtesy of jacobly
+macro ?!
+	local typeid_counter, child_counter
+	typeid_counter = 1
+	child_counter = 0
 
-struc Widget_def
-    .TypeId         rb  1
-    .vtable         rl  1
-end struc
+	macro defwidget? type*, fields&
+		local typeid, args
 
-virtual at 0
-Widget_def Widget_def
-end virtual
+		typeid_counter = typeid_counter + 1
+		typeid := typeid_counter
 
-struc Widget_t
-    .TypeId         rb  1
-    .vtable         rl  1
-    .Definition     rl  1
-    .parent         rl  1
-    .HasFocus       rl  1
-    .X              rl  1
-    .Y              rb  1
-    .Width          rl  1
-    .Height         rb  1
-end struc
+		args equ type?
+		iterate field, fields
+			match =children, field
+				if % <> %%
+					err 'syntax error: defwidget field children should be last'
+				end if
+				; handled later
+			else match size= name, field
+				if % <> 1
+					args equ args,
+				end if
+				args equ args name*
+			else
+				err 'syntax error: defwidget field: ', `field
+			end match
+		end iterate
 
-struc Widget_vtable
-    .Length         rl  1
-    .IsDynamic      rb  1
-    .GetNextItem    rl  1
-    .ctor           rl  1
-    .dtor           rl  1
-    .MoveTo         rl  1
-    .Paint          rl  1
-    .Focus          rl  1
-    .Unfocus        rl  1
-    .SendInput      rl  1
-end struc
+		match expand, args
+			macro expand
+				child_counter = child_counter + 1
+
+				db typeid
+				dl _#type#_vtable
+				iterate field, fields
+					match =children, field
+						local child_count
+						db child_count
+						child_counter =: 0
+
+						macro end?.type?
+							child_count := child_counter
+							restore child_counter
+							purge end?.type?
+						end macro
+					else
+						field
+					end match
+				end iterate
+			end macro
+		end match
+	end macro
+
+	purge ?
+end macro
+
+defwidget RowList, children
+defwidget RowItems, db Alignment, children
+defwidget Label, db Font, dl Text
+defwidget Checkbox, db Font, dl Text, dl Variable

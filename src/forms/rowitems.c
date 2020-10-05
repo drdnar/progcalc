@@ -6,11 +6,11 @@
 static uint8_t SetWidth(Widget_t* self, uint24_t width);
 
 
-static const WIDGET_vtable vtable =
+const WIDGET_vtable_t WIDGET_vtable =
 {
     /* Widget */
     {
-        sizeof(WIDGET_vtable),
+        sizeof(WIDGET_vtable_t),
         false,
         &GetNextItem,
         &WIDGET_ctor,
@@ -42,7 +42,7 @@ Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def**
     Widget_t* child;
     WIDGET_t* widget = (WIDGET_t*)malloc(sizeof(WIDGET_t) - sizeof(ptrdiff_t) + sizeof(ptrdiff_t) * template->ChildCount);
     widget->Widget.TypeId = TYPEID;
-    widget->Widget.vtable = (Widget_vtable*)&vtable;
+    widget->Widget.vtable = (Widget_vtable*)&WIDGET_vtable;
     widget->Widget.Definition = Template;
     widget->Widget.Parent = parent;
     widget->Widget.Width = 0;
