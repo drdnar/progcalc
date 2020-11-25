@@ -15,7 +15,8 @@ CharTextWindow_t StatusBar_Window =
 {
     0, 0,
     LCD_WIDTH, 0,
-    0, 0
+    0, 0,
+    FONT_SMALL_PROP_BOLD
 };
 
 
@@ -59,7 +60,6 @@ static CharTextWindow_t oldWindow;
 
 void StatusBar_Draw(void)
 {
-    char* s;
     if (!Settings.StatusBarEnabled)
         return;
     Style_SaveTextWindow(&oldWindow);

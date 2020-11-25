@@ -4,6 +4,7 @@
 #include "checkbox.h"
 #include "../calc1252.h"
 #include <fontlibc.h>
+#include "../style.h"
 #include "../ui.h"
 
 const WIDGET_vtable_t WIDGET_vtable =
@@ -24,7 +25,7 @@ const WIDGET_vtable_t WIDGET_vtable =
 };
 
 
-static Widget_def* GetNextItem(const Widget_def* Template)
+static const Widget_def* GetNextItem(const Widget_def* Template)
 {
     return (Widget_def*)((WIDGET_t*)Template + 1);
 }

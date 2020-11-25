@@ -6,11 +6,18 @@
 # ----------------------------
 
 NAME        ?= PROGCALC
-COMPRESSED  ?= YES
+COMPRESSED  ?= NO
+ARCHIVED    ?= NO
 ICON        ?= iconc.png
 DESCRIPTION ?= "Programmer's Calculator"
+OUTPUT_MAP  ?= YES
 #OPT_MODE    ?= -Oz
 
-# ----------------------------
+CFLAGS ?= -Wall -Wextra -Oz
+CXXFLAGS ?= -Wall -Wextra -Oz
 
-include $(CEDEV)/include/.makefile
+ifndef CEDEV
+$(error CEDEV environment path variable is not set)
+endif
+
+include $(CEDEV)/meta/makefile.mk

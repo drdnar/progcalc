@@ -18,20 +18,42 @@
 #include "inputbigint.h"
 #include "statusbar.h"
 
+#include "forms/forms.h"
+#include "forms/checkbox.h"
+#include "forms/label.h"
+#include "forms/rowitems.h"
+#include "forms/rowlist.h"
+#include "testform.h"
+
+
 /* Main Function */
 void main(void) {
     sk_key_t k;
-    bool dirty = false;
+    bool dirty = true;
+    
+    /* Need to force stuff to appear in output file. *
+    RowList_t* rowlist;
+    RowItems_t* rowitems;
+    Checkbox_t* checkbox;
+    Label_t* label;
+
+    label = (Label_t*)Label_ctor(&SampleForm, NULL, NULL);
+*/
+
     Style_Initialize();
     Ui_Initialize();
     Settings_Initialize();
     Rpn_Reset();
-    fontlib_ClearWindow();
-    Rpn_Redraw();
-    StatusBar_Draw();
 
     do
     {
+        if (dirty)
+        {
+            dirty = false;
+            fontlib_ClearWindow();
+            Rpn_Redraw();
+            StatusBar_Draw();
+        }
         do
             k = GetKey();
         while (!k);
@@ -72,13 +94,6 @@ void main(void) {
                 Settings_ChangeDisplayBits(SHOW_128);
                 dirty = true;
                 break;
-        }
-        if (dirty)
-        {
-            dirty = false;
-            fontlib_ClearWindow();
-            Rpn_Redraw();
-            StatusBar_Draw();
         }
     } while (k != sk_Quit);
     

@@ -3,6 +3,7 @@
 #include "widget.inc.h"
 #include "label.h"
 #include <fontlibc.h>
+#include "../style.h"
 
 const WIDGET_vtable_t WIDGET_vtable =
 {
@@ -24,7 +25,7 @@ const WIDGET_vtable_t WIDGET_vtable =
 };
 
 
-static Widget_def* GetNextItem(const Widget_def* Template)
+static const Widget_def* GetNextItem(const Widget_def* Template)
 {
     return (Widget_def*)((WIDGET_t*)Template + 1);
 }

@@ -1,17 +1,18 @@
 ;
 ; Native eZ80 assembly routines
+	section	.text
+	assume	adl = 1
 
-	.assume adl=1
-	.def _Lcd_Dim
-	.def _Lcd_Bright
-	.def _GetRtcSeconds
-	.def _GetCSC_Breakable
-	.def _CheckIfOnKeyPressed
-	.def _ClearOnKeyPressed
-	.def _RtcTimer_Expired
-	.ref _ExitClean
-	.def _CallIfNotNull8
-	.def _CallIfNotNull24
+	public _Lcd_Dim
+	public _Lcd_Bright
+	public _GetRtcSeconds
+	public _GetCSC_Breakable
+	public _CheckIfOnKeyPressed
+	public _ClearOnKeyPressed
+	public _RtcTimer_Expired
+	extern _ExitClean
+	public _CallIfNotNull8
+	public _CallIfNotNull24
 
 _GetCSC                    = 002014Ch
 _RestoreLCDBrightness      = 0021AB8h
@@ -19,8 +20,6 @@ _DimLCDSlow                = 0021AC0h
 flags			= 0D00080h		; location of OS Flags (+-80h)
 rtc_Seconds = 0F30000h
 rtc_Minutes = 0F30004h
-
-.text
 
 
 ;-------------------------------------------------------------------------------
@@ -114,6 +113,7 @@ _GetCSC_Breakable:
 ;    program immediately.
 	ei
 	halt
+	ld	iy, flags
 	call	_GetCSC
 	cp	15		; skClear
 	ret	nz

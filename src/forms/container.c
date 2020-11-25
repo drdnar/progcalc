@@ -5,9 +5,9 @@
 #define this_ChildCount (this->Container.ChildCount)
 
 
-Widget_def* Container_GetNextItem(const Container_def* Template)
+const Widget_def* Container_GetNextItem(const Container_def* Template)
 {
-    Widget_def* childDef = &Template->FirstChild;
+    const Widget_def* childDef = &Template->FirstChild;
     unsigned char i = Template->ChildCount;
     while (i --> 0)
         childDef = childDef->vtable->GetNextItem(childDef);
@@ -71,9 +71,10 @@ int24_t Container_Focus(Widget_t* self)
 bool Container_FocusNext(Widget_t* self)
 {
     Container_Iterator_t iterator;
+    Widget_t* child;
     Container_InitializeIterator(self, &iterator);
     iterator.Index = this->Container.ActiveIndex;
-    Widget_t* child = Container_IteratorNext(&iterator);
+    child = Container_IteratorNext(&iterator);
     while (child)
     {
         if (!child->vtable->Focus(child))
@@ -87,9 +88,10 @@ bool Container_FocusNext(Widget_t* self)
 bool Container_FocusPrevious(Widget_t* self)
 {
     Container_Iterator_t iterator;
+    Widget_t* child;
     Container_InitializeIterator(self, &iterator);
     iterator.Index = this->Container.ActiveIndex;
-    Widget_t* child = Container_IteratorPrevious(&iterator);
+    child = Container_IteratorPrevious(&iterator);
     while (child)
     {
         if (!child->vtable->Focus(child))
@@ -114,12 +116,12 @@ int24_t Container_SendInput(Widget_t* self, int24_t messageId)
 }
 
 
-Widget_t*  Container_InitializeIterator(Widget_t* self, Container_Iterator_t* iterator)
+Widget_t* Container_InitializeIterator(Widget_t* self, Container_Iterator_t* iterator)
 {
     iterator->Container = this;
     iterator->Index = 0;
     iterator->IsExhausted = false;
-    return Container_IteratorFirst(self);
+    return Container_IteratorFirst(iterator);
 }
 
 
@@ -128,7 +130,7 @@ Widget_t* Container_IteratorCurrent(Container_Iterator_t* iterator)
     Container_t_data* container = &iterator->Container->Container;
     if (iterator->IsExhausted)
         return NULL;
-    return container->Children[container->ActiveIndex];
+    return (*container->Children)[container->ActiveIndex];
 }
 
 
@@ -141,7 +143,7 @@ Widget_t* Container_IteratorFirst(Container_Iterator_t* iterator)
         return NULL;
     }
     iterator->Index = 0;
-    return container->Children[0];
+    return (*container->Children)[0];
 }
 
 
@@ -156,7 +158,7 @@ Widget_t* Container_IteratorLast(Container_Iterator_t* iterator)
     }
     i = container->ChildCount - 1;
     iterator->Index = i;
-    return container->Children[i];
+    return (*container->Children)[i];
 }
 
 
@@ -170,7 +172,7 @@ Widget_t* Container_IteratorNext(Container_Iterator_t* iterator)
         iterator->IsExhausted = true;
         return NULL;
     }
-    return container->Children[++iterator->Index];
+    return (*container->Children)[++iterator->Index];
 }
 
 
@@ -184,5 +186,5 @@ Widget_t* Container_IteratorPrevious(Container_Iterator_t* iterator)
         iterator->IsExhausted = true;
         return NULL;
     }
-    return container->Children[--iterator->Index];
+    return (*container->Children)[--iterator->Index];
 }

@@ -25,9 +25,9 @@ const WIDGET_vtable_t WIDGET_vtable =
 };
 
 
-static Widget_def* GetNextItem(const Widget_def* Template)
+static const Widget_def* GetNextItem(const Widget_def* Template)
 {
-    Widget_def* childDef = &template->FirstChild;
+    const Widget_def* childDef = &template->FirstChild;
     unsigned char i = template->ChildCount;
     while (i --> 0)
         childDef = childDef->vtable->GetNextItem(childDef);
@@ -40,7 +40,7 @@ Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def**
     unsigned char i;
     Widget_def* childDef;
     Widget_t* child;
-    WIDGET_t* widget = (WIDGET_t*)malloc(sizeof(WIDGET_t) - sizeof(ptrdiff_t) + sizeof(ptrdiff_t) * template->ChildCount);
+    WIDGET_t* widget = (WIDGET_t*)malloc(sizeof(WIDGET_t) - sizeof(Widget_t*) + sizeof(Widget_t*) * template->ChildCount);
     widget->Widget.TypeId = TYPEID;
     widget->Widget.vtable = (Widget_vtable*)&WIDGET_vtable;
     widget->Widget.Definition = Template;
@@ -126,7 +126,7 @@ static int24_t SendInput(Widget_t* self, int24_t messageId)
     Widget_t** child;
     for (i = 0, child = &this->Children[0]; i < this->ChildCount; i++, child++)
         if ((*child)->HasFocus)
-            if (r = (*child)->vtable->SendInput(*child, messageId))
+            if ((r = (*child)->vtable->SendInput(*child, messageId)))
                 return r;
     return 0;
 }

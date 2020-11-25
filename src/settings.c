@@ -131,6 +131,7 @@ void Settings_Finalize(void)
         if (!file)
             break;
         fileData = ti_GetDataPtr(file);
+        /* TODO: Fix this warning. */
         if (strncmp(&fileData->IdString, SETTINGS_FILE_HEADER, sizeof(SETTINGS_FILE_HEADER)))
             return;
         archived = ti_IsArchived(file);

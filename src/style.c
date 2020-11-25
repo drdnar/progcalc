@@ -19,6 +19,7 @@ fontlib_font_t* DrMono14Bold;
 fontlib_font_t* DrSans14Bold;
 fontlib_font_t* DrSans10Regular;
 fontlib_font_t* DrSans10Bold;
+FontId_t CurrentFont;
 unsigned int GroupDelimiterWidth;
 unsigned char Baseline14;
 unsigned char Baseline10;
@@ -35,7 +36,6 @@ void ShowErrorAndExit(char* msg)
 
 void Style_Initialize(void)
 {
-    unsigned char w;
     DrMono14Bold = fontlib_GetFontByStyle("DrMono", 14, 14, FONTLIB_BOLD, FONTLIB_BOLD, 0, 0);
     DrSans10Regular = fontlib_GetFontByStyle("DrSans", 10, 10, FONTLIB_NORMAL, FONTLIB_NORMAL, 0, 0);
     DrSans14Bold = fontlib_GetFontByStyle("DrSans", 14, 14, FONTLIB_BOLD, FONTLIB_BOLD, 0, 0);
@@ -99,6 +99,7 @@ void Style_SaveTextWindow(CharTextWindow_t* saveTarget)
     saveTarget->Height = fontlib_GetWindowHeight();
     saveTarget->CursorX = fontlib_GetCursorX();
     saveTarget->CursorY = fontlib_GetCursorY();
+    saveTarget->FontId = CurrentFont;
 }
 
 
@@ -106,30 +107,36 @@ void Style_RestoreTextWindow(CharTextWindow_t* window)
 {
     fontlib_SetWindow(window->X, window->Y, window->Width, window->Height);
     fontlib_SetCursorPosition(window->CursorX, window->CursorY);
+    Style_SetFont(window->FontId);
 }
 
 
 void Style_SetLargeFontMono(void)
 {
     fontlib_SetFont(DrMono14Bold, 0);
+    CurrentFont = FONT_LARGE_MONO;
+    
 }
 
 
 void Style_SetLargeFontProp(void)
 {
     fontlib_SetFont(DrSans14Bold, 0);
+    CurrentFont = FONT_LARGE_PROP;
 }
 
 
 void Style_SetSmallFontProp(void)
 {
     fontlib_SetFont(DrSans10Regular, 0);
+    CurrentFont = FONT_SMALL_PROP;
 }
 
 
 void Style_SetSmallFontPropBold(void)
 {
     fontlib_SetFont(DrSans10Bold, 0);
+    CurrentFont = FONT_SMALL_PROP_BOLD;
 }
 
 
@@ -138,6 +145,7 @@ void Style_SetSmallFontPropAligned(void)
     unsigned char dh = DrSans14Bold->baseline_height - DrSans10Regular->baseline_height;
     fontlib_SetFont(DrSans10Regular, 0);
     fontlib_SetLineSpacing(dh, DrSans14Bold->height - dh - DrSans10Regular->height);
+    CurrentFont = FONT_SMALL_PROP_ALIGNED;
 }
 
 

@@ -1,51 +1,51 @@
-	.assume adl=1
+	section	.text
+	assume	adl = 1
 
-	.public	_BigIntZero
-	.public	_BigIntTen
-;	.public	_BigIntNegativeOne
-	.public	_BigIntCopyFromTo
-	.public	_BigIntSetToZero
-	.public	_BigIntSetToOne
-	.public	_BigIntSetToNegativeOne
-	.public	_BigIntIncrement
-	.public	_BigIntDecrement
-	.public	_BigIntAdd
-	.public	_BigIntSubtract
-;	.public	_BigIntAddInPlace
-;	.public	_BigIntSubtractInPlace
-	.public	_BigIntNegate
-;	.public	_BigIntNegateInPlace
-	.public	_BigIntIsNonZero
-	.public	_BigIntIsZero
-	.public	_BigIntGetSign
-	.public	_BigIntCompare
-	.public	_BigIntToNativeInt
-	.public	_BigIntBinify
-	.public	_BigIntOctify
-	.public	_BigIntHexify
-	.public	_BigIntShiftLeft
-	.public	_BigIntShiftBitInOnLeft
-;	.public	_BigIntShiftLeftInPlace
-	.public	_BigIntShiftRight
-;	.public	_BigIntShiftUnsignedRightInPlace
-	.public	_BigIntSignedShiftRight
-	.public	_BigIntShiftBitInOnRight
-;	.public	_BigIntShiftRightInPlace
-	.public	_BigIntAnd
-	.public	_BigIntOr
-	.public	_BigIntXor
-	.public	_BigIntNot
-	.public	_BigIntNand
-	.public	_BigIntGetBit
-	.public	_BigIntSetBit
-	.public	_BigIntMultiply
-	.public	_BigIntDivide
-	.public	_BigIntToStringBin
-	.public	_BigIntToStringOct
-	.public	_BigIntToStringHex
-	.public	_BigIntToString
+	public	_BigIntZero
+	public	_BigIntTen
+;	public	_BigIntNegativeOne
+	public	_BigIntCopyFromTo
+	public	_BigIntSetToZero
+	public	_BigIntSetToOne
+	public	_BigIntSetToNegativeOne
+	public	_BigIntIncrement
+	public	_BigIntDecrement
+	public	_BigIntAdd
+	public	_BigIntSubtract
+;	public	_BigIntAddInPlace
+;	public	_BigIntSubtractInPlace
+	public	_BigIntNegate
+;	public	_BigIntNegateInPlace
+	public	_BigIntIsNonZero
+	public	_BigIntIsZero
+	public	_BigIntGetSign
+	public	_BigIntCompare
+	public	_BigIntToNativeInt
+	public	_BigIntBinify
+	public	_BigIntOctify
+	public	_BigIntHexify
+	public	_BigIntShiftLeft
+	public	_BigIntShiftBitInOnLeft
+;	public	_BigIntShiftLeftInPlace
+	public	_BigIntShiftRight
+;	public	_BigIntShiftUnsignedRightInPlace
+	public	_BigIntSignedShiftRight
+	public	_BigIntShiftBitInOnRight
+;	public	_BigIntShiftRightInPlace
+	public	_BigIntAnd
+	public	_BigIntOr
+	public	_BigIntXor
+	public	_BigIntNot
+	public	_BigIntNand
+	public	_BigIntGetBit
+	public	_BigIntSetBit
+	public	_BigIntMultiply
+	public	_BigIntDivide
+	public	_BigIntToStringBin
+	public	_BigIntToStringOct
+	public	_BigIntToStringHex
+	public	_BigIntToString
 
-.text
 ; Some routines jump to the end of a BigInt using LEA, and some routines make a
 ; stack local BigInt, so this should be less than 120.
 ;
@@ -61,13 +61,13 @@
 BIG_INT_SIZE := 16
 
 _BigIntTen:
-	.db	10
+	db	10
 _BigIntZero:
-	.db	0, 0, 0, 0, 0, 0, 0, 0
-	.db	0, 0, 0, 0, 0, 0, 0, 0
+	db	0, 0, 0, 0, 0, 0, 0, 0
+	db	0, 0, 0, 0, 0, 0, 0, 0
 ;_BigIntNegativeOne:
-;	.db	255, 255, 255, 255, 255, 255, 255, 255
-;	.db	255, 255, 255, 255, 255, 255, 255, 255
+;	db	255, 255, 255, 255, 255, 255, 255, 255
+;	db	255, 255, 255, 255, 255, 255, 255, 255
 
 ;-------------------------------------------------------------------------------
 _BigIntCopyFromTo:
@@ -1042,7 +1042,7 @@ bim.knownOverflow:
 	; return .of;
 	ld	a,(ix + bim.of)
 ; Close stack frame
-	ld	hl,ix + bim.localsSize
+	lea	hl,ix + bim.localsSize
 	ld	sp,hl
 	pop	ix
 	ret

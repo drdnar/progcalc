@@ -15,6 +15,15 @@ enum FontId
     FONT_SMALL_PROP_ALIGNED
 };
 
+/**
+ * Type of a FontId.
+ */
+typedef uint8_t FontId_t;
+
+/**
+ * The FontId of the last font set by a call to Style_SetSomeFont().
+ */
+extern FontId_t CurrentFont;
 
 /**
  * Main text color.
@@ -121,6 +130,7 @@ typedef struct
     unsigned char Height;
     unsigned int CursorX;
     unsigned char CursorY;
+    FontId_t FontId;
 } CharTextWindow_t;
 
 /**

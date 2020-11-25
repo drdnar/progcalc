@@ -4,12 +4,15 @@
 #define WIDGET_H
 #include "forms.h"
 
-#define EXPAND_ARGUMENT(arg) arg
+#define PASTE_(x, y) x##y
+#define PASTE(x, y) PASTE_(x, y)
+#define WIDGET_def PASTE(WIDGET, _def)
+
 /**
  * Name of this widget's changing data struct.
  * Allows easy copy-and-paste of code.
  */
-#define WIDGET_t EXPAND_ARGUMENT(WIDGET) ## _t
+#define WIDGET_t PASTE(WIDGET, _t)
 /**
  * Pointer to this widget's changable data, such as position.
  */
@@ -18,7 +21,7 @@
  * Name of this widget's definition struct.
  * Allows easy copy-and-paste of code.
  */
-#define WIDGET_def EXPAND_ARGUMENT(WIDGET) ## _def
+#define WIDGET_def PASTE(WIDGET, _def)
 /**
  * Pointer to this widget's unchanging data, such as text it displays.
  */
@@ -30,19 +33,19 @@
 /**
  * Type name of this widget's expanded vtabel, if applicable.
  */
-#define WIDGET_vtable_t EXPAND_ARGUMENT(WIDGET) ## _vtable_t
+#define WIDGET_vtable_t PASTE(WIDGET, _vtable_t)
 /**
  * Name of this widget's actual vtable.
  * This must be global in scope so it can be referenced.
  */
-#define WIDGET_vtable EXPAND_ARGUMENT(WIDGET) ## _vtable
+#define WIDGET_vtable PASTE(WIDGET, _vtable)
 /**
  * Name of this widget's public constructor.
  */
-#define WIDGET_ctor EXPAND_ARGUMENT(WIDGET) ## _ctor
+#define WIDGET_ctor PASTE(WIDGET, _ctor)
 
 
-static Widget_def* GetNextItem(Widget_def* Template);
+static const Widget_def* GetNextItem(const Widget_def* Template);
 static Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def** next);
 static void dtor(Widget_t* self);
 static uint8_t MoveTo(Widget_t* self, uint24_t X, uint8_t Y);

@@ -56,7 +56,7 @@ typedef struct Widget_t
      * Pointer to the widget's definition.
      * Useful as a reference to fixed data the widget needs to access.
      */
-    Widget_def* Definition;
+    const Widget_def* Definition;
     /**
      * Pointer to the widget's parent, if any.
      */
@@ -101,7 +101,7 @@ typedef struct Widget_vtable
      * @param Template Pointer to template data block
      * @return Pointer to next widget.
      */
-    Widget_def* (*GetNextItem)(const Widget_def* Template);
+    const Widget_def* (*GetNextItem)(const Widget_def* Template);
     /**
      * Constructor for a widget.
      * @param Template Pointer to the widget's template (i.e. constant data used in the form.
@@ -153,23 +153,6 @@ typedef struct Widget_vtable
      */
     int24_t (*SendInput)(Widget_t* self, int24_t messageId);
 } Widget_vtable;
-
-typedef struct
-{
-    /**
-     * Block of data common to all widget definitions.
-     */
-    Widget_def Widget;
-    /**
-     * Number of child items present.
-     * This should be greater than zero.
-     */
-    uint8_t ItemsCount;
-    /**
-     * First child item.
-     */
-    Widget_def Child;
-} RowItems_def;
 
 /**
  * Duplicates a vtable into RAM.

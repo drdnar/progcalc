@@ -72,7 +72,7 @@ Widget_t* Container_ctor(const Widget_def* Template, Widget_t* self, Widget_def*
  * @note Do not pass a reference to your containing Widget_def, as this
  * specifically expects a pointer to the Container_def portion.
  */
-Widget_def* Container_GetNextItem(const Container_def* Template);
+const Widget_def* Container_GetNextItem(const Container_def* Template);
 /**
  * Container destructor.
  * @note This does NOT free memory, except for the memory used by the child list.
