@@ -31,19 +31,21 @@ void main(void) {
     sk_key_t k;
     bool dirty = true;
     
-    /* Need to force stuff to appear in output file. *
+    Style_Initialize();
+    Ui_Initialize();
+    Settings_Initialize();
+    Rpn_Reset();
+
+    /* Need to force stuff to appear in output file. */
     RowList_t* rowlist;
     RowItems_t* rowitems;
     Checkbox_t* checkbox;
     Label_t* label;
 
-    label = (Label_t*)Label_ctor(&SampleForm, NULL, NULL);
-*/
-
-    Style_Initialize();
-    Ui_Initialize();
-    Settings_Initialize();
-    Rpn_Reset();
+    label = (Label_t*)Label_ctor(&TestLabel, NULL, NULL);
+    label->Widget.vtable->MoveTo((Widget_t*)label, 10, 10);
+    rowitems = (RowItems_t*)RowItems_ctor(&TestRowItems, NULL, NULL);
+    rowitems->Widget.vtable->MoveTo((Widget_t*)rowitems, 10, 30);
 
     do
     {
@@ -53,6 +55,8 @@ void main(void) {
             fontlib_ClearWindow();
             Rpn_Redraw();
             StatusBar_Draw();
+    label->Widget.vtable->Paint((Widget_t*)label);
+    rowitems->Widget.vtable->Paint((Widget_t*)rowitems);
         }
         do
             k = GetKey();

@@ -25,7 +25,6 @@ Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* self, Widget_def** n
 {
     unsigned char i;
     Widget_def* childDef;
-    Widget_t* child;
     this->Container.ActiveIndex = 0;
     this->Container.ChildCount = template->ChildCount;
     this->Container.Children = calloc(template->ChildCount, sizeof(Widget_t*));

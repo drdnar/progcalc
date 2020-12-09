@@ -38,7 +38,7 @@ typedef struct RowList_t
     /**
      * Array of pointers to child widgets this container instance has.
      */
-    Widget_t* Children[1];
+    Widget_t* Children[];
 } RowList_t;
 
 /**

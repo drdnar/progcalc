@@ -97,26 +97,25 @@ unsigned char Format_GetNumberHeight(Base_t base)
 void Format_PrintInBase(BigInt_t* n, Base_t base)
 {
     Coord_t home;
-    unsigned int x1, x2 = 0;
-    unsigned char y1;
+    unsigned int x = 0;
     Style_SaveCursor(&home);
     switch (base)
     {
         case BINARY:
-            x2 = Format_PrintBin(n);
+            x = Format_PrintBin(n);
             break;
         case OCTAL:
-            x2 = Format_PrintOct(n);
+            x = Format_PrintOct(n);
             break;
         case DECIMAL:
-            x2 = Format_PrintDec(n);
+            x = Format_PrintDec(n);
             break;
         case HEXADECIMAL:
-            x2 = Format_PrintHex(n);
+            x = Format_PrintHex(n);
             break;
     }
     gfx_SetColor(fontlib_GetBackgroundColor());
-    gfx_FillRectangle_NoClip(home.x, home.y, x2 - home.x, fontlib_GetCursorY() - home.y + fontlib_GetCurrentFontHeight());
+    gfx_FillRectangle_NoClip(home.x, home.y, x - home.x, fontlib_GetCursorY() - home.y + fontlib_GetCurrentFontHeight());
 }
 
 
@@ -203,28 +202,12 @@ static char* printBinCh[] =
 
 unsigned int Format_PrintBin(BigInt_t* n)
 {
-    unsigned char h, i, j;
+    unsigned char h, i;
     char* ch;
     unsigned int xreturn;
     windowize(Format_BinSize.x);
     xreturn = PrintBaseLabel(BINARY, Format_BinSize.y);
     BigIntToStringBin(n, Format_NumberBuffer);
-    /*switch (Settings.DisplayBits)
-    {
-        case SHOW_32:
-            i = 4;
-            ch = FormattedNumberBuffer + (BIG_INT_SIZE - 4) * 8;
-            break;
-        case SHOW_64:
-            i = 8;
-            ch = FormattedNumberBuffer + (BIG_INT_SIZE - 8) * 8;
-            break;
-        case SHOW_128:
-            i = 16;
-            ch = FormattedNumberBuffer + (BIG_INT_SIZE - 16) * 8;
-            break;
-    }
-    for (; i > 0; i--)*/
     /* Array indexing seems to produce less terrible output than if or switch. */
     ch = printBinCh[Settings.DisplayBits];
     for (h = Format_BinSize.y / CHAR_HEIGHT; h > 0; h--)
@@ -282,7 +265,7 @@ static unsigned char const printDecInitialDigits[] =
 
 unsigned int Format_PrintDec(BigInt_t* n)
 {
-    unsigned char i, j, expected;
+    unsigned char expected;
     unsigned char group, subgroup, actualDigits;
     char* ch, *src;
     unsigned int xreturn;
@@ -348,7 +331,7 @@ static char* printHexCh[] =
 
 unsigned int Format_PrintHex(BigInt_t* n)
 {
-    unsigned char i, j;
+    unsigned char i;
     char* ch;
     unsigned int xreturn;
     windowize(Format_HexSize.x);

@@ -4,11 +4,22 @@ macro ?!
 	typeid_counter = 1
 	child_counter = 0
 
+    ;;;;
+	;; Declares a widget structure
+	;; @param type Name of the widget type prefix, must match the name in C, e.g. Label
+	;; @param fields List of fields along with their type, e.g. dl someStringPointer.
+	;; Additionally, the final entry may be named "children" without any type.
+	;; This declares that the widget has a list of children, terminated by end, e.g. end RowList.
+	;;;;
 	macro defwidget? type*, fields&
-		local typeid, args
+		local typeid, args, vtname
 
+		; Increment type ID counter
 		typeid_counter = typeid_counter + 1
 		typeid := typeid_counter
+
+		; Declare the _vtable pointer for linking
+		esc extern _#type#_vtable
 
 		args equ type?
 		iterate field, fields
@@ -55,7 +66,19 @@ macro ?!
 	purge ?
 end macro
 
+; These must be declared in the same order as in forms.h so that the type IDs match.
 defwidget RowList, children
 defwidget RowItems, db Alignment, children
 defwidget Label, db Font, dl Text
 defwidget Checkbox, db Font, dl Text, dl Variable
+
+; Font IDs matching style.h
+FONT_LARGE_PROP = 0
+FONT_LARGE_MONO = 1
+FONT_SMALL_PROP = 2
+FONT_SMALL_PROP_BOLD = 3
+FONT_SMALL_PROP_ALIGNED = 4
+
+; Alignment options for RowItems
+ROW_ITEMS_LEFT = 0
+ROW_ITEMS_RIGHT = 1

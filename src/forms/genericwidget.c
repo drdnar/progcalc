@@ -1,6 +1,9 @@
 #include "forms.h"
 #include <string.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+
 Widget_vtable* Clone_Widget_vtable(const Widget_vtable* src)
 {
     Widget_vtable* vtable = malloc(src->Length);
@@ -58,3 +61,5 @@ int24_t GenericWidget_SendInput(Widget_t* self, int24_t messageId)
 {
     return 0;
 }
+
+#pragma clang diagnostic pop

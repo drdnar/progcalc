@@ -40,7 +40,7 @@ static BigIntStack_t* MainStack = NULL;
  */
 static BigInt_t CurrentInput;
 
-static BigInt_t Temp0;
+/*static BigInt_t Temp0;*/
 static BigInt_t Temp1;
 static BigInt_t Temp2;
 static BigInt_t Temp3;
@@ -57,7 +57,8 @@ CharTextWindow_t Rpn_Window =
 {
     0, 0,
     LCD_WIDTH, LCD_HEIGHT,
-    0, 0
+    0, 0,
+    FONT_LARGE_PROP
 };
 
 /**
@@ -136,8 +137,8 @@ void Rpn_Redraw(void)
 {
     Coord_t upperLeft;
     unsigned int index;
-    Style_SetLargeFontProp();
     Style_RestoreTextWindow(&Rpn_Window);
+/*    Style_SetLargeFontProp();*/
     fontlib_SetCursorPosition(Rpn_Window.X, Rpn_Window.Y + Rpn_Window.Height);
     /* Cache height of an entry. TODO: This might NOT actually be helpful to cache here. */
     EntryHeight = Format_GetNumberHeight(Settings.PrimaryBase) + Format_GetNumberHeight(Settings.SecondaryBase);
@@ -227,7 +228,6 @@ static void scrollLast(void)
 bool Rpn_SendKey(sk_key_t k)
 {
     bool r;
-    signed char x;
     unsigned int i;
     if (k == sk_Enter && InputMode != RPN_SCROLL)
     {
@@ -272,10 +272,12 @@ bool Rpn_SendKey(sk_key_t k)
                 return false;
         }
         if (ScrollIndex == 0)
+        {
             if (GetBigInt_IsActive())
                 InputMode = RPN_INPUT;
             else
                 InputMode = RPN_NO_INPUT;
+        }
     }
     else
     {

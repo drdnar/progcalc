@@ -36,7 +36,7 @@ typedef struct Container_t_data
     /**
      * Pointer to array of pointers to child widgets this container instance has.
      */
-    Widget_t* (*Children)[1];
+    Widget_t* (*Children)[];
 } Container_t_data;
 
 typedef struct Container_t
@@ -67,18 +67,21 @@ typedef struct Container_vtable_t
  * @return Returns a pointer to a newly-constructed widget, but not having been positioned yet.
  */
 Widget_t* Container_ctor(const Widget_def* Template, Widget_t* self, Widget_def** next);
+
 /**
  * Walks the child list of a Container_def struct.
  * @note Do not pass a reference to your containing Widget_def, as this
  * specifically expects a pointer to the Container_def portion.
  */
 const Widget_def* Container_GetNextItem(const Container_def* Template);
+
 /**
  * Container destructor.
  * @note This does NOT free memory, except for the memory used by the child list.
  * @param self Pointer to Container widget whose child list should be freed.
  */
 void Container_dtor(Widget_t* self);
+
 /**
  * Moves a container and all its children to a specific location.
  * @note The locations of the container and all its children must already be initialized.
@@ -88,12 +91,14 @@ void Container_dtor(Widget_t* self);
  * @return Returns zero on success.
  */
 uint8_t Container_MoveTo(Widget_t* self, uint24_t X, uint8_t Y);
+
 /**
  * Paints all of a Container's children.
  * @param self Pointer to self.
  * @return Returns zero.
  */
 int24_t Container_Paint(Widget_t* self);
+
 /**
  * Gives focus to the currently active child.
  */
@@ -127,36 +132,42 @@ typedef struct Container_Iterator_t
  * @return Returns a pointer to the first child widget.
  */
 Widget_t* Container_InitializeIterator(Widget_t* self, Container_Iterator_t* iterator);
+
 /**
  * Gets the current widget the iterator is pointing to.
  * @param iterator Pointer to iterator
  * @return Returns a pointer to the widget, or NULL if no widget.
  */
 Widget_t* Container_IteratorCurrent(Container_Iterator_t* iterator);
+
 /**
  * Sets the iterator to the first child.
  * @param iterator Pointer to iterator
  * @return Returns a pointer to the widget, or NULL if no widget.
  */
 Widget_t* Container_IteratorFirst(Container_Iterator_t* iterator);
+
 /**
  * Sets the iterator to the last child.
  * @param iterator Pointer to iterator
  * @return Returns a pointer to the widget, or NULL if no widget.
  */
 Widget_t* Container_IteratorLast(Container_Iterator_t* iterator);
+
 /**
  * Sets the iterator to the next child.
  * @param iterator Pointer to iterator
  * @return Returns a pointer to the widget, or NULL if no widget.
  */
 Widget_t* Container_IteratorNext(Container_Iterator_t* iterator);
+
 /**
  * Sets the iterator to the previous child.
  * @param iterator Pointer to iterator
  * @return Returns a pointer to the widget, or NULL if no widget.
  */
 Widget_t* Container_IteratorPrevious(Container_Iterator_t* iterator);
+
 /**
  * @return Return true if successful, false if no subsequent children can accept focus.
  */

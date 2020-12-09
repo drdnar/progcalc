@@ -44,12 +44,16 @@
  */
 #define WIDGET_ctor PASTE(WIDGET, _ctor)
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
 
 static const Widget_def* GetNextItem(const Widget_def* Template);
-static Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def** next);
+Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def** next);
 static void dtor(Widget_t* self);
 static uint8_t MoveTo(Widget_t* self, uint24_t X, uint8_t Y);
 static int24_t Paint(Widget_t* self);
 static int24_t Focus(Widget_t* self);
 static int24_t Unfocus(Widget_t* self);
 static int24_t SendInput(Widget_t* self, int24_t messageId);
+
+#pragma clang diagnostic pop

@@ -40,7 +40,7 @@ Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def**
     unsigned char i;
     Widget_def* childDef;
     Widget_t* child;
-    WIDGET_t* widget = (WIDGET_t*)malloc(sizeof(WIDGET_t) - sizeof(Widget_t*) + sizeof(Widget_t*) * template->ChildCount);
+    WIDGET_t* widget = (WIDGET_t*)malloc(sizeof(WIDGET_t) + sizeof(Widget_t*) * template->ChildCount);
     widget->Widget.TypeId = TYPEID;
     widget->Widget.vtable = (Widget_vtable*)&WIDGET_vtable;
     widget->Widget.Definition = Template;
