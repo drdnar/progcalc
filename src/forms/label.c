@@ -42,7 +42,7 @@ Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def**
     widget->Widget.Height = fontlib_GetCurrentFontHeight();
     widget->Widget.Width = fontlib_GetStringWidth(((WIDGET_def*)Template)->Text);
     if (next != NULL)
-        *next = (Widget_def*)((WIDGET_t*)Template + 1);
+        *next = (Widget_def*)((WIDGET_def*)Template + 1);
     return (Widget_t*)widget;
 }
 

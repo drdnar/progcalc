@@ -25,6 +25,7 @@
 #include "forms/rowlist.h"
 #include "testform.h"
 
+unsigned char someBool = 1;
 
 /* Main Function */
 void main(void) {
@@ -44,8 +45,10 @@ void main(void) {
 
     label = (Label_t*)Label_ctor(&TestLabel, NULL, NULL);
     label->Widget.vtable->MoveTo((Widget_t*)label, 10, 10);
-    rowitems = (RowItems_t*)RowItems_ctor(&TestRowItems, NULL, NULL);
-    rowitems->Widget.vtable->MoveTo((Widget_t*)rowitems, 10, 30);
+    //rowitems = (RowItems_t*)RowItems_ctor(&TestRowItems, NULL, NULL);
+    //rowitems->Widget.vtable->MoveTo((Widget_t*)rowitems, 10, 30);
+    rowlist = (RowList_t*)RowList_ctor(&TestRowList, NULL, NULL);
+    rowlist->Widget.vtable->MoveTo((Widget_t*)rowlist, 10, 30);
 
     do
     {
@@ -56,7 +59,8 @@ void main(void) {
             Rpn_Redraw();
             StatusBar_Draw();
     label->Widget.vtable->Paint((Widget_t*)label);
-    rowitems->Widget.vtable->Paint((Widget_t*)rowitems);
+    //rowitems->Widget.vtable->Paint((Widget_t*)rowitems);
+    rowlist->Widget.vtable->Paint((Widget_t*)rowlist);
         }
         do
             k = GetKey();

@@ -43,7 +43,7 @@ Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def**
     widget->Widget.Width = fontlib_GetStringWidth(((WIDGET_def*)Template)->Text)
         + fontlib_GetStringWidth(CALC1252_CURSOR_RIGHT " " CALC1252_RADIO_UNCHECKED "  " CALC1252_CURSOR_LEFT);
     if (next != NULL)
-        *next = (Widget_def*)((WIDGET_t*)Template + 1);
+        *next = (Widget_def*)((WIDGET_def*)Template + 1);
     return (Widget_t*)widget;
 }
 

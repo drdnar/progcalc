@@ -55,7 +55,7 @@ Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def**
         widget->Children[i] = child;
         if (widget->Widget.Height < child->Height)
             widget->Widget.Height = child->Height;
-        widget->Widget.Width += child->Height;
+        widget->Widget.Width += child->Width;
     }
     if (next != NULL)
         *next = childDef;
