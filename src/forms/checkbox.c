@@ -41,7 +41,7 @@ Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def**
     Style_SetFont(((WIDGET_def*)Template)->Font);
     widget->Widget.Height = fontlib_GetCurrentFontHeight();
     widget->Widget.Width = fontlib_GetStringWidth(((WIDGET_def*)Template)->Text)
-        + fontlib_GetStringWidth(CALC1252_CURSOR_RIGHT " " CALC1252_RADIO_UNCHECKED "  " CALC1252_CURSOR_LEFT);
+        + fontlib_GetStringWidth(CALC1252_CURSOR_RIGHT " " CALC1252_RADIO_UNCHECKED "   " CALC1252_CURSOR_LEFT);
     if (next != NULL)
         *next = (Widget_def*)((WIDGET_def*)Template + 1);
     return (Widget_t*)widget;
@@ -64,6 +64,7 @@ static int24_t Paint(Widget_t* self)
     else
         ch = CALC1252_RADIO_UNCHECKED_CHAR;
     fontlib_DrawGlyph(ch);
+    fontlib_DrawGlyph(' ');
     fontlib_DrawString(definition->Text);
     fontlib_DrawGlyph(' ');
     if (this->Widget.HasFocus)

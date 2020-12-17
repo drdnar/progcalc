@@ -1,6 +1,7 @@
 #ifndef ROW_ITEMS_H
 #define ROW_ITEMS_H
 #include "forms.h"
+#include "container.h"
 
 /**
  * Sets the width of this container.
@@ -31,14 +32,9 @@ typedef struct RowItems_def
      */
     uint8_t Alignment;
     /**
-     * Number of children this container has.
+     * Initial child list.
      */
-    uint8_t ChildCount;
-    /**
-     * First entry in this container's child Items.
-     * This is not an array, but a table that needs special parsing logic.
-     */
-    Widget_def FirstChild;
+    Container_def Children;
 } RowItems_def;
 
 /**
@@ -51,13 +47,9 @@ typedef struct RowItems_t
      */
     Widget_t Widget;
     /**
-     * Number of children this container has.
+     * Data common to all Containers.
      */
-    uint8_t ChildCount;
-    /**
-     * Array of pointers to child widgets this container instance has.
-     */
-    Widget_t* Children[];
+    Container_t_data Container;
 } RowItems_t;
 
 /**

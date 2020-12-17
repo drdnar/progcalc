@@ -10,6 +10,10 @@
  */
 #define CHILDREN(container) (*container->Container.Children)
 
+/**
+ * This does not describe a whole Container widget template, just the data part
+ * Container code needs to parse.
+ */
 typedef struct Container_def
 {
     /**
@@ -23,6 +27,10 @@ typedef struct Container_def
     Widget_def FirstChild;
 } Container_def;
 
+/**
+ * This is the subsection of data all Containers have.
+ * This MUST be the second item after the Widget_t block.
+ */
 typedef struct Container_t_data
 {
     /**
@@ -39,6 +47,9 @@ typedef struct Container_t_data
     Widget_t* (*Children)[];
 } Container_t_data;
 
+/**
+ * Generic Container struct.
+ */
 typedef struct Container_t
 {
     /**
@@ -51,6 +62,9 @@ typedef struct Container_t
     Container_t_data Container;
 } Container_t;
 
+/**
+ * Currently unused.
+ */
 typedef struct Container_vtable_t
 {
     /**

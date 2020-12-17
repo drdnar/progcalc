@@ -1,6 +1,7 @@
 #ifndef ROW_LIST_H
 #define ROW_LIST_H
 #include "forms.h"
+#include "container.h"
 
 /**
  * Describes a widget template.
@@ -12,14 +13,9 @@ typedef struct RowList_def
      */
     Widget_def Widget;
     /**
-     * Number of children this container has.
+     * Initial child list.
      */
-    uint8_t ChildCount;
-    /**
-     * First entry in this container's child list.
-     * This is not an array, but a table that needs special parsing logic.
-     */
-    Widget_def FirstChild;
+    Container_def Children;
 } RowList_def;
 
 /**
@@ -32,13 +28,9 @@ typedef struct RowList_t
      */
     Widget_t Widget;
     /**
-     * Number of children this container has.
+     * Data common to all Containers.
      */
-    uint8_t ChildCount;
-    /**
-     * Array of pointers to child widgets this container instance has.
-     */
-    Widget_t* Children[];
+    Container_t_data Container;
 } RowList_t;
 
 /**

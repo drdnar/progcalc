@@ -103,6 +103,7 @@ bool Container_FocusPrevious(Widget_t* self)
 
 int24_t Container_Unfocus(Widget_t* self)
 {
+    GenericWidget_Unfocus(self);
     Widget_t* child = this_Children[this->Container.ActiveIndex];
     return child->vtable->Unfocus(child);
 }
