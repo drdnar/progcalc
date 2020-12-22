@@ -22,6 +22,12 @@ typedef enum
     BUTTON
 } WidgetIds;
 
+typedef enum
+{
+    WIDGET_DEF_NO_FLAGS = 0,
+    WIDGET_DEF_CONTAINER = 1
+} Widget_def_Flags;
+
 /**
  * Static data used to form a Widget_t object.
  */
@@ -31,6 +37,10 @@ typedef struct Widget_def
      * Identifies what kind of widget this is.
      */
     uint8_t TypeId;
+    /**
+     * Additional information about a widget.
+     */
+    uint8_t Flags;
     /**
      * Pointer to the widget's method table.
      * TypeId tells other widgets what this is, while the vtable is used to invoke methods.

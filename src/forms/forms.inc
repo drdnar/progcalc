@@ -1,3 +1,7 @@
+; Definition flags
+WIDGET_DEF_NO_FLAGS = 0
+WIDGET_DEF_CONTAINER = 1
+
 ; Macro courtesy of jacobly
 macro ?!
 	local typeid_counter, child_counter
@@ -7,12 +11,14 @@ macro ?!
     ;;;;
 	;; Declares a widget structure
 	;; @param type Name of the widget type prefix, must match the name in C, e.g. Label
+	;; @param defflags Should be WIDGET_DEF_CONTAINER if the Widget is a Container.
 	;; @param fields List of fields along with their type, e.g. dl someStringPointer.
 	;; Additionally, the final entry may be named "children" without any type.
 	;; This declares that the widget has a list of children, terminated by end, e.g. end RowList.
 	;;;;
-	macro defwidget? type*, fields&
-		local typeid, args, vtname
+	macro defwidget? type*, userflags:0, fields&
+		local typeid, args, vtname, defflags
+		defflags = userflags
 
 		; Increment type ID counter
 		typeid_counter = typeid_counter + 1
@@ -26,6 +32,8 @@ macro ?!
 			match =children, field
 				if % <> %%
 					err 'syntax error: defwidget field children should be last'
+				else
+					defflags = (defflags or WIDGET_DEF_CONTAINER)
 				end if
 				; handled later
 			else match size= name, field
@@ -43,6 +51,7 @@ macro ?!
 				child_counter = child_counter + 1
 
 				db typeid
+				db defflags
 				dl _#type#_vtable
 				iterate field, fields
 					match =children, field
@@ -67,10 +76,10 @@ macro ?!
 end macro
 
 ; These must be declared in the same order as in forms.h so that the type IDs match.
-defwidget RowList, children
-defwidget RowItems, db Alignment, children
-defwidget Label, db Font, dl Text
-defwidget Checkbox, db Font, dl Text, dl Variable
+defwidget RowList, , children
+defwidget RowItems, , db Alignment, children
+defwidget Label, , db Font, dl Text
+defwidget Checkbox, , db Font, dl Text, dl Variable
 
 ; Font IDs matching style.h
 FONT_LARGE_PROP = 0

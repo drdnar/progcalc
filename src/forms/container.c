@@ -116,6 +116,14 @@ int24_t Container_SendInput(Widget_t* self, int24_t messageId)
 }
 
 
+Widget_t* Container_GetTopmostParent(Widget_t* self)
+{
+    while (self->Parent != NULL)
+        self = self->Parent;
+    return self;
+}
+
+
 Widget_t* Container_InitializeIterator(Widget_t* self, Container_Iterator_t* iterator)
 {
     iterator->Container = this;

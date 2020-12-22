@@ -127,11 +127,26 @@ int24_t Container_Unfocus(Widget_t* self);
 int24_t Container_SendInput(Widget_t* self, int24_t messageId);
 
 /**
+ * Recursively searches for the topmost parent.
+ * @param self Pointer to a widget
+ * @return Pointer to a Widget whose Parent is NULL.
+ */
+Widget_t* Container_GetTopmostParent(Widget_t* self);
+
+/**
  * Type of an interator used for enumerating children.
  */
 typedef struct Container_Iterator_t
 {
+    /**
+     * Pointer to the Container this is iterating over.
+     * You should not modify this.
+     */
     Container_t* Container;
+    /**
+     * Current index this Iterator is looking at.
+     * This index must always be valid.
+     */
     uint8_t Index;
     /**
      * True if the iterator is out of items to enumerate.
