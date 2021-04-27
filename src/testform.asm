@@ -20,10 +20,18 @@ _TestLabel:
 Label FONT_LARGE_PROP, teststr
 
 
+; Temporary test checkbox
+public _TestCheckbox
+	extern	_someBool
+_TestCheckbox:
+Checkbox FONT_LARGE_PROP, someCheckboxText, _someBool
+; END TEMPORARY THINGY
+
 public _TestRowList
 _TestRowList:
 RowList
 	Label FONT_LARGE_PROP, someTitle
+end RowList
 
 public _TestRowItems
 _TestRowItems:
@@ -32,6 +40,6 @@ RowItems ROW_ITEMS_LEFT
 	Label FONT_LARGE_PROP, rowItemsTestStr2
 end RowItems
 
-	extern	_someBool
-	Checkbox FONT_LARGE_PROP, someCheckboxText, _someBool
-end RowList
+;	extern	_someBool
+;	Checkbox FONT_LARGE_PROP, someCheckboxText, _someBool
+;end RowList

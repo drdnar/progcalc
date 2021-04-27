@@ -18,17 +18,19 @@
 #include "inputbigint.h"
 #include "statusbar.h"
 
-#include "forms/forms.h"
+#include "forms/widget.h"
 #include "forms/checkbox.h"
 #include "forms/label.h"
 #include "forms/rowitems.h"
 #include "forms/rowlist.h"
 #include "testform.h"
 
+using namespace Forms;
+
 unsigned char someBool = 1;
 
 /* Main Function */
-void main(void) {
+int main(void) {
     sk_key_t k;
     bool dirty = true;
     
@@ -38,17 +40,29 @@ void main(void) {
     Rpn_Reset();
 
     /* Need to force stuff to appear in output file. */
-    RowList_t* rowlist;
-    RowItems_t* rowitems;
-    Checkbox_t* checkbox;
-    Label_t* label;
-
-    label = (Label_t*)Label_ctor(&TestLabel, NULL, NULL);
-    label->Widget.vtable->MoveTo((Widget_t*)label, 10, 10);
+//    RowList_t* rowlist;      
+//    RowItems_t* rowitems;
+    //Checkbox* checkbox;
+    
+    Label* label = (Label*)TestLabel.TypeDescriptor->ctor(&TestLabel, nullptr, nullptr);
+    label->MoveTo(10, 20);
+    Checkbox* checkbox = (Checkbox*)TestCheckbox.TypeDescriptor->ctor(&TestCheckbox, nullptr, nullptr);
+    checkbox->MoveTo(20, 50);
+    //Label* label = (Label*)Label_desc.ctor(&TestLabel, nullptr, nullptr);
+    
+    RowList* rowlist = (RowList*)TestRowList.TypeDescriptor->ctor(&TestRowList, nullptr, nullptr);
+    rowlist->Layout();
+    rowlist->MoveTo(15, 100);
+    //label = (Label*)Label_ctor(&TestLabel, NULL, NULL);
+    //label->Widget.vtable->MoveTo((Widget*)label, 10, 10);
+    RowItems* rowitems = (RowItems*)TestRowItems.TypeDescriptor->ctor(&TestRowItems, nullptr, nullptr);
+    rowitems->Layout();
+    rowitems->MoveTo(15, 125);
+    
     //rowitems = (RowItems_t*)RowItems_ctor(&TestRowItems, NULL, NULL);
     //rowitems->Widget.vtable->MoveTo((Widget_t*)rowitems, 10, 30);
-    rowlist = (RowList_t*)RowList_ctor(&TestRowList, NULL, NULL);
-    rowlist->Widget.vtable->MoveTo((Widget_t*)rowlist, 10, 30);
+//    rowlist = (RowList_t*)RowList_ctor(&TestRowList, NULL, NULL);
+//    rowlist->Widget.vtable->MoveTo((Widget_t*)rowlist, 10, 30);
 
     do
     {
@@ -58,9 +72,13 @@ void main(void) {
             fontlib_ClearWindow();
             Rpn_Redraw();
             StatusBar_Draw();
-    label->Widget.vtable->Paint((Widget_t*)label);
+            label->Paint();
+            checkbox->Paint();
+            rowlist->Paint();
+            rowitems->Paint();
+    //label->Widget.vtable->Paint((Widget*)label);
     //rowitems->Widget.vtable->Paint((Widget_t*)rowitems);
-    rowlist->Widget.vtable->Paint((Widget_t*)rowlist);
+    //rowlist->Widget.vtable->Paint((Widget*)rowlist);
         }
         do
             k = GetKey();
@@ -108,6 +126,7 @@ void main(void) {
     /* Pause */
     //while (!os_GetCSC());
     ExitClean();
+    return 0;
 }
 
 

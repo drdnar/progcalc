@@ -1,56 +1,47 @@
-#define WIDGET Label
-#define TYPEID LABEL
-#include "widget.inc.h"
 #include "label.h"
 #include <fontlibc.h>
 #include "../style.h"
 
-const WIDGET_vtable_t WIDGET_vtable =
+using namespace Forms;
+
+
+static Widget_def* GetNextItem(Widget_def* Template)
 {
-    /* Widget */
-    {
-        sizeof(WIDGET_vtable_t),
-        false,
-        &GetNextItem,
-        &WIDGET_ctor,
-        &GenericWidget_dtor,
-        &GenericWidget_MoveTo,
-        &Paint,
-        /* Focus */
-        &GenericWidget_FailureEvent,
-        /* Unfocus */
-        &GenericWidget_SuccessEvent,
-        &GenericWidget_SendInput
-    }
+    if (Template == nullptr)
+        return nullptr;
+    return (Widget_def*)((Label_def*)Template + 1);
+}
+
+
+Widget* Forms::Label_ctor(Widget_def* Template, Widget* parent, Widget_def** next)
+{
+    Label* widget = new Label();
+    widget->_definition = Template;
+    widget->_parent = parent;
+    widget->_font = ((Label_def*)Template)->Font;
+    widget->_text = ((Label_def*)Template)->Text;
+    //reinterpret_cast<Label_def&>(Template).Font;
+    Style_SetFont(widget->_font);
+    widget->_height = fontlib_GetCurrentFontHeight();
+    widget->_width = fontlib_GetStringWidth(widget->_text);
+    if (next != nullptr)
+        *next = (Widget_def*)((Label_def*)Template + 1);
+    return widget;
+}
+
+
+extern "C" const Widget_desc Label_desc
+{
+    ID::Label,
+    &Label_ctor,
+    &GetNextItem
 };
 
 
-static const Widget_def* GetNextItem(const Widget_def* Template)
+Status Label::Paint()
 {
-    return (Widget_def*)((WIDGET_t*)Template + 1);
-}
-
-
-Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def** next)
-{
-    WIDGET_t* widget = (WIDGET_t*)malloc(sizeof(WIDGET_t));
-    widget->Widget.TypeId = TYPEID;
-    widget->Widget.vtable = (Widget_vtable*)&WIDGET_vtable;
-    widget->Widget.Definition = Template;
-    widget->Widget.Parent = parent;
-    Style_SetFont(((WIDGET_def*)Template)->Font);
-    widget->Widget.Height = fontlib_GetCurrentFontHeight();
-    widget->Widget.Width = fontlib_GetStringWidth(((WIDGET_def*)Template)->Text);
-    if (next != NULL)
-        *next = (Widget_def*)((WIDGET_def*)Template + 1);
-    return (Widget_t*)widget;
-}
-
-
-static int24_t Paint(Widget_t* self)
-{
-    Style_SetFont(definition->Font);
-    fontlib_SetCursorPosition(self->X, self->Y);
-    fontlib_DrawString(definition->Text);
-    return 0;
+    Style_SetFont(_font);
+    fontlib_SetCursorPosition(_x, _y);
+    fontlib_DrawString(_text);
+    return Status::Success;
 }

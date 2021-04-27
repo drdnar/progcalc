@@ -2,6 +2,10 @@
 #define BIGINTSTACK_H
 #include "bigint.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     unsigned int MaxSize;
@@ -144,5 +148,9 @@ void BigIntStack_Delete(BigIntStack_t* self, unsigned int n);
  * @param n Number of entries to remove
  */
 void BigIntStack_DeleteFromBottom(BigIntStack_t* self, unsigned int n);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BIGINTSTACK_H */

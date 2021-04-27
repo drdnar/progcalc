@@ -5,6 +5,10 @@
 #include "style.h"
 #include "settings.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern Coord_t Format_BinSize;
 extern Coord_t Format_OctSize;
 extern Coord_t Format_DecSize;
@@ -79,5 +83,9 @@ unsigned int Format_PrintOct(BigInt_t* n);
  * @return X coordinate printing started at.
  */
 unsigned int Format_PrintBin(BigInt_t* n);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* FORMATTING_H */

@@ -1,4 +1,5 @@
-#include "forms/forms.h"
-extern Widget_def TestLabel;
-extern Widget_def TestRowItems;
-extern Widget_def TestRowList;
+#include "forms/widget.h"
+extern Forms::Widget_def TestLabel;
+extern Forms::Widget_def TestCheckbox;
+extern Forms::Widget_def TestRowItems;
+extern Forms::Widget_def TestRowList;

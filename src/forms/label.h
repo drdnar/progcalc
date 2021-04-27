@@ -1,11 +1,16 @@
-#ifndef LABEL_H
-#define LABEL_H
-#include "forms.h"
+#ifndef FORMS_LABEL_H
+#define FORMS_LABEL_H
+#include "widget.h"
+
+namespace Forms
+{
+
+extern "C" const Widget_desc Label_desc;
 
 /**
  * Describes a widget template.
  */
-typedef struct Label_def
+struct Label_def
 {
     /**
      * Data common to all widget definitions.
@@ -19,42 +24,35 @@ typedef struct Label_def
      * Text to display.
      */
     char* Text;
-} Label_def;
+};
 
-/**
- * Represents an instantiated widget.
- */
-typedef struct Label_t
+class Label : public Widget
 {
-    /**
-     * Data common to all widget instances.
-     */
-    Widget_t Widget;
-} Label_t;
+    public:
+        /* Inherited:
+         * MoveTo
+         * GetX
+         * GetY
+         * Unfocus
+         * GetParent
+         */
+        Status Focus(void) { return Status::Failure; };
+        WidgetMessage SendInput(WidgetMessage message) { return 0; };
+        Status Paint(void);
+        ~Label() = default;
+        /* New routines: */
+        friend Widget* Label_ctor(Widget_def* Template, Widget* parent, Widget_def** next);
+    protected:
+        /**
+         * Font ID used for text in this Label.
+         */
+        uint8_t _font;
+        /**
+         * Pointer to a C-style string that is displayed by this Label.
+         */
+        char* _text;
+};
 
-/**
- * List of methods available for this widget class.
- */
-typedef struct Label_vtable_t
-{
-    /**
-     * Data common to all widget vtables.
-     */
-    Widget_vtable Widget;
-} Label_vtable_t;
+} /* namespace Forms */
 
-/**
- * Reference to the master vtable for this widget type.
- * This is public only because it needs to be visible for widget templates to reference.
- */
-extern const Label_vtable_t Label_vtable;
-
-/**
- * Public constructor.
- * @param Template Pointer to a template for constructing a new widget.
- * @param parent Pointer to the widget's parent object, if it has one.
- * @return Returns a pointer to a newly-constructed widget, but not having been positioned yet.
- */
-Widget_t* Label_ctor(const Widget_def* Template, Widget_t* parent, Widget_def** next);
-
-#endif /* LABEL_H */
+#endif /* FORMS_LABEL_H */

@@ -1,11 +1,16 @@
-#ifndef CHECKBOX_H
-#define CHECKBOX_H
-#include "forms.h"
+#ifndef FORMS_CHECKBOX_H
+#define FORMS_CHECKBOX_H
+#include "widget.h"
+
+namespace Forms
+{
+
+extern "C" const Widget_desc Checkbox_desc;
 
 /**
  * Describes a widget template.
  */
-typedef struct Checkbox_def
+struct Checkbox_def
 {
     /**
      * Data common to all widget definitions.
@@ -23,42 +28,38 @@ typedef struct Checkbox_def
      * Pointer to variable this checkbox edits.
      */
     bool* Variable;
-} Checkbox_def;
+};
 
-/**
- * Represents an instantiated widget.
- */
-typedef struct Checkbox_t
+class Checkbox : public Widget
 {
-    /**
-     * Data common to all widget instances.
-     */
-    Widget_t Widget;
-} Checkbox_t;
+    public:
+        /* Inherited:
+         * MoveTo
+         * GetX
+         * GetY
+         * GetParent
+         */
+        Status Focus(void);
+        Status Unfocus(void);
+        WidgetMessage SendInput(WidgetMessage message);
+        Status Paint(void);
+        /* New routines: */
+        friend Widget* Checkbox_ctor(Widget_def* Template, Widget* parent, Widget_def** next);
+    protected:
+        /**
+         * Font ID used for text in this Label.
+         */
+        uint8_t _font;
+        /**
+         * Pointer to a C-style string that is displayed by this Label.
+         */
+        char* _text;
+        /**
+         * Pointer to a simple variable that this Checkbox toggles.
+         */
+        bool* _variable;
+};
 
-/**
- * List of methods available for this widget class.
- */
-typedef struct Checkbox_vtable_t
-{
-    /**
-     * Data common to all widget vtables.
-     */
-    Widget_vtable Widget;
-} Checkbox_vtable_t;
+} /* namespace Forms */
 
-/**
- * Reference to the master vtable for this widget type.
- * This is public only because it needs to be visible for widget templates to reference.
- */
-extern const Checkbox_vtable_t Checkbox_vtable;
-
-/**
- * Public constructor.
- * @param Template Pointer to a template for constructing a new widget.
- * @param parent Pointer to the widget's parent object, if it has one.
- * @return Returns a pointer to a newly-constructed widget, but not having been positioned yet.
- */
-Widget_t* Checkbox_ctor(const Widget_def* Template, Widget_t* parent, Widget_def** next);
-
-#endif /* CHECKBOX_H */
+#endif /* FORMS_CHECKBOX_H */

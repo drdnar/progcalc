@@ -3,6 +3,10 @@
 #include <stdbool.h>
 #include "style.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Specifies the area where the status bar will appear.
  */
@@ -40,5 +44,9 @@ void StatusBar_UpdateBatteryLevel(void);
  * @return Either 0 or a non-zero number (not necessarily only 0 or 1).
  */
 #define boot_IsCharging ((unsigned char (*)(void))0x3CC)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* STATUS_BAR_H */

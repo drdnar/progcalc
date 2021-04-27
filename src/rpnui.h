@@ -4,6 +4,10 @@
 #include <tice.h>
 #include "style.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Specifies the screen space available for the RPN UI.
  */
@@ -37,5 +41,9 @@ void Rpn_SetInputMode(bool mode);
  * Returns whether the UI is in stack scrolling mode.
  */
 bool Rpn_IsScrollingActive(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* RPN_UI_H */

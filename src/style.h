@@ -4,6 +4,10 @@
 #include <tice.h>
 #include <graphx.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef uint8_t Color_t;
 
 enum FontId
@@ -213,5 +217,9 @@ void Style_SetSmallFontPropAligned(void);
  * @param fontId A member of the FontId enum.
  */
 void Style_SetFont(uint8_t fontId);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

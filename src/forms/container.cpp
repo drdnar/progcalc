@@ -1,198 +1,267 @@
-#define WIDGET Container
-#include "widget.inc.h"
 #include "container.h"
-#define this_Children (*this->Container.Children)
-#define this_ChildCount (this->Container.ChildCount)
+#include <string.h>
 
+using namespace Forms;
 
-const Widget_def* Container_GetNextItem(const Container_def* Template)
+/**
+ * Returns a somewhat larger number, using a spurious coinage.
+ */
+#define EMBIGGEN(x) (((x) * 3 + 1) / 2)
+
+Widget_def* Container::GetNextItem(Container_def* Template)
 {
-    const Widget_def* childDef = &Template->FirstChild;
-    unsigned char i = Template->ChildCount;
-    while (i --> 0)
-        childDef = childDef->vtable->GetNextItem(childDef);
-    return childDef;
+    if (Template == nullptr)
+        return nullptr;
+    Widget_def* def = &Template->FirstChild;
+    for (uint8_t i = Template->ChildCount; i > 0; i--)
+        def = def->TypeDescriptor->GetNextWidget(def);
+    return def;
 }
 
 
-void Container_dtor(Widget_t* self)
+void Forms::Container_ctor(Container_def* Template, Container& self, Widget_def** Next)
 {
-    free(*this->Container.Children);
+    Widget_def* next = &Template->FirstChild;
+    if (self._size == 0)
+        self._size = EMBIGGEN(Template->ChildCount);
+    self._children = new Widget*[self._size];
+    Widget** child = self._children;
+    if (self._children)
+    {
+        self._count = Template->ChildCount;
+        for (unsigned char i = self._count; i > 0; i--, child++)
+            *child = next->TypeDescriptor->ctor(next, &self, &next);
+    }
+    else
+    {
+        /* Out of memory, so, uh . . . skip over the child list, I guess. */
+        next = Container::GetNextItem(Template);
+        self._size = 0;
+        self._count = 0;
+    }
+    if (Next != nullptr)
+        *Next = next;
 }
 
 
-Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* self, Widget_def** next)
+Container::~Container()
 {
-    unsigned char i;
-    Widget_def* childDef;
-    this->Container.ActiveIndex = 0;
-    this->Container.ChildCount = template->ChildCount;
-    this->Container.Children = calloc(template->ChildCount, sizeof(Widget_t*));
-    /* Construct children */
-    for (i = 0, childDef = &template->FirstChild; i < template->ChildCount; i++)
-        this_Children[i] = childDef->vtable->ctor(childDef, self, &childDef);
-    if (next != NULL)
-        *next = childDef;
-    return (Widget_t*)self;
+    if (!_children)
+        return;
+    Widget** child = _children;
+    for (Container_size_t i = _count; i > 0; i--, child++)
+        delete *child;
+    delete[] _children;
 }
 
 
-uint8_t Container_MoveTo(Widget_t* self, uint24_t X, uint8_t Y)
+Status Container::MoveTo(uint24_t x, uint8_t y)
 {
-    Widget_t* child;
-    Container_Iterator_t iterator;
-    X = X - self->X;
-    Y = Y - self->Y;
-    GenericWidget_MoveTo(self, X, Y);
-    for (child = Container_InitializeIterator(self, &iterator); child != NULL; child = Container_IteratorNext(&iterator))
-        child->vtable->MoveTo(child, child->X + X, child->Y + Y);
+    /* Signed or unsigned, doesn't really matter here, just let it overflow. */
+    uint24_t dx = x - _x;
+    uint24_t dy = y - _y;
+    _x = x;
+    _y = y;
+    if (!_count)
+        return Status::Success;
+    Widget** item = _children;
+    for (Container_size_t i = _count; i > 0; i--, item++)
+        (*item)->MoveTo((*item)->_x + dx, (*item)->_y + dy);
+    return Status::Success; 
+}
+
+
+Status Container::Focus(void)
+{
+    if (!_count)
+        return Status::Failure;
+    Status r = _children[_active_index]->Focus();
+    _hasFocus = r == Status::Success;
+    return r;
+}
+
+
+Status Container::Unfocus(void)
+{
+    if (!_count)
+        return Status::Success;
+    Status r = _children[_active_index]->Unfocus();
+    _hasFocus = r != Status::Success;
+    return r;
+}
+
+
+WidgetMessage Container::SendInput(WidgetMessage message)
+{
+    if (!_count)
+        return _children[_active_index]->SendInput(message);
     return 0;
 }
 
 
-int24_t Container_Paint(Widget_t* self)
+Status Container::Paint(void)
 {
-    Widget_t* child;
-    Container_Iterator_t iterator;
-    for (child = Container_InitializeIterator(self, &iterator); child != NULL; child = Container_IteratorNext(&iterator))
-        child->vtable->Paint(child);
-    return 0;
+    if (!_count)
+        return Status::Success;
+    Widget** item = _children;
+    for (Container_size_t i = _count; i > 0; i--, item++)
+        (*item)->Paint();
+    return Status::Success;
 }
 
 
-int24_t Container_Focus(Widget_t* self)
+Container_size_t Container::_increment_index(Container_size_t i)
 {
-    Widget_t* child = this_Children[this->Container.ActiveIndex];
-    return child->vtable->Focus(child);
+    if (++i >= _count)
+        i = 0;
+    return i;
 }
 
 
-bool Container_FocusNext(Widget_t* self)
+Container_size_t Container::_decrement_index(Container_size_t i)
 {
-    Container_Iterator_t iterator;
-    Widget_t* child;
-    Container_InitializeIterator(self, &iterator);
-    iterator.Index = this->Container.ActiveIndex;
-    child = Container_IteratorNext(&iterator);
-    while (child)
-    {
-        if (!child->vtable->Focus(child))
-            return true;
-        child = Container_IteratorNext(&iterator);
-    }
-    return false;
+    if (!i)
+        i = _count;
+    return i--;
 }
 
 
-bool Container_FocusPrevious(Widget_t* self)
+void Container::BeginUpdate(void)
 {
-    Container_Iterator_t iterator;
-    Widget_t* child;
-    Container_InitializeIterator(self, &iterator);
-    iterator.Index = this->Container.ActiveIndex;
-    child = Container_IteratorPrevious(&iterator);
-    while (child)
-    {
-        if (!child->vtable->Focus(child))
-            return true;
-        child = Container_IteratorPrevious(&iterator);
-    }
-    return false;
+    _updating = true;
+    _begin_update();
 }
 
 
-int24_t Container_Unfocus(Widget_t* self)
+void Container::_begin_update(void)
 {
-    GenericWidget_Unfocus(self);
-    Widget_t* child = this_Children[this->Container.ActiveIndex];
-    return child->vtable->Unfocus(child);
+    /* Do nothing */
 }
 
 
-int24_t Container_SendInput(Widget_t* self, int24_t messageId)
+void Container::EndUpdate(void)
 {
-    Widget_t* child = this_Children[this->Container.ActiveIndex];
-    return child->vtable->SendInput(child, messageId);
+    _end_update();
+    _updating = false;
 }
 
 
-Widget_t* Container_GetTopmostParent(Widget_t* self)
+void Container::_end_update(void)
 {
-    while (self->Parent != NULL)
-        self = self->Parent;
-    return self;
+    Paint();
 }
 
 
-Widget_t* Container_InitializeIterator(Widget_t* self, Container_Iterator_t* iterator)
+Status Container::FocusNext()
 {
-    iterator->Container = this;
-    iterator->Index = 0;
-    iterator->IsExhausted = false;
-    return Container_IteratorFirst(iterator);
+    if (!_count)
+        return Status::Failure;
+    if (!_hasFocus)
+        return Status::Failure;
+    Container_size_t index = _active_index;
+    if (_children[_active_index]->Unfocus() != Status::Success)
+        return Status::Failure;
+    while ((index = _increment_index(index)) != _active_index)
+        if (_children[index]->Focus() == Status::Success)
+        {
+            _active_index = index;
+            return Status::Success;
+        }
+    /*if (_children[_active_index]->Focus() != Status::Success) // ? ? ?
+        _active_index = 0;*/
+    _children[_active_index]->Focus();
+    return Status::Failure;
 }
 
 
-Widget_t* Container_IteratorCurrent(Container_Iterator_t* iterator)
+Status Container::FocusPrevious()
 {
-    Container_t_data* container = &iterator->Container->Container;
-    if (iterator->IsExhausted)
-        return NULL;
-    return (*container->Children)[container->ActiveIndex];
+    if (!_count)
+        return Status::Failure;
+    if (!_hasFocus)
+        return Status::Failure;
+    Container_size_t index = _active_index;
+    if (_children[_active_index]->Unfocus() != Status::Success)
+        return Status::Failure;
+    while ((index = _decrement_index(index)) != _active_index)
+        if (_children[index]->Focus() == Status::Success)
+        {
+            _active_index = index;
+            return Status::Success;
+        }
+    /*if (_children[_active_index]->Focus() != Status::Success) // ? ? ?
+        _active_index = 0;*/
+    _children[_active_index]->Focus();
+    return Status::Failure;
 }
 
 
-Widget_t* Container_IteratorFirst(Container_Iterator_t* iterator)
+Widget& Container::Get(Container_size_t index) const
 {
-    Container_t_data* container = &iterator->Container->Container;
-    if (container->ChildCount == 0)
-    {
-        iterator->IsExhausted = true;
-        return NULL;
-    }
-    iterator->Index = 0;
-    return (*container->Children)[0];
+    return *_children[index];
 }
 
 
-Widget_t* Container_IteratorLast(Container_Iterator_t* iterator)
+/*Widget*& Container::operator[](Container_size_t index) const
 {
-    uint8_t i;
-    Container_t_data* container = &iterator->Container->Container;
-    if (container->ChildCount == 0)
-    {
-        iterator->IsExhausted = true;
-        return NULL;
-    }
-    i = container->ChildCount - 1;
-    iterator->Index = i;
-    return (*container->Children)[i];
+    return _children[index];
+}*/
+
+
+void Container::Replace(Container_size_t index, Widget& item)
+{
+    delete _children[index];
+    _children[index] = &item;
 }
 
 
-Widget_t* Container_IteratorNext(Container_Iterator_t* iterator)
+Widget**  Container::_enlarge(void)
 {
-    Container_t_data* container = &iterator->Container->Container;
-    if (iterator->IsExhausted)
-        return NULL;
-    if (iterator->Index + 1 >= container->ChildCount || iterator->Index == 255)
-    {
-        iterator->IsExhausted = true;
-        return NULL;
-    }
-    return (*container->Children)[++iterator->Index];
+    Container_size_t newsize = EMBIGGEN(_size);
+    if (newsize < _size)
+        newsize = -1;
+    if (newsize == _size)
+        return nullptr;
+    Widget** resized = new Widget*[newsize];
+    if (resized == nullptr)
+        return nullptr;
+    memcpy(resized, _children, sizeof(Widget*) * _count);
+    delete[] _children;
+    _size = newsize;
+    return _children = resized;
 }
 
 
-Widget_t* Container_IteratorPrevious(Container_Iterator_t* iterator)
+Status Container::Add(Widget& widget)
 {
-    Container_t_data* container = &iterator->Container->Container;
-    if (iterator->IsExhausted)
-        return NULL;
-    if (iterator->Index == 0)
-    {
-        iterator->IsExhausted = true;
-        return NULL;
-    }
-    return (*container->Children)[--iterator->Index];
+    if (_count >= _size)
+        if (!_enlarge())
+            return Status::Failure;
+    _children[_count++] = &widget;
+    return Status::Success;
+}
+
+
+Status Container::Insert(Container_size_t index, Widget& widget)
+{
+    if (_count >= _size)
+        if (!_enlarge())
+            return Status::Failure;
+    memmove(_children + index + 1, _children + index, _count++ - index);
+    _children[index] = &widget;
+    return Status::Success;
+}
+
+
+Widget& Container::Leak(Container_size_t index)
+{
+    Widget* widget = _children[index];
+    memmove(_children + index, _children + index + 1, --_count - index);
+    return *widget;
+}
+
+
+void Container::Delete(Container_size_t index)
+{
+    delete &Leak(index);
 }

@@ -1,94 +1,79 @@
-#define WIDGET RowItems
-#define TYPEID ROW_ITEMS
-#include "widget.inc.h"
 #include "rowitems.h"
 
-static uint8_t SetWidth(Widget_t* self, uint24_t width);
+using namespace Forms;
 
 
-const WIDGET_vtable_t WIDGET_vtable =
+static Widget_def* GetNextItem(Widget_def* Template)
 {
-    /* Widget */
+    if (Template == nullptr)
+        return nullptr;
+    return Container::GetNextItem(&((RowItems_def*)Template)->Contents);
+}
+
+
+Widget* Forms::RowItems_ctor(Widget_def* Template, Widget* parent, Widget_def** Next)
+{
+    RowItems* rowitems = new RowItems();
+    rowitems->_definition = Template;
+    rowitems->_parent = parent;
+    rowitems->_alignment = ((RowItems_def*)Template)->Alignment;
+    // Initialize children
+    Container_ctor(&((RowItems_def*)Template)->Contents, *rowitems, Next);
+    // Compute size
+    unsigned int height;
+    Widget** widget = rowitems->_children;
+    for (Container_size_t i = rowitems->_count; i > 0; i--)
     {
-        sizeof(WIDGET_vtable_t),
-        false,
-        &GetNextItem,
-        &WIDGET_ctor,
-        &dtor,
-        &MoveTo,
-        &Container_Paint,
-        &Container_Focus,
-        &Container_Unfocus,
-        &Container_SendInput
-    },
-    &SetWidth
+        if (rowitems->_height < (height = (*widget)->GetHeight()))
+            rowitems->_height = height;
+        rowitems->_width += (*widget++)->GetWidth();
+    }
+    return rowitems;
+}
+
+
+extern "C" const Widget_desc RowItems_desc
+{
+    ID::Label,
+    &RowItems_ctor,
+    &GetNextItem
 };
 
 
-static const Widget_def* GetNextItem(const Widget_def* Template)
+void RowItems::Layout(void)
 {
-    return Container_GetNextItem(&template->Children);
-}
-
-
-static void dtor(Widget_t* self)
-{
-    Container_dtor(self);
-    GenericWidget_dtor(self);
-}
-
-
-Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def** next)
-{
-    WIDGET_t* widget = (WIDGET_t*)malloc(sizeof(WIDGET_t));
-    widget->Widget.TypeId = TYPEID;
-    widget->Widget.vtable = (Widget_vtable*)&WIDGET_vtable;
-    widget->Widget.Definition = Template;
-    widget->Widget.Parent = parent;
-    widget->Widget.Width = 0;
-    widget->Widget.Height = 0;
-    /* Construct children */
-    Container_ctor(&template->Children, (Widget_t*)widget, next);
-    /* Get height and width */
-    Container_Iterator_t i;
-    for (Widget_t* child = Container_InitializeIterator(widget, &i); !i.IsExhausted; child = Container_IteratorNext(&i))
+    unsigned int x = _x;
+    unsigned char y = _y;
+    Widget** widget = _children;
+    switch (_alignment)
     {
-        if (widget->Widget.Height < child->Height)
-            widget->Widget.Height = child->Height;
-        widget->Widget.Width += child->Width;        
+        case HorizontalAlignment::Left:
+            // No need to do anything.
+            break;
+        case HorizontalAlignment::Center:
+            x += (_width - _min_width) / 2;
+            break;
+        case HorizontalAlignment::Right:
+            x += _width - _min_width;
+            break;
     }
-    /* Updating next is taken care of by Container_ctor(). */
-    return (Widget_t*)widget;
+    for (Container_size_t i = _count; i > 0; i--)
+    {
+        (*widget)->MoveTo(x, y);
+        x += (*widget++)->GetWidth();
+    }
 }
 
 
-static uint8_t MoveTo(Widget_t* self, uint24_t X, uint8_t Y)
+HorizontalAlignment RowItems::GetAlignment(void)
 {
-    Container_Iterator_t i;
-    GenericWidget_MoveTo(self, X, Y);
-    /* Another way to handle this would be to change the vtable. */
-    if (definition->Alignment == ROW_ITEMS_LEFT)
-    {
-        for (Widget_t* child = Container_InitializeIterator(self, &i); !i.IsExhausted; child = Container_IteratorNext(&i), X += child->Width)
-            child->vtable->MoveTo(child, X, Y);
-    }
-    else if (definition->Alignment == ROW_ITEMS_RIGHT)
-    {
-        X += this->Widget.Width;
-        for (Widget_t* child = Container_InitializeIterator(self, &i); !i.IsExhausted; child = Container_IteratorNext(&i), X -= child->Width)
-            child->vtable->MoveTo(child, X, Y);
-    }
-    /* Otherwise, . . . ? */
-    else
-        return 1;
-    return 0;
+    return _alignment;
 }
 
 
-static uint8_t SetWidth(Widget_t* self, uint24_t width)
+Status RowItems::SetAlignment(HorizontalAlignment alignment)
 {
-    this->Widget.Width = width;
-    if (definition->Alignment == ROW_ITEMS_RIGHT)
-        self->vtable->MoveTo(self, self->X, self->Y);
-    return 0;
+    _alignment = alignment;
+    Layout();
+    return Status::Success;
 }

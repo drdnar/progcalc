@@ -5,6 +5,10 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum
 {
     BINARY,
@@ -80,5 +84,9 @@ char* GetBaseLongName(Base_t base);
  * Converts a DisplayBits const into a string.
  */
 char* GetDisplayBitsName(uint8_t bytes);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SETTINGS_H */

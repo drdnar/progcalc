@@ -1,6 +1,10 @@
 #ifndef UI_H
 #define UI_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Exits the program, cleaning up stuff.
  */
@@ -96,5 +100,8 @@ void Ui_Initialize(void);
 
 void Ui_Finalize(void);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* UI_H */

@@ -1,88 +1,55 @@
-#ifndef ROW_ITEMS_H
-#define ROW_ITEMS_H
-#include "forms.h"
+#ifndef FORMS_ROWITEMS
+#define FORMS_ROWITEMS
+#include "widget.h"
 #include "container.h"
 
-/**
- * Sets the width of this container.
- * This is necessary for layout when ROW_ITEMS_RIGHT is used.
- * @param self Pointer to container.
- * @param width Width to set.
- * @return Returns 0 on success.
- */
-#define SetRowItemsWidth(self, width) ((RowItems_t*)self)->SetWidth(self, width)
-
-enum
+namespace Forms
 {
-    ROW_ITEMS_LEFT,
-    ROW_ITEMS_RIGHT
-};
+
+extern "C" const Widget_desc RowItems_desc;
 
 /**
  * Describes a widget template.
  */
-typedef struct RowItems_def
+struct RowItems_def
 {
     /**
      * Data common to all widget definitions.
      */
     Widget_def Widget;
     /**
-     * Specifies whether items are left or right justified.
+     * Instructs RowItems how to do layout.
      */
-    uint8_t Alignment;
+    HorizontalAlignment Alignment;
     /**
-     * Initial child list.
+     * Child items list.
      */
-    Container_def Children;
-} RowItems_def;
+    Container_def Contents;
+};
 
-/**
- * Represents an instantiated widget.
- */
-typedef struct RowItems_t
+class RowItems : public Container
 {
-    /**
-     * Data common to all widget instances.
-     */
-    Widget_t Widget;
-    /**
-     * Data common to all Containers.
-     */
-    Container_t_data Container;
-} RowItems_t;
+    public:
+        /* Inherited:
+         * GetX
+         * GetY
+         * GetParent
+         * Focus
+         * Unfocus
+         * SendInput
+         * Paint
+         * MoveTo
+         */
+        void Layout(void);
+        /* New routines: */
+        static Widget_def* GetNextItem(Container_def* Template);
+        friend Widget* RowItems_ctor(Widget_def* Template, Widget* parent, Widget_def** Next);
+        HorizontalAlignment GetAlignment(void);
+        virtual Status SetAlignment(HorizontalAlignment alignment);
+    protected:
+        HorizontalAlignment _alignment;
+};
 
-/**
- * List of methods available for this widget class.
- */
-typedef struct RowItems_vtable_t
-{
-    /**
-     * Data common to all widget vtables.
-     */
-    Widget_vtable Widget;
-    /**
-     * Sets the width of this container.
-     * This is necessary for layout when ROW_ITEMS_RIGHT is used.
-     * @param self Pointer to self.
-     * @param width Width to set.
-     * @return Returns 0 on success.
-     */
-    uint8_t (*SetWidth)(Widget_t* self, uint24_t width);
-} RowItems_vtable_t;
+} /* namespace Forms */
 
-/**
- * Reference to the master vtable for this widget type.
- * This is public only because it needs to be visible for widget templates to reference.
- */
-extern const RowItems_vtable_t RowItems_vtable;
-
-/**
- * Public constructor.
- * @param Template Pointer to a template for constructing a new widget.
- * @param parent Pointer to the widget's parent object, if it has one.
- * @return Returns a pointer to a newly-constructed widget, but not having been positioned yet.
- */
-Widget_t* RowItems_ctor(const Widget_def* Template, Widget_t* parent, Widget_def** next);
-
-#endif /* ROW_ITEMS_H */
+#endif /* FORMS_ROWITEMS */

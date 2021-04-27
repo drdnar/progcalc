@@ -5,6 +5,10 @@
 #include "bigint.h"
 #include "style.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Caches the correct window settings for the input routines.
  */
@@ -44,5 +48,9 @@ void GetBigInt_Redraw(void);
  * @param Pointer to variable to receive entry.
  */
 void GetBigInt(BigInt_t* n);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* INPUT_BIG_INT_H */

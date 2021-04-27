@@ -1,68 +1,54 @@
-#define WIDGET RowList
-#define TYPEID ROW_LIST
-#include "widget.inc.h"
 #include "rowlist.h"
 
-const WIDGET_vtable_t WIDGET_vtable =
+using namespace Forms;
+
+
+static Widget_def* GetNextItem(Widget_def* Template)
 {
-    /* Widget */
+    if (Template == nullptr)
+        return nullptr;
+    return Container::GetNextItem(&((RowList_def*)Template)->Contents);
+}
+
+
+Widget* Forms::RowList_ctor(Widget_def* Template, Widget* parent, Widget_def** Next)
+{
+    RowList* rowlist = new RowList();
+    rowlist->_definition = Template;
+    rowlist->_parent = parent;
+    // Initialize children
+    Container_ctor(&((RowList_def*)Template)->Contents, *rowlist, Next);
+    // Compute size
+    unsigned int width = 0, temp;
+    unsigned char height = 0;
+    Widget** widget = rowlist->_children;
+    for (Container_size_t i = rowlist->_count; i > 0; i--)
     {
-        sizeof(WIDGET_vtable_t),
-        false,
-        &GetNextItem,
-        &WIDGET_ctor,
-        &dtor,
-        &MoveTo,
-        &Container_Paint,
-        &Container_Focus,
-        &Container_Unfocus,
-        &Container_SendInput
+        if (width < (temp = (*widget)->GetWidth()))
+            width = temp;
+        height += (*widget++)->GetHeight();
     }
+    rowlist->_height = rowlist->_min_height = height;
+    rowlist->_width = rowlist->_min_width = width;
+    return rowlist;
+}
+
+
+extern "C" const Widget_desc RowList_desc
+{
+    ID::Label,
+    &RowList_ctor,
+    &GetNextItem
 };
 
 
-static const Widget_def* GetNextItem(const Widget_def* Template)
+void RowList::Layout(void)
 {
-    return Container_GetNextItem(&template->Children);
-}
-
-
-static void dtor(Widget_t* self)
-{
-    Container_dtor(self);
-    GenericWidget_dtor(self);
-}
-
-
-Widget_t* WIDGET_ctor(const Widget_def* Template, Widget_t* parent, Widget_def** next)
-{
-    WIDGET_t* widget = (WIDGET_t*)malloc(sizeof(WIDGET_t));
-    widget->Widget.TypeId = TYPEID;
-    widget->Widget.vtable = (Widget_vtable*)&WIDGET_vtable;
-    widget->Widget.Definition = Template;
-    widget->Widget.Parent = parent;
-    widget->Widget.Width = 0;
-    widget->Widget.Height = 0;
-    /* Construct children */
-    Container_ctor(&template->Children, (Widget_t*)widget, next);
-    /* Get height and width */
-    Container_Iterator_t i;
-    for (Widget_t* child = Container_InitializeIterator(widget, &i); !i.IsExhausted; child = Container_IteratorNext(&i))
+    unsigned int x = _x;
+    unsigned char y = _y;
+    for (Container_size_t i = 0; i < _count; i--)
     {
-        if (widget->Widget.Width < child->Width)
-            widget->Widget.Width = child->Width;
-        widget->Widget.Height += child->Height;
+        _children[i]->MoveTo(x, y);
+        y += _children[i]->GetHeight();
     }
-    /* Updating next is taken care of by Container_ctor(). */
-    return (Widget_t*)widget;
-}
-
-
-static uint8_t MoveTo(Widget_t* self, uint24_t X, uint8_t Y)
-{
-    Container_Iterator_t i;
-    GenericWidget_MoveTo(self, X, Y);
-    for (Widget_t* child = Container_InitializeIterator(self, &i); !i.IsExhausted; child = Container_IteratorNext(&i), Y += child->Height)
-        child->vtable->MoveTo(child, X, Y);
-    return 0;
 }

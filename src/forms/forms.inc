@@ -25,7 +25,7 @@ macro ?!
 		typeid := typeid_counter
 
 		; Declare the _vtable pointer for linking
-		esc extern _#type#_vtable
+		esc extern _#type#_desc
 
 		args equ type?
 		iterate field, fields
@@ -49,10 +49,9 @@ macro ?!
 		match expand, args
 			macro expand
 				child_counter = child_counter + 1
-
-				db typeid
+;				db typeid
+				dl _#type#_desc
 				db defflags
-				dl _#type#_vtable
 				iterate field, fields
 					match =children, field
 						local child_count
@@ -90,4 +89,5 @@ FONT_SMALL_PROP_ALIGNED = 4
 
 ; Alignment options for RowItems
 ROW_ITEMS_LEFT = 0
-ROW_ITEMS_RIGHT = 1
+ROW_ITEMS_CENTER = 1
+ROW_ITEMS_RIGHT = 2
