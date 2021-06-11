@@ -76,7 +76,7 @@ end macro
 
 ; These must be declared in the same order as in forms.h so that the type IDs match.
 defwidget RowList, , children
-defwidget RowItems, , db Alignment, children
+defwidget RowItems, , db Alignment, db Padding, children
 defwidget Label, , db Font, dl Text
 defwidget Checkbox, , db Font, dl Text, dl Variable
 

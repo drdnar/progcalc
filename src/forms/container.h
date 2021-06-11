@@ -1,5 +1,5 @@
-#ifndef FORMS_CONTAINER
-#define FORMS_CONTAINER
+#ifndef FORMS_CONTAINER_H
+#define FORMS_CONTAINER_H
 #include "widget.h"
 
 namespace Forms
@@ -22,6 +22,9 @@ struct Container_def
     Widget_def FirstChild;
 };
 
+/**
+ * Type of Container indexes.
+ */
 typedef uint8_t Container_size_t;
 
 class Container : public Widget
@@ -32,7 +35,7 @@ class Container : public Widget
          * GetY
          * GetParent
          */
-        Status MoveTo(uint24_t x, uint8_t y);
+        Status MoveTo(x_t x, y_t y);
         Status Focus(void);
         Status Unfocus(void);
         WidgetMessage SendInput(WidgetMessage message);
@@ -183,4 +186,4 @@ class Container : public Widget
 
 } /* namespace Forms */
 
-#endif /* FORMS_CONTAINER */
+#endif /* FORMS_CONTAINER_H */

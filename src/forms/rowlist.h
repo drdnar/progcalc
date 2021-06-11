@@ -1,5 +1,5 @@
-#ifndef FORMS_ROWLIST
-#define FORMS_ROWLIST
+#ifndef FORMS_ROWLIST_H
+#define FORMS_ROWLIST_H
 #include "widget.h"
 #include "container.h"
 
@@ -44,4 +44,4 @@ class RowList : public Container
 
 } /* namespace Forms */
 
-#endif /* FORMS_ROWLIST */
+#endif /* FORMS_ROWLIST_H */

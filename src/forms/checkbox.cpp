@@ -1,8 +1,8 @@
 #include "checkbox.h"
-#include "../calc1252.h"
+#include "calc1252.h"
 #include <fontlibc.h>
 #include "../style.h"
-#include "../ui.h"
+//#include "../ui.h"
 
 using namespace Forms;
 

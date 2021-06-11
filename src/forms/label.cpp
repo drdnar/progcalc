@@ -38,8 +38,16 @@ extern "C" const Widget_desc Label_desc
 };
 
 
+Label::~Label()
+{
+    // Do nothing
+}
+
+
 Status Label::Paint()
 {
+    if (_hidden)
+        return Status::Success;
     Style_SetFont(_font);
     fontlib_SetCursorPosition(_x, _y);
     fontlib_DrawString(_text);

@@ -2,42 +2,65 @@
 #define STATUS_BAR_H
 #include <stdbool.h>
 #include "style.h"
+#include "forms/widget.h"
+#include "forms/textmanager.h"
+#include "misc.h"
 
-#ifdef __cplusplus
+namespace Forms
+{
+
+class StatusBar final : public Widget
+{
+    public:
+        StatusBar(void);
+        Status MoveTo(x_t x, y_t y);
+        Status Paint(void);
+        WidgetMessage SendInput(WidgetMessage message);
+        Status Hide(void);
+        Status Show(void);
+        /**
+         * Requests that the StatusBar consider updating the battery level.
+         * This will only actually check for a battery level change every few
+         * seconds.
+         */
+        void UpdateBatteryLevel(void);
+    private:
+        /**
+         * Handles physical painting of the battery icon, as well as making sure
+         * the level displayed matches the latest battery level measurement.
+         */
+        void _draw_battery_icon(void);
+        /**
+         * Measures the battery level and caches the result.
+         */
+        bool _update_battery_level(void);
+        /**
+         * Cached measurement of the battery's charge level.
+         */
+        static unsigned char battery_level;
+        /**
+         * Cached test of whether the battery is charging.
+         */
+        static bool battery_charging;
+        /**
+         * Keeps track of when the battery level should next be checked.
+         */
+        static unsigned int battery_timer;
+        /**
+         * The status bar's location is fixed.
+         */
+        const TextWindow window =
+        {
+            0, 0,
+            LCD_WIDTH, 0,
+            0, 0,
+            FONT_SMALL_PROP_BOLD
+        };
+        static uint16_t battery_pips[7];
+};
+
+
 extern "C" {
-#endif
-
-/**
- * Specifies the area where the status bar will appear.
- */
-extern CharTextWindow_t StatusBar_Window;
-
-/**
- * Fully redraws the status bar.
- */
-void StatusBar_Draw(void);
-
-/**
- * Turns on the status bar.
- */
-void StatusBar_Enable(void);
-
-/**
- * Turns off the status bar.
- */
-void StatusBar_Disable(void);
-
-/** 
- * Returns whether the status bar is active.
- * @return True if the status bar should be drawn.
- */
-bool StatusBar_IsEnabled(void);
-
-/**
- * Updates the battery level display if the battery has changed.
- * This internally uses the RTC to determine how often to poll the battery.
- */
-void StatusBar_UpdateBatteryLevel(void);
 
 /**
  * Checks if the calculator is currently charging.
@@ -45,8 +68,8 @@ void StatusBar_UpdateBatteryLevel(void);
  */
 #define boot_IsCharging ((unsigned char (*)(void))0x3CC)
 
-#ifdef __cplusplus
-}
-#endif
+} /* extern "C" */
+
+} /* namespace Forms */
 
 #endif /* STATUS_BAR_H */

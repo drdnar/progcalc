@@ -35,7 +35,7 @@ end RowList
 
 public _TestRowItems
 _TestRowItems:
-RowItems ROW_ITEMS_LEFT
+RowItems ROW_ITEMS_LEFT, 5
 	Label FONT_LARGE_PROP, rowItemsTestStr1
 	Label FONT_LARGE_PROP, rowItemsTestStr2
 end RowItems

@@ -55,11 +55,11 @@ Container::~Container()
 }
 
 
-Status Container::MoveTo(uint24_t x, uint8_t y)
+Status Container::MoveTo(x_t x, y_t y)
 {
     /* Signed or unsigned, doesn't really matter here, just let it overflow. */
-    uint24_t dx = x - _x;
-    uint24_t dy = y - _y;
+    x_t dx = x - _x;
+    y_t dy = y - _y;
     _x = x;
     _y = y;
     if (!_count)

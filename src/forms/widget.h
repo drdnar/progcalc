@@ -83,12 +83,27 @@ struct Widget_desc
     Widget_def* (*GetNextWidget)(Widget_def* definition);
 };
 
+/* For a lame attempt at portability */
+
 /**
  * Type of a message ID sent to a Widget.
  * Typically a key code.
  */
 typedef int24_t WidgetMessage;
 
+/**
+ * Type of horizontal axis values.
+ */
+typedef uint24_t x_t;
+
+/**
+ * Type of vertical axis values.
+ */
+typedef uint8_t y_t;
+
+/**
+ * Parent class of all Widgets in the Forms system.
+ */
 class Widget
 {
     friend class Container;
@@ -100,19 +115,19 @@ class Widget
          * @param y Row
          * @return Returns zero on success.
          */
-        virtual Status MoveTo(uint24_t x, uint8_t y);
+        virtual Status MoveTo(x_t x, y_t y);
 
         /**
          * Returns a widget's left-most column.
          * @return X value
          */
-        uint24_t GetX(void) const;
+        x_t GetX(void) const;
 
         /**
          * Returns a widget's top-most row.
          * @return Y value 
          */
-        uint8_t GetY(void) const;
+        y_t GetY(void) const;
 
         /**
          * Resizes the widget, but does not repaint it.
@@ -120,7 +135,7 @@ class Widget
          * @param height New height for widget.
          * @return Returns zero on success.
          */
-        virtual Status SetSize(uint24_t width, uint8_t height);
+        virtual Status SetSize(x_t width, y_t height);
 
         /**
          * Gets a Widget's width.
@@ -160,6 +175,38 @@ class Widget
         bool HasFocus(void);
 
         /**
+         * Checks whether the Widget is disabled (interaction disabled).
+         * @return True if interaction with the Widget is disabled.
+         */
+        bool IsDisabled(void);
+
+        /**
+         * Requests the Widget disable user interaction.
+         */
+        virtual Status Disable(void);
+
+        /**
+         * Requests the Widget enable user interaction.
+         */
+        virtual Status Enable(void);
+
+        /**
+         * Checks whether the Widget is hidden.
+         * @return True if the Widget is hidden.
+         */
+        bool IsHidden(void);
+
+        /**
+         * Requests the Widget become hidden.
+         */
+        virtual Status Hide(void);
+
+        /**
+         * Requests the Widget stop being hidden.
+         */
+        virtual Status Show(void);
+
+        /**
          * Sends an input message to an object.
          * This will typically be a key code.
          * @param messageId Input data, such as a key code
@@ -176,38 +223,38 @@ class Widget
         /**
          * Virtual destructor.
          */
-        virtual ~Widget() = default;
+        virtual ~Widget();
 
     protected:
         /**
          * Column coordinate.
          */
-        uint24_t _x = 0;
+        x_t _x = 0;
 
         /**
          * Row coordinate.
          */
-        uint8_t _y = 0;
+        y_t _y = 0;
 
         /**
          * Width.
          */
-        uint24_t _width = 0;
+        x_t _width = 0;
 
         /**
          * Height.
          */
-        uint8_t _height = 0;
+        y_t _height = 0;
 
         /**
          * Caches a Widget's minimum size, for reference.
          */
-        uint24_t _min_width = 0;
+        x_t _min_width = 0;
         
         /**
          * Caches a Widget's minimum size, for reference.
          */
-        uint8_t _min_height = 0;
+        y_t _min_height = 0;
 
         /**
          * Pointer back to Widget's definition struct.
@@ -220,6 +267,16 @@ class Widget
          * NULL if the Widget is a top-most container.
          */
         Widget* _parent = nullptr;
+
+        /**
+         * True if the Widget is disabled, preventing user interaction.
+         */
+        bool _disabled = false;
+
+        /**
+         * True if the Widget is hidden, so it won't be drawn.
+         */
+        bool _hidden = false;
         
         /**
          * True if the Widget currently has focus.

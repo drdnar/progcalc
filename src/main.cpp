@@ -12,7 +12,6 @@
 #include "bigint.h"
 #include "settings.h"
 #include "style.h"
-#include "ui.h"
 #include "printbigint.h"
 #include "rpnui.h"
 #include "inputbigint.h"
@@ -23,6 +22,9 @@
 #include "forms/label.h"
 #include "forms/rowitems.h"
 #include "forms/rowlist.h"
+#include "forms/textmanager.h"
+#include "forms/keyboardeventsource.h"
+#include "forms/calc1252.h"
 #include "testform.h"
 
 using namespace Forms;
@@ -33,18 +35,30 @@ unsigned char someBool = 1;
 int main(void) {
     sk_key_t k;
     bool dirty = true;
-    
-    Style_Initialize();
-    Ui_Initialize();
+
     Settings_Initialize();
+    Format_InitDisplaySizes();
+    // These two are also called by Settings_ChangeDisplayBits
+    Format_ConfigureDisplaySizes();
+    GetBigInt_Reposition();
     Rpn_Reset();
+    
+    KeyboardEventSource& keyboard = KeyboardEventSource::GetInstance();
+    KeyboardEventSource::Enable2nd();
+    KeyboardEventSource::EnableIndicator();
+    FontManager::SetFont(FONT_LARGE_PROP);
+    KeyboardEventSource::SetIndicatorLocation(LCD_WIDTH - fontlib_GetGlyphWidth(CALC1252_CURSOR_2ND_CHAR), 0);
+
+    StatusBar statusBar;
+    statusBar.Show();
+
 
     /* Need to force stuff to appear in output file. */
 //    RowList_t* rowlist;      
 //    RowItems_t* rowitems;
     //Checkbox* checkbox;
     
-    Label* label = (Label*)TestLabel.TypeDescriptor->ctor(&TestLabel, nullptr, nullptr);
+/*    Label* label = (Label*)TestLabel.TypeDescriptor->ctor(&TestLabel, nullptr, nullptr);
     label->MoveTo(10, 20);
     Checkbox* checkbox = (Checkbox*)TestCheckbox.TypeDescriptor->ctor(&TestCheckbox, nullptr, nullptr);
     checkbox->MoveTo(20, 50);
@@ -57,7 +71,7 @@ int main(void) {
     //label->Widget.vtable->MoveTo((Widget*)label, 10, 10);
     RowItems* rowitems = (RowItems*)TestRowItems.TypeDescriptor->ctor(&TestRowItems, nullptr, nullptr);
     rowitems->Layout();
-    rowitems->MoveTo(15, 125);
+    rowitems->MoveTo(15, 125);*/
     
     //rowitems = (RowItems_t*)RowItems_ctor(&TestRowItems, NULL, NULL);
     //rowitems->Widget.vtable->MoveTo((Widget_t*)rowitems, 10, 30);
@@ -71,17 +85,17 @@ int main(void) {
             dirty = false;
             fontlib_ClearWindow();
             Rpn_Redraw();
-            StatusBar_Draw();
-            label->Paint();
+            statusBar.Paint();
+/*            label->Paint();
             checkbox->Paint();
             rowlist->Paint();
-            rowitems->Paint();
+            rowitems->Paint();*/
     //label->Widget.vtable->Paint((Widget*)label);
     //rowitems->Widget.vtable->Paint((Widget_t*)rowitems);
     //rowlist->Widget.vtable->Paint((Widget*)rowlist);
         }
         do
-            k = GetKey();
+            k = (sk_key_t)keyboard.GetEvent();
         while (!k);
         if (GetBigInt_SendKey(k))
         {
@@ -132,8 +146,16 @@ int main(void) {
 
 void ExitClean(void)
 {
-    Ui_Finalize();
-    Style_Finalize();
     Settings_Finalize(); /* Run last so Garbage Collect? screen won't cause massive graphical corruption. */
     exit(0);
+}
+
+
+extern "C" void InitializationError(const char* message)
+{
+    os_ClrHome();
+    os_PutStrFull("Initialization error:");
+    os_PutStrFull(message);
+    while (!os_GetCSC());
+    exit(1);
 }

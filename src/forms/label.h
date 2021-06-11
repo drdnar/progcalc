@@ -37,10 +37,15 @@ class Label : public Widget
          * GetParent
          */
         Status Focus(void) { return Status::Failure; };
+        Status Disable(void) { return Status::Failure; };
         WidgetMessage SendInput(WidgetMessage message) { return 0; };
         Status Paint(void);
-        ~Label() = default;
+        ~Label();
         /* New routines: */
+        /**
+         * This whole hack with the friend _ctor is necessary because I don't
+         * feel like dealing with mangled C++ names.
+         */
         friend Widget* Label_ctor(Widget_def* Template, Widget* parent, Widget_def** next);
     protected:
         /**

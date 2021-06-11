@@ -1,6 +1,10 @@
 #ifndef EZ80_H
 #define EZ80_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Checks if routine is NULL.  If not, runs routine.
  * @warning CONTAINS SMC, cannon run from flash
@@ -62,5 +66,9 @@ bool CheckIfOnKeyPressed(void);
  * Resets the ON-key-pressed flag.
  */
 void ClearOnKeyPressed(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

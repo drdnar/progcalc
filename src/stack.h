@@ -87,7 +87,7 @@ BigInt_t* BigIntStack_Peek(BigIntStack_t* self);
 BigInt_t* BigIntStack_Pop(BigIntStack_t* self, BigInt_t* destination);
 
 /**
- * Resides the backing store of stack.
+ * Resizes the backing store of stack.
  * @param self Pointer to stack
  * @param newSize New maximum number of entries for stack
  * @return Returns zero if no live stack entires were deleted; otherwise, returns the number of lost stack entries.

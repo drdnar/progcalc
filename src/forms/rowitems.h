@@ -1,5 +1,5 @@
-#ifndef FORMS_ROWITEMS
-#define FORMS_ROWITEMS
+#ifndef FORMS_ROWITEMS_H
+#define FORMS_ROWITEMS_H
 #include "widget.h"
 #include "container.h"
 
@@ -21,6 +21,10 @@ struct RowItems_def
      * Instructs RowItems how to do layout.
      */
     HorizontalAlignment Alignment;
+    /**
+     * Extra horizontal spacing to add between items.
+     */
+    uint8_t Padding;
     /**
      * Child items list.
      */
@@ -48,8 +52,9 @@ class RowItems : public Container
         virtual Status SetAlignment(HorizontalAlignment alignment);
     protected:
         HorizontalAlignment _alignment;
+        unsigned char _padding;
 };
 
 } /* namespace Forms */
 
-#endif /* FORMS_ROWITEMS */
+#endif /* FORMS_ROWITEMS_H */

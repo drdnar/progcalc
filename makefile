@@ -5,7 +5,7 @@
 # Set COMPRESSED to "YES" to create a compressed program
 # ----------------------------
 
-NAME        ?= PROGCALC
+NAME        = PROGCALC
 COMPRESSED  ?= NO
 ARCHIVED    ?= NO
 ICON        ?= iconc.png

@@ -1,5 +1,8 @@
-#ifndef STYLE_H
-#define STYLE_H
+/**
+ * This is deprecated by the Forms code, but is being kept while converting code over.
+ */
+#ifndef FAKE_STYLE_H
+#define FAKE_STYLE_H
 
 #include <tice.h>
 #include <graphx.h>
@@ -10,14 +13,14 @@ extern "C" {
 
 typedef uint8_t Color_t;
 
-enum FontId
+/*enum FontId
 {
     FONT_LARGE_PROP,
     FONT_LARGE_MONO,
     FONT_SMALL_PROP,
     FONT_SMALL_PROP_BOLD,
     FONT_SMALL_PROP_ALIGNED
-};
+};*/
 
 /**
  * Type of a FontId.
@@ -137,31 +140,16 @@ typedef struct
     FontId_t FontId;
 } CharTextWindow_t;
 
-/**
- * Displays an error message on the homescreen, and then exits.
- * @param msg String to display.
- */
-void ShowErrorAndExit(char* msg);
 
 /**
  * Prints a string, centering it in the current text window.
  */
-void Style_PrintCentered(const char* string);
+//void Style_PrintCentered(const char* string);
 
 /**
  * Prints a string right-aligned.
  */
-void Style_PrintRight(const char* string);
-
-/**
- * Initializes stuff related to graphics and layout.
- */
-void Style_Initialize(void);
-
-/**
- * Uninitializes stuff related to graphics and layout.
- */
-void Style_Finalize(void);
+//void Style_PrintRight(const char* string);
 
 /**
  * Saves the current cursor.
@@ -218,8 +206,9 @@ void Style_SetSmallFontPropAligned(void);
  */
 void Style_SetFont(uint8_t fontId);
 
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif /* FAKE_STYLE_H */

@@ -2,8 +2,8 @@
 #define PRINT_BIG_INT_H
 
 #include "bigint.h"
-#include "style.h"
 #include "settings.h"
+#include "style.h"
 
 #ifdef __cplusplus
 extern "C" {

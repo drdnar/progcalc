@@ -3,7 +3,13 @@
 using namespace Forms;
 
 
-Status Widget::MoveTo(uint24_t x, uint8_t y)
+Widget::~Widget()
+{
+    // Do nothing.
+}
+
+
+Status Widget::MoveTo(x_t x, y_t y)
 {
     _x = x;
     _y = y;
@@ -11,19 +17,19 @@ Status Widget::MoveTo(uint24_t x, uint8_t y)
 }
 
 
-uint24_t Widget::GetX(void) const
+x_t Widget::GetX(void) const
 {
     return _x;
 }
 
 
-uint8_t Widget::GetY(void) const
+y_t Widget::GetY(void) const
 {
     return _y;
 }
 
 
-Status Widget::SetSize(uint24_t width, uint8_t height)
+Status Widget::SetSize(x_t width, y_t height)
 {
     if (width < _min_width || height < _min_height)
         return Status::Failure;
@@ -33,13 +39,13 @@ Status Widget::SetSize(uint24_t width, uint8_t height)
 }
 
 
-uint24_t Widget::GetWidth(void) const
+x_t Widget::GetWidth(void) const
 {
     return _width;
 }
 
 
-uint8_t Widget::GetHeight(void) const
+y_t Widget::GetHeight(void) const
 {
     return _height;
 }
@@ -70,4 +76,44 @@ bool Widget::HasFocus(void)
 Widget* Widget::GetParent(void)
 {
     return _parent;
+}
+
+
+bool Widget::IsDisabled(void)
+{
+    return _disabled;
+}
+
+
+Status Widget::Disable(void)
+{
+    _disabled = true;
+    return Status::Success;
+}
+
+
+Status Widget::Enable(void)
+{
+    _disabled = false;
+    return Status::Success;
+}
+
+
+bool Widget::IsHidden(void)
+{
+    return _hidden;
+}
+
+
+Status Widget::Hide(void)
+{
+    _hidden = true;
+    return Status::Success;
+}
+
+
+Status Widget::Show(void)
+{
+    _hidden = false;
+    return Status::Success;
 }

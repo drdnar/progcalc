@@ -17,6 +17,7 @@ Widget* Forms::RowItems_ctor(Widget_def* Template, Widget* parent, Widget_def** 
     rowitems->_definition = Template;
     rowitems->_parent = parent;
     rowitems->_alignment = ((RowItems_def*)Template)->Alignment;
+    rowitems->_padding = ((RowItems_def*)Template)->Padding;
     // Initialize children
     Container_ctor(&((RowItems_def*)Template)->Contents, *rowitems, Next);
     // Compute size
@@ -26,8 +27,9 @@ Widget* Forms::RowItems_ctor(Widget_def* Template, Widget* parent, Widget_def** 
     {
         if (rowitems->_height < (height = (*widget)->GetHeight()))
             rowitems->_height = height;
-        rowitems->_width += (*widget++)->GetWidth();
+        rowitems->_width += (*widget++)->GetWidth() + rowitems->_padding;
     }
+    rowitems->_width -= rowitems->_padding;
     return rowitems;
 }
 
@@ -42,8 +44,8 @@ extern "C" const Widget_desc RowItems_desc
 
 void RowItems::Layout(void)
 {
-    unsigned int x = _x;
-    unsigned char y = _y;
+    x_t x = _x;
+    y_t y = _y;
     Widget** widget = _children;
     switch (_alignment)
     {
@@ -60,7 +62,7 @@ void RowItems::Layout(void)
     for (Container_size_t i = _count; i > 0; i--)
     {
         (*widget)->MoveTo(x, y);
-        x += (*widget++)->GetWidth();
+        x += (*widget++)->GetWidth() + _padding;
     }
 }
 
