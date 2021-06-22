@@ -41,9 +41,9 @@ Status StatusBar::MoveTo(x_t x, y_t y)
 }
 
 
-WidgetMessage StatusBar::SendInput(WidgetMessage message)
+bool StatusBar::SendInput(Message& message)
 {
-    return 0;
+    return false;
 }
 
 

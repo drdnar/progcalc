@@ -11,15 +11,15 @@ using namespace Forms;
 
 GUI::GUI(Widget_def* gui)
 {
-    _form = (Container*)gui->TypeDescriptor->ctor(gui, nullptr, nullptr);
-    if (_form == nullptr)
+    form = (Container*)gui->TypeDescriptor->ctor(gui, nullptr, nullptr);
+    if (form == nullptr)
         return;
 }
 
 
 GUI::~GUI(void)
 {
-    delete _form;
+    delete form;
 }
 
 

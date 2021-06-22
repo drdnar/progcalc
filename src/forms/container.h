@@ -38,7 +38,7 @@ class Container : public Widget
         Status MoveTo(x_t x, y_t y);
         Status Focus(void);
         Status Unfocus(void);
-        WidgetMessage SendInput(WidgetMessage message);
+        bool SendInput(Message& message);
         Status Paint(void);
         /* New routines: */
         ~Container();

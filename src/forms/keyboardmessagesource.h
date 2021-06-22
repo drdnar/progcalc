@@ -1,6 +1,6 @@
 #ifndef FORMS_KEYBOARD_EVENT_SOURCE_H
 #define FORMS_KEYBOARD_EVENT_SOURCE_H
-#include "eventsource.h"
+#include "messages.h"
 #include <graphx.h>
 
 extern "C" const unsigned int ApdDimTime;
@@ -10,16 +10,16 @@ namespace Forms
 {
 
 /**
- * Process keyboard events.
+ * Processes keyboard events.
  * TODO: In the old C code, this also handled the 2nd indicator and APD.
  * The location of the 2nd indicator is still global state, which should be
  * changed.
  * APD timing should maybe be broken off into its own object.
  */
-class KeyboardEventSource final : public EventSource
+class KeyboardEventSource final : public MessageSource
 {
     public:
-        WidgetMessage GetEvent(void);
+        Message GetMessage(void);
         /**
          * Returns an object that the GUI subsystem can get events from.
          */

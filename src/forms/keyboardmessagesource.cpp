@@ -1,4 +1,4 @@
-#include "keyboardeventsource.h"
+#include "keyboardmessagesource.h"
 #include <fontlibc.h>
 #include <tice.h>
 #include <stdlib.h>
@@ -41,6 +41,7 @@ KeyboardEventSource::KeyboardEventSource(void)
     }
     /* Otherwise, initialization will fail later when trying to load fonts. */
     restart_apd();
+    MessageLoop::RegisterSynchronousMessageSource(*this);
 }
 
 
@@ -103,7 +104,7 @@ void KeyboardEventSource::unshow_cursor(void)
 }
 
 
-WidgetMessage KeyboardEventSource::GetEvent(void)
+Message KeyboardEventSource::GetMessage(void)
 {
     sk_key_t key = GetCSC_Breakable();
     if (key)
@@ -118,7 +119,7 @@ WidgetMessage KeyboardEventSource::GetEvent(void)
                     set2nd();
                 else
                     reset2nd();
-                return 0;
+                return {MESSAGE_NONE, MESSAGE_NONE};
             }
             else if (second)
             {
@@ -129,7 +130,7 @@ WidgetMessage KeyboardEventSource::GetEvent(void)
     }
     else
         check_apd();
-    return key;
+    return {MESSAGE_KEY, key};
 }
 
 

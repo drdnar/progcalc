@@ -41,7 +41,7 @@ class Checkbox : public Widget
          */
         Status Focus(void);
         Status Unfocus(void);
-        WidgetMessage SendInput(WidgetMessage message);
+        bool SendInput(Message& message);
         Status Paint(void);
         /* New routines: */
         friend Widget* Checkbox_ctor(Widget_def* Template, Widget* parent, Widget_def** next);

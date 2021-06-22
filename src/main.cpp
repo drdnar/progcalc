@@ -23,7 +23,7 @@
 #include "forms/rowitems.h"
 #include "forms/rowlist.h"
 #include "forms/textmanager.h"
-#include "forms/keyboardeventsource.h"
+#include "forms/keyboardmessagesource.h"
 #include "forms/calc1252.h"
 #include "testform.h"
 
@@ -35,6 +35,8 @@ unsigned char someBool = 1;
 int main(void) {
     sk_key_t k;
     bool dirty = true;
+
+    Message message;
 
     Settings_Initialize();
     Format_InitDisplaySizes();
@@ -95,7 +97,12 @@ int main(void) {
     //rowlist->Widget.vtable->Paint((Widget*)rowlist);
         }
         do
-            k = (sk_key_t)keyboard.GetEvent();
+        {
+            message = keyboard.GetMessage();
+            if (message.Id == MESSAGE_NONE)
+                continue;
+            k = (sk_key_t)message.ExtendedCode;
+        }
         while (!k);
         if (GetBigInt_SendKey(k))
         {

@@ -89,17 +89,139 @@ struct Widget_desc
  * Type of a message ID sent to a Widget.
  * Typically a key code.
  */
-typedef int24_t WidgetMessage;
+#ifdef _EZ80
+typedef int24_t MessageCode;
+#else
+typedef unsigned int MessageCode;
+#endif
+
+
+/**
+ * Contains a message code and a data pointer, in case an event needs extra data.
+ */
+struct Message
+{
+    /**
+     * Primary message code.
+     */
+    MessageCode Id;
+    union
+    {
+        /**
+         * Extended message information.
+         * The type and meaning of this is specific to the message code.
+         */
+        MessageCode ExtendedCode;
+        /**
+         * Pointer to extended message information.
+         * The type and meaning of this is specific to the message code.
+         */
+        void* DataPointer;
+    };
+};
+
+
+/**
+ * Standard message IDs.
+ */
+enum MessageId
+{
+    /**
+     * The null message; nothing has happened.
+     */
+    MESSAGE_NONE = 0,
+    /**
+     * A raw, unprocessed key code.
+     * ExtendedCode is the key code itself.
+     */
+    MESSAGE_RAW_KEY,
+    /**
+     * A key code, possibly including flags such as 2nd.
+     * ExtendedCode is the key code itself.
+     */
+    MESSAGE_KEY,
+    /**
+     * A keystroke converted into a typed character.
+     * ExtendedCode is an ASCII character (or Unicode, I guess, if you're insane).
+     */
+    MESSAGE_TYPE_CHARACTER,
+    /**
+     * Hardware timer 1 has expired.
+     */
+    MESSAGE_HW_TIMER_1_EXPIRED,
+    /**
+     * Hardware timer 2 has expired.
+     */
+    MESSAGE_HW_TIMER_2_EXPIRED,
+    /**
+     * Hardware timer 3 has expired.
+     */
+    MESSAGE_HW_TIMER_3_EXPIRED,
+    /**
+     * Sent once a second.
+     * ExtendedCode is how many seconds has elasped since last tick.
+     * (Might not be one if someone ran some excessively long message handler.)
+     */
+    MESSAGE_RTC_TICK,
+    /**
+     * A timer used for animations has expired.
+     */
+    MESSAGE_TIMER_ANIMATE,
+    /**
+     * Please exit event loop processing.
+     */
+    MESSAGE_EXIT_EVENT_LOOP,
+    /**
+     * Global change in UI layout.
+     */
+    MESSAGE_LAYOUT_CHANGE,
+    /**
+     * Global change in UI layout, but instead of an ExtendedCode, there is a
+     * DataPointer.  The data are application-defined.
+     */
+    MESSAGE_LAYOUT_CHANGE_DATA,
+    /**
+     * Chnage in application-defined global settings.
+     */
+    MESSAGE_SETTINGS_CHANGE,
+    /**
+     * Chnage in application-defined global settings, but instead of an
+     * ExtendedCode, there is a DataPointer.  The data are application-defined.
+     */
+    MESSAGE_SETTINGS_CHANGE_DATA,
+    /**
+     * Instructs the GUI manager to change to a new Form.
+     * Any currently active Form is deleted.
+     * DataPointer is a Form to construct.
+     */
+    MESSAGE_GUI_CHANGE_DIALOG,
+    /**
+     * Instructs the GUI manager to open a new modal dialog.
+     * The currently active Form is inactivated and gets control again when the
+     * modal closes.
+     */
+    MESSAGE_GUI_MODAL_DIALOG,
+};
+
 
 /**
  * Type of horizontal axis values.
  */
+#ifdef _EZ80
 typedef uint24_t x_t;
+#else
+typedef unsigned int x_t;
+#endif
 
 /**
  * Type of vertical axis values.
  */
+#ifdef _EZ80
 typedef uint8_t y_t;
+#else
+typedef unsigned int y_t;
+#endif
+
 
 /**
  * Parent class of all Widgets in the Forms system.
@@ -210,9 +332,10 @@ class Widget
          * Sends an input message to an object.
          * This will typically be a key code.
          * @param messageId Input data, such as a key code
-         * @param Returns zero if the object has not processed the input. Returns non-zero otherwise.
+         * @param Returns false if the object has not processed the input.
+         * Returns true if further processing of the message should be disabled.
          */
-        virtual WidgetMessage SendInput(WidgetMessage message) = 0;
+        virtual bool SendInput(Message& message) = 0;
 
         /**
          * Returns a pointer to a Widget's container.  This may be NULL.

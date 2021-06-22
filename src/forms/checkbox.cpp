@@ -83,13 +83,13 @@ Status Checkbox::Paint()
 }
 
 
-WidgetMessage Checkbox::SendInput(WidgetMessage messageId)
+bool Checkbox::SendInput(Message& message)
 {
-    if (messageId == sk_Enter || messageId == sk_2nd)
+    if (message.Id == MESSAGE_KEY && (message.ExtendedCode == sk_Enter || message.ExtendedCode == sk_2nd))
     {
         *_variable = !*_variable;
         Paint();
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }

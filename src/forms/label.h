@@ -38,7 +38,7 @@ class Label : public Widget
          */
         Status Focus(void) { return Status::Failure; };
         Status Disable(void) { return Status::Failure; };
-        WidgetMessage SendInput(WidgetMessage message) { return 0; };
+        bool SendInput(Message& message) { return false; };
         Status Paint(void);
         ~Label();
         /* New routines: */

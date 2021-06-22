@@ -91,7 +91,7 @@ Status Container::Unfocus(void)
 }
 
 
-WidgetMessage Container::SendInput(WidgetMessage message)
+bool Container::SendInput(Message& message)
 {
     if (!_count)
         return _children[_active_index]->SendInput(message);

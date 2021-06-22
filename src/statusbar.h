@@ -15,7 +15,7 @@ class StatusBar final : public Widget
         StatusBar(void);
         Status MoveTo(x_t x, y_t y);
         Status Paint(void);
-        WidgetMessage SendInput(WidgetMessage message);
+        bool SendInput(Message& message);
         Status Hide(void);
         Status Show(void);
         /**

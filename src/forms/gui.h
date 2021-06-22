@@ -2,7 +2,7 @@
 #define FORMS_GUI_H
 #include "widget.h"
 #include "container.h"
-#include "eventsource.h"
+#include "messages.h"
 
 namespace Forms
 {
@@ -21,9 +21,9 @@ class GUI
          */
         void GiveControl(void);
     private:
-        Widget* _header = nullptr;
-        Container* _form = nullptr;
-        Widget* _footer = nullptr;
+        Widget* header = nullptr;
+        Container* form = nullptr;
+        Widget* footer = nullptr;
 
 };
 
