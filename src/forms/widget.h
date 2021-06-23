@@ -158,6 +158,10 @@ enum MessageId
      */
     MESSAGE_HW_TIMER_3_EXPIRED,
     /**
+     * APD event.
+     */
+    MESSAGE_APD,
+    /**
      * Sent once a second.
      * ExtendedCode is how many seconds has elasped since last tick.
      * (Might not be one if someone ran some excessively long message handler.)

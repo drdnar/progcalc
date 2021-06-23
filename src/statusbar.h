@@ -4,15 +4,19 @@
 #include "style.h"
 #include "forms/widget.h"
 #include "forms/textmanager.h"
+#include "forms/messages.h"
 #include "misc.h"
 
 namespace Forms
 {
 
-class StatusBar final : public Widget
+class StatusBar final : public Widget, public MessageSink
 {
     public:
-        StatusBar(void);
+        /**
+         * There can only be one.  This is the one.
+         */
+        static StatusBar& GetInstance(void) { return instance; }
         Status MoveTo(x_t x, y_t y);
         Status Paint(void);
         bool SendInput(Message& message);
@@ -25,6 +29,8 @@ class StatusBar final : public Widget
          */
         void UpdateBatteryLevel(void);
     private:
+        static StatusBar instance;
+        StatusBar(void);
         /**
          * Handles physical painting of the battery icon, as well as making sure
          * the level displayed matches the latest battery level measurement.

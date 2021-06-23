@@ -10,21 +10,49 @@ namespace Forms
 /**
  * This class handles all user interaction for a Forms GUI.
  */
-class GUI
+class GUI : public MessageSink
 {
     public:
-        GUI(Widget_def* gui);
-        ~GUI(void);
         /**
-         * Passes control to the GUI.  The GUI handles all hardware and software
-         * events.
+         * Returns GUI singleton.
          */
-        void GiveControl(void);
+        GUI GetInstance(void) { return instance; }
+        bool SendMessage(Message& message);
+        /**
+         * Maximum number of nested modal dialogs supported.
+         */
+        static const unsigned char MAX_DIALOGS = 16;
+        static Container* GetActiveDialog(void) { return active_dialog; }
     private:
-        Widget* header = nullptr;
-        Container* form = nullptr;
-        Widget* footer = nullptr;
-
+        GUI(void);
+        ~GUI(void);
+        static GUI instance;
+        /**
+         * Stack of active dialogs.
+         * If dialogs[0] is nullptr, then no GUI is active at all!
+         */
+        static Container* dialogs[MAX_DIALOGS];
+        /**
+         * Number of active dialogs.
+         */
+        static unsigned char dialog_count;
+        /**
+         * Cached pointer to active dialog.
+         * This should always be the same as dialogs[dialog_count - 1].
+         */
+        static Container* active_dialog;
+        /**
+         * Tears down all active dialogs.
+         */
+        static void flush_dialogs(void);
+        /**
+         * Internal routine that starts a dialog.
+         */
+        static void begin_dialog(Widget_def*);
+        /**
+         * Internal routine that cleans up a closed dialog.
+         */
+        static void end_dialog(void);
 };
 
 } /* namespace Forms */

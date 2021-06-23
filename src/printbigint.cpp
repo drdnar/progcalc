@@ -88,7 +88,7 @@ void Format_ConfigureDisplaySizes(void)
     Format_HexSize = displaySizes[Settings.DisplayBits][HEXADECIMAL];
     and ZDS generated each array index separately instead of seeing they're related so now I'm doing this.
     */
-    Coord_t* ptr = &displaySizes[Settings.DisplayBits][BINARY];
+    Coord_t* ptr = &displaySizes[Settings::GetDisplayBits()][BINARY];
     Format_BinSize = *ptr++;
     Format_OctSize = *ptr++;
     Format_DecSize = *ptr++;
@@ -100,7 +100,7 @@ unsigned char Format_GetNumberHeight(Base_t base)
 {
     if (base == NO_BASE)
         return 0;
-    return displaySizes[Settings.DisplayBits][base].y;
+    return displaySizes[Settings::GetDisplayBits()][base].y;
 }
 
 
@@ -160,7 +160,7 @@ static unsigned int PrintBaseLabel(Base_t base, unsigned char height)
     char* baseName;
     bool altHex = false;
     unsigned int x;
-    if (base == HEXADECIMAL && Settings.DisplayBits >= SHOW_128)
+    if (base == HEXADECIMAL && Settings::GetDisplayBits() >= SHOW_128)
     {
         altHex = true;
         baseName = "0x";
@@ -219,7 +219,7 @@ unsigned int Format_PrintBin(BigInt_t* n)
     xreturn = PrintBaseLabel(BINARY, Format_BinSize.y);
     BigIntToStringBin(n, Format_NumberBuffer);
     /* Array indexing seems to produce less terrible output than if or switch. */
-    ch = printBinCh[Settings.DisplayBits];
+    ch = printBinCh[Settings::GetDisplayBits()];
     for (h = Format_BinSize.y / CHAR_HEIGHT; h > 0; h--)
     {
         for (i = 4; i > 0; i--)
@@ -249,7 +249,7 @@ static size_t const printPartialCopy[] =
 static void partialCopy(BigInt_t* n)
 {
     BigIntSetToZero(&tempn);
-    memcpy(&tempn, n, printPartialCopy[Settings.DisplayBits]);
+    memcpy(&tempn, n, printPartialCopy[Settings::GetDisplayBits()]);
 }
 
 /*
@@ -288,11 +288,11 @@ unsigned int Format_PrintDec(BigInt_t* n)
     /* Somewhat dubious pointer arithmetic, but should be well-defined since
        the output is part of the same array as the input. */
     actualDigits = (unsigned char)(src - Format_NumberBuffer);
-    expected = printDecExpectedSize[Settings.DisplayBits];
-    group = printDecGroups[Settings.DisplayBits];
-    subgroup = printDecInitialDigits[Settings.DisplayBits];
+    expected = printDecExpectedSize[Settings::GetDisplayBits()];
+    group = printDecGroups[Settings::GetDisplayBits()];
+    subgroup = printDecInitialDigits[Settings::GetDisplayBits()];
 
-    if (Settings.DisplayBits == SHOW_128)
+    if (Settings::GetDisplayBits() == SHOW_128)
     {
         fontlib_DrawString("   ");
         printNumSep();
@@ -347,7 +347,7 @@ unsigned int Format_PrintHex(BigInt_t* n)
     windowize(Format_HexSize.x);
     xreturn = PrintBaseLabel(HEXADECIMAL, Format_HexSize.y);
     BigIntToStringHex(n, Format_NumberBuffer);
-    for (i = printHexI[Settings.DisplayBits], ch = printHexCh[Settings.DisplayBits]; i > 0; i--)
+    for (i = printHexI[Settings::GetDisplayBits()], ch = printHexCh[Settings::GetDisplayBits()]; i > 0; i--)
     {
         fontlib_DrawStringL(ch, HEX_GROUPING);
         ch = fontlib_GetLastCharacterRead() + 1;
@@ -390,7 +390,7 @@ unsigned int Format_PrintOct(BigInt_t* n)
     char* ch;
     unsigned int xreturn;
     lines = 1;
-    bits = Settings.DisplayBits;
+    bits = Settings::GetDisplayBits();
     windowize(Format_OctSize.x);
     xreturn = PrintBaseLabel(OCTAL, Format_OctSize.y);
     

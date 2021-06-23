@@ -38,7 +38,6 @@ int main(void) {
 
     Message message;
 
-    Settings_Initialize();
     Format_InitDisplaySizes();
     // These two are also called by Settings_ChangeDisplayBits
     Format_ConfigureDisplaySizes();
@@ -51,34 +50,8 @@ int main(void) {
     FontManager::SetFont(FONT_LARGE_PROP);
     KeyboardEventSource::SetIndicatorLocation(LCD_WIDTH - fontlib_GetGlyphWidth(CALC1252_CURSOR_2ND_CHAR), 0);
 
-    StatusBar statusBar;
+    StatusBar& statusBar = StatusBar::GetInstance();
     statusBar.Show();
-
-
-    /* Need to force stuff to appear in output file. */
-//    RowList_t* rowlist;      
-//    RowItems_t* rowitems;
-    //Checkbox* checkbox;
-    
-/*    Label* label = (Label*)TestLabel.TypeDescriptor->ctor(&TestLabel, nullptr, nullptr);
-    label->MoveTo(10, 20);
-    Checkbox* checkbox = (Checkbox*)TestCheckbox.TypeDescriptor->ctor(&TestCheckbox, nullptr, nullptr);
-    checkbox->MoveTo(20, 50);
-    //Label* label = (Label*)Label_desc.ctor(&TestLabel, nullptr, nullptr);
-    
-    RowList* rowlist = (RowList*)TestRowList.TypeDescriptor->ctor(&TestRowList, nullptr, nullptr);
-    rowlist->Layout();
-    rowlist->MoveTo(15, 100);
-    //label = (Label*)Label_ctor(&TestLabel, NULL, NULL);
-    //label->Widget.vtable->MoveTo((Widget*)label, 10, 10);
-    RowItems* rowitems = (RowItems*)TestRowItems.TypeDescriptor->ctor(&TestRowItems, nullptr, nullptr);
-    rowitems->Layout();
-    rowitems->MoveTo(15, 125);*/
-    
-    //rowitems = (RowItems_t*)RowItems_ctor(&TestRowItems, NULL, NULL);
-    //rowitems->Widget.vtable->MoveTo((Widget_t*)rowitems, 10, 30);
-//    rowlist = (RowList_t*)RowList_ctor(&TestRowList, NULL, NULL);
-//    rowlist->Widget.vtable->MoveTo((Widget_t*)rowlist, 10, 30);
 
     do
     {
@@ -88,13 +61,6 @@ int main(void) {
             fontlib_ClearWindow();
             Rpn_Redraw();
             statusBar.Paint();
-/*            label->Paint();
-            checkbox->Paint();
-            rowlist->Paint();
-            rowitems->Paint();*/
-    //label->Widget.vtable->Paint((Widget*)label);
-    //rowitems->Widget.vtable->Paint((Widget_t*)rowitems);
-    //rowlist->Widget.vtable->Paint((Widget*)rowlist);
         }
         do
         {
@@ -114,31 +80,31 @@ int main(void) {
         switch (k)
         {
             case sk_Window:
-                Settings_ChangePrimaryBase(BINARY);
+                Settings::SetPrimaryBase(BINARY);
                 dirty = true;
                 break;
             case sk_Zoom:
-                Settings_ChangePrimaryBase(OCTAL);
+                Settings::SetPrimaryBase(OCTAL);
                 dirty = true;
                 break;
             case sk_Trace:
-                Settings_ChangePrimaryBase(DECIMAL);
+                Settings::SetPrimaryBase(DECIMAL);
                 dirty = true;
                 break;
             case sk_Graph:
-                Settings_ChangePrimaryBase(HEXADECIMAL);
+                Settings::SetPrimaryBase(HEXADECIMAL);
                 dirty = true;
                 break;
             case sk_Alpha:
-                Settings_ChangeDisplayBits(SHOW_32);
+                Settings::SetDisplayBits(SHOW_32);
                 dirty = true;
                 break;
             case sk_GraphVar:
-                Settings_ChangeDisplayBits(SHOW_64);
+                Settings::SetDisplayBits(SHOW_64);
                 dirty = true;
                 break;
             case sk_Stat:
-                Settings_ChangeDisplayBits(SHOW_128);
+                Settings::SetDisplayBits(SHOW_128);
                 dirty = true;
                 break;
         }
@@ -153,7 +119,6 @@ int main(void) {
 
 void ExitClean(void)
 {
-    Settings_Finalize(); /* Run last so Garbage Collect? screen won't cause massive graphical corruption. */
     exit(0);
 }
 

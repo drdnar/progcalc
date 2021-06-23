@@ -119,7 +119,7 @@ void GetBigInt_Reposition(void)
 {
     GetBigInt_Window.X = Rpn_Window.X;
     GetBigInt_Window.Width = Rpn_Window.Width;
-    GetBigInt_Window.Height = Format_GetNumberHeight(Settings.PrimaryBase);
+    GetBigInt_Window.Height = Format_GetNumberHeight(Settings::GetPrimaryBase());
     GetBigInt_Window.Y = Rpn_Window.Y + Rpn_Window.Height - GetBigInt_Window.Height;
 }
 
@@ -134,7 +134,7 @@ bool GetBigInt_SendKey(sk_key_t k)
         Addend.d[0] = digit;
         msb = CurrentInput.d[BIG_INT_SIZE - 1];
         BigIntCopyFromTo(&CurrentInput, &temp2);
-        switch (Settings.PrimaryBase)
+        switch (Settings::GetPrimaryBase())
         {
             case BINARY:
                 if (digit > 1 || msb > 0x7F)
@@ -169,8 +169,8 @@ bool GetBigInt_SendKey(sk_key_t k)
                 BigIntAdd(&CurrentInput, &Addend);
                 break;
         }
-        if ((Settings.DisplayBits == SHOW_32 && BigIntCompare(&CurrentInput, &MaxShow32) > 0)
-            || (Settings.DisplayBits == SHOW_64 && BigIntCompare(&CurrentInput, &MaxShow64) > 0))
+        if ((Settings::GetDisplayBits() == SHOW_32 && BigIntCompare(&CurrentInput, &MaxShow32) > 0)
+            || (Settings::GetDisplayBits() == SHOW_64 && BigIntCompare(&CurrentInput, &MaxShow64) > 0))
         {
             BigIntCopyFromTo(&temp2, &CurrentInput);
             return false;
@@ -183,7 +183,7 @@ bool GetBigInt_SendKey(sk_key_t k)
     {
         if (!EntryActive)
             return false;
-        switch (Settings.PrimaryBase)
+        switch (Settings::GetPrimaryBase())
         {
             case HEXADECIMAL:
                 BigIntShiftRight(&CurrentInput);
@@ -233,7 +233,7 @@ void GetBigInt_Redraw(void)
     Style_SaveTextWindow(&oldWindow);
     Style_RestoreTextWindow(&GetBigInt_Window);
     fontlib_HomeUp();
-    Format_PrintInBase(&CurrentInput, Settings.PrimaryBase);
+    Format_PrintInBase(&CurrentInput, Settings::GetPrimaryBase());
     fontlib_HomeUp();
     fontlib_DrawString("#");
     Style_RestoreTextWindow(&oldWindow);

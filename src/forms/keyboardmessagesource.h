@@ -11,10 +11,9 @@ namespace Forms
 
 /**
  * Processes keyboard events.
- * TODO: In the old C code, this also handled the 2nd indicator and APD.
+ * TODO: In the old C code, this also handled the 2nd indicator.
  * The location of the 2nd indicator is still global state, which should be
  * changed.
- * APD timing should maybe be broken off into its own object.
  */
 class KeyboardEventSource final : public MessageSource
 {
@@ -81,28 +80,12 @@ class KeyboardEventSource final : public MessageSource
          */
         static KeyboardEventSource instance;
         /**
-         * Configures how many seconds to wait before dimming the screen.
-         */
-        const unsigned int APD_DIM_TIME = 60;
-        /**
-         * Configures how many seconds to wait to quit after dimming the screen.
-         */
-        const unsigned int APD_QUIT_TIME = 120;
-        /**
          * Assumed height of the indicator cursor.
          */
         const unsigned char INDICATOR_HEIGHT = 14;
         KeyboardEventSource(void);
         /*KeyboardEventSource(KeyboardEventSource const& x) = default;
         KeyboardEventSource(KeyboardEventSource&& x) = default;*/
-        /**
-         * Restarts the APD count-down.
-         */
-        static void restart_apd(void);
-        /**
-         * Checks the APD timer.  Ends the program if it has expired.
-         */
-        static void check_apd(void);
         /**
          * Controls whether a cursor indicator will be shown.
          */
@@ -151,14 +134,6 @@ class KeyboardEventSource final : public MessageSource
          * Caches state of capital alpha modifier.
          */
         //static bool ALPHA = false;
-        /**
-         * Power-saving timer.
-         */
-        static unsigned int apdtimer;
-        /**
-         * True when display dimming is active.
-         */
-        static bool dimmed;
         /**
          * Caches whatever was under the 2nd/alpha indicator.
          */

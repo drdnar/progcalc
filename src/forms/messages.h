@@ -6,6 +6,25 @@
 namespace Forms
 {
 
+/**
+ * Priority IDs for MessageSinks.
+ */
+enum MessageSinkPriority
+{
+    SINK_PRIORITY_ULTRA = 16,
+    SINK_PRIORITY_VERY_HIGH = 32,
+    SINK_PRIORITY_HIGH = 64,
+    SINK_PRIORITY_MEDIUM_HIGH = 96,
+    SINK_PRIORITY_SLIGHTLY_ELEVATED = 112,
+    SINK_PRIORITY_NORMAL = 128,
+    SINK_PRIORITY_SLIGHTLY_LOWERED = 144,
+    SINK_PRIORITY_MEDIUM_LOW = 160,
+    SINK_PRIORITY_LOW = 192,
+    SINK_PRIORITY_VERY_LOW = 224,
+    SINK_PRIORITY_MINIMAL = 240,
+    SINK_PRIORITY_POST_PROCESS = 255
+};
+
 
 /**
  * Interface for a class that generates messages.

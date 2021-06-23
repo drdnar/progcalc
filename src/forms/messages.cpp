@@ -1,10 +1,11 @@
 #include "messages.h"
+#include "apd.h"
 #include <string.h>
 
 #ifdef _EZ80
 /**
  * Same as <string.h> memmove, but the destination MUST be after (at a higher
- * memory address) the source, and forces efficient inline eZ80 assembly.
+ * memory address than) the source, and forces efficient inline eZ80 assembly.
  * @param destination Target address, e.g. &somearr[i + 2]
  * @param source Source address, e.g. &somearr[i]
  * @param count Number of bytes to move
@@ -15,7 +16,7 @@ static inline void memmove_forward(void* destination, const void* source, size_t
 }
 /**
  * Same as <string.h> memmove, but the destination MUST be before (at a lower
- * memory address) the source, and forces efficient inline eZ80 assembly.
+ * memory address than) the source, and forces efficient inline eZ80 assembly.
  * @param destination Target address, e.g. &somearr[i - 2]
  * @param source Source address, e.g. &somearr[i]
  * @param count Number of bytes to move
@@ -199,6 +200,7 @@ void MessageLoop::Begin(void)
 {
     MessageSource** source = &synchronousMessageSources[0];
     Message message;
+    bool quitting = false;
     do
     {
         #ifdef _EZ80
@@ -214,10 +216,15 @@ void MessageLoop::Begin(void)
             #ifdef _EZ80
             hadMessage = true;
             #endif
+            if (message.Id == MESSAGE_APD && message.ExtendedCode == APD_TURN_OFF)
+            {
+                quitting = true;
+                EnqueueMessage({ .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = MESSAGE_NONE });
+            }
             sinkEvent(message);
             processPendingMessages();
             if (message.Id == MESSAGE_EXIT_EVENT_LOOP)
-                return;
+                quitting = true;
         }
         #ifdef _EZ80
         if (!hadMessage)
@@ -227,7 +234,7 @@ void MessageLoop::Begin(void)
             __asm__("halt");
         }
         #endif
-    } while (true);
+    } while (!quitting);
 }
 
 

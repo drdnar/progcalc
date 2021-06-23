@@ -17,12 +17,17 @@ using namespace Forms;
 
 
 unsigned char StatusBar::battery_level;
+
 bool StatusBar::battery_charging;
+
 unsigned int StatusBar::battery_timer;
+
 uint16_t StatusBar::battery_pips[7];
 
+StatusBar StatusBar::instance;
 
-StatusBar::StatusBar(void)
+
+StatusBar::StatusBar(void) : MessageSink(SINK_PRIORITY_SLIGHTLY_ELEVATED)
 {
     // TODO: When this starts up, this needs to check whether to show or hide
     // based on settings.
@@ -96,15 +101,15 @@ Status StatusBar::Paint(void)
     Style_SetSmallFontPropBold();
     fontlib_SetLineSpacing(1, 1);
     fontlib_SetCursorPosition(150, 0);
-    fontlib_DrawString(GetDisplayBitsName(Settings.DisplayBits));
+    fontlib_DrawString(GetDisplayBitsName(Settings::GetDisplayBits()));
     fontlib_DrawString(" bits");
     fontlib_SetCursorPosition(220, 0);
-    fontlib_DrawString(GetBaseShortCapsName(Settings.PrimaryBase));
+    fontlib_DrawString(GetBaseShortCapsName(Settings::GetPrimaryBase()));
     fontlib_SetCursorPosition(260, 0);
-    if (Settings.SecondaryBase != NO_BASE)
+    if (Settings::GetSecondaryBase() != NO_BASE)
     {
         fontlib_DrawString("(");
-        fontlib_DrawString(GetBaseShortCapsName(Settings.SecondaryBase));
+        fontlib_DrawString(GetBaseShortCapsName(Settings::GetSecondaryBase()));
         fontlib_DrawGlyph(')');
     }
     fontlib_SetColors(COLOR_FOREGROUND, COLOR_BACKGROUND);

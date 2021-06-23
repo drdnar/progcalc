@@ -10,12 +10,6 @@
 
 using namespace Forms;
 
-/**
- * Exits the program, cleaning up stuff.
- */
-extern "C" void ExitClean(void); /* I don't really have a better idea where to put this declaration. */
-
-
 KeyboardEventSource KeyboardEventSource::instance;
 bool KeyboardEventSource::cursor_enabled = false;
 bool KeyboardEventSource::cursor_shown = false;
@@ -25,8 +19,6 @@ bool KeyboardEventSource::second_enabled = false;
 bool KeyboardEventSource::second = 0;
 //bool KeyboardEventSource::alpha = false;
 //bool KeyboardEventSource::ALPHA = false;
-unsigned int KeyboardEventSource::apdtimer = 0;
-bool KeyboardEventSource::dimmed = false;
 gfx_sprite_t* KeyboardEventSource::under_indicator = nullptr;
 
 
@@ -40,7 +32,6 @@ KeyboardEventSource::KeyboardEventSource(void)
         under_indicator = gfx_MallocSprite(fontlib_GetGlyphWidth(CALC1252_CURSOR_2ND_CHAR), INDICATOR_HEIGHT);
     }
     /* Otherwise, initialization will fail later when trying to load fonts. */
-    restart_apd();
     MessageLoop::RegisterSynchronousMessageSource(*this);
 }
 
@@ -110,7 +101,6 @@ Message KeyboardEventSource::GetMessage(void)
     if (key)
     {
         ClearOnKeyPressed();
-        restart_apd();
         if (second_enabled)
         {
             if (key == sk_2nd)
@@ -119,7 +109,7 @@ Message KeyboardEventSource::GetMessage(void)
                     set2nd();
                 else
                     reset2nd();
-                return {MESSAGE_NONE, MESSAGE_NONE};
+                return { .Id = MESSAGE_NONE, .ExtendedCode = MESSAGE_NONE};
             }
             else if (second)
             {
@@ -128,9 +118,7 @@ Message KeyboardEventSource::GetMessage(void)
             }
         }
     }
-    else
-        check_apd();
-    return {MESSAGE_KEY, key};
+    return { .Id = MESSAGE_KEY, .ExtendedCode = key };
 }
 
 
@@ -162,31 +150,4 @@ void KeyboardEventSource::reset2nd(void)
         return;
     unshow_cursor();
     second = false;
-}
-
-
-void KeyboardEventSource::restart_apd(void)
-{
-    if (dimmed)
-    {
-        Lcd_Bright();
-        dimmed = false;
-    }
-    apdtimer = GetRtcSeconds() + ApdDimTime;
-}
-
-
-void KeyboardEventSource::check_apd(void)
-{
-    if (RtcTimer_Expired(apdtimer))
-    {
-        if (!dimmed)
-        {
-            dimmed = true;
-            Lcd_Dim();
-            apdtimer = GetRtcSeconds() + ApdQuitTime;
-        }
-        else
-            ExitClean();
-    }
 }

@@ -123,15 +123,15 @@ static bool DrawStackEntry(unsigned int n)
         return false;
     oldLoc.Location.y = (unsigned char)printY;
     oldLoc.Location.Restore();
-    Format_PrintInBase(BigIntStack_Get(MainStack, n, NULL), Settings.PrimaryBase);
+    Format_PrintInBase(BigIntStack_Get(MainStack, n, NULL), Settings::GetPrimaryBase());
     nextLoc.Save();
     oldLoc.Location.Restore();
     fontlib_DrawUInt(n, 2);
     fontlib_DrawGlyph(':');
-    if (Settings.SecondaryBase != NO_BASE)
+    if (Settings::GetSecondaryBase() != NO_BASE)
     {
         nextLoc.Restore();
-        Format_PrintInBase(BigIntStack_Get(MainStack, n, NULL), Settings.SecondaryBase);
+        Format_PrintInBase(BigIntStack_Get(MainStack, n, NULL), Settings::GetSecondaryBase());
     }
     return true;
 }
@@ -145,7 +145,7 @@ void Rpn_Redraw(void)
 /*    Style_SetLargeFontProp();*/
     fontlib_SetCursorPosition(Rpn_Window.X, Rpn_Window.Y + Rpn_Window.Height);
     /* Cache height of an entry. TODO: This might NOT actually be helpful to cache here. */
-    EntryHeight = Format_GetNumberHeight(Settings.PrimaryBase) + Format_GetNumberHeight(Settings.SecondaryBase);
+    EntryHeight = Format_GetNumberHeight(Settings::GetPrimaryBase()) + Format_GetNumberHeight(Settings::GetSecondaryBase());
     /*if (InputMode == RPN_INPUT) Shouldn't be necessary to mae this conditional, as the redraw routine already checks this? */
         GetBigInt_Redraw();
     upperLeft.Save();
