@@ -38,7 +38,7 @@ void APD::Reset(void)
 
 bool APD::SendMessage(Message& message)
 {
-    if (message.Id == MESSAGE_RAW_KEY)
+    if (message.Id == MESSAGE_RAW_KEY || message.Id == MESSAGE_KEY)
         Reset();
     else if (message.Id == MESSAGE_RTC_TICK)
     {

@@ -12,6 +12,7 @@
 #include "misc.h"
 #include "forms/widget.h"
 #include "forms/textmanager.h"
+#include "forms/ignorewarning.h"
 
 using namespace Forms;
 
@@ -26,33 +27,67 @@ uint16_t StatusBar::battery_pips[7];
 
 StatusBar StatusBar::instance;
 
-
-StatusBar::StatusBar(void) : MessageSink(SINK_PRIORITY_SLIGHTLY_ELEVATED)
+const TextWindow StatusBar::window =
 {
-    // TODO: When this starts up, this needs to check whether to show or hide
-    // based on settings.
+    0, 0,
+    LCD_WIDTH, SMALL_FONT_HEIGHT + 2,
+    0, 0,
+    FONT_SMALL_PROP_BOLD
+};
+
+
+StatusBar::StatusBar() : MessageSink(SINK_PRIORITY_SLIGHTLY_ELEVATED)
+{
+    MessageLoop::RegisterMessageSink(*this);
     unsigned char i;
     uint16_t* p = &battery_pips[0];
     for (i = 0; i < 4; i++)
         *p++ = lcd_Palette[COLOR_BATTERY_EMPTY_PIP];
     for (i = 0; i < 3; i++)
         *p++ = lcd_Palette[COLOR_BATTERY_PIP];
+    if (Settings::GetStatusBar())
+        Show();
+    else
+        Hide();
 }
 
 
+IGNORE_WARNING_UNUSED_PARAMETER
 Status StatusBar::MoveTo(x_t x, y_t y)
+END_IGNORE_WARNING
 {
     return Status::Failure;
 }
 
 
+
+IGNORE_WARNING_UNUSED_PARAMETER
 bool StatusBar::SendInput(Message& message)
+END_IGNORE_WARNING
 {
     return false;
 }
 
 
-void StatusBar::_draw_battery_icon(void)
+bool StatusBar::SendMessage(Message& message)
+{
+    if (message.Id == MESSAGE_SETTINGS_CHANGE)
+    {
+        if (message.ExtendedCode == SETTINGS_STATUS_BAR_CHANGE)
+            if (Settings::GetStatusBar())
+                Show();
+            else
+                Hide();
+        else
+            dirty = true;
+    }
+    if (dirty)
+        Paint();
+    return false;
+}
+
+
+void StatusBar::_draw_battery_icon()
 {
     if (battery_charging)
         lcd_Palette[COLOR_BATTERY_OUTLINE] = lcd_Palette[COLOR_BATTERY_CHARGING];
@@ -65,7 +100,7 @@ void StatusBar::_draw_battery_icon(void)
 }
 
 
-bool StatusBar::_update_battery_level(void)
+bool StatusBar::_update_battery_level()
 {
     unsigned char level = battery_level;
     unsigned char charging = battery_charging;
@@ -76,7 +111,7 @@ bool StatusBar::_update_battery_level(void)
 }
 
 
-void StatusBar::UpdateBatteryLevel(void)
+void StatusBar::UpdateBatteryLevel()
 {
     if (RtcTimer_Expired(battery_timer))
         if (_update_battery_level())
@@ -84,12 +119,12 @@ void StatusBar::UpdateBatteryLevel(void)
 }
 
 
-Status StatusBar::Paint(void)
+Status StatusBar::Paint()
 {
-    if (_hidden)
+    dirty = false;
+    if (hidden)
         return Status::Success;
-    TextWindow old_window;
-    old_window.Save();
+    //WindowSaver saver;
     window.Restore();
     fontlib_SetColors(COLOR_STATUS_BAR_FOREGROUND, COLOR_STATUS_BAR_BACKGROUND);
     fontlib_HomeUp();
@@ -113,27 +148,27 @@ Status StatusBar::Paint(void)
         fontlib_DrawGlyph(')');
     }
     fontlib_SetColors(COLOR_FOREGROUND, COLOR_BACKGROUND);
-    old_window.Restore();
     _draw_battery_icon();
     return Status::Success;
 }
 
 
-Status StatusBar::Show(void)
+Status StatusBar::Show()
 {
-    _height = SMALL_FONT_HEIGHT + 2;
-    // TODO: this information gets propagated back to the RPN UI
-    Rpn_Window.Height -= SMALL_FONT_HEIGHT + 2;
-    Rpn_Window.Y = SMALL_FONT_HEIGHT + 2;
+    hidden = false;
+    dirty = true;
+    height = SMALL_FONT_HEIGHT + 2;
     _update_battery_level();
     return Status::Success;
 }
 
 
-Status StatusBar::Hide(void)
+Status StatusBar::Hide()
 {
-    _height = 0;
-    Rpn_Window.Height += SMALL_FONT_HEIGHT + 2;
-    Rpn_Window.Y = 0;
+    hidden = true;
+    dirty = true;
+    height = 0;
+    //Rpn_Window.Height += SMALL_FONT_HEIGHT + 2;
+    //Rpn_Window.Y = 0;
     return Status::Success;
 }

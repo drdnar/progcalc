@@ -15,6 +15,7 @@ enum SettingsMessageIds
     SETTINGS_ALWAYS_SHOW_DEC_CHANGE,
     SETTINGS_ALWAYS_SHOW_OCT_CHANGE,
     SETTINGS_ALWAYS_SHOW_BIN_CHANGE,
+    SETTINGS_STATUS_BAR_CHANGE,
 };
 
 enum Bases_t
@@ -61,7 +62,7 @@ class Settings final
          * DisplayBits getter.
          * @return Member of { SHOW_32, SHOW_64, SHOW_128 }
          */
-        static inline bool GetDisplayBits(void) { return settings.DisplayBits; }
+        static inline Base_t GetDisplayBits() { return settings.DisplayBits; }
         /**
          * DisplayBits setter.
          */
@@ -70,7 +71,7 @@ class Settings final
          * Getter for PrimaryBase.
          * @return Member of { BINARY, OCTAL, DECIMAL, HEXADECIMAL }
          */
-        static Base_t GetPrimaryBase(void) { return settings.PrimaryBase; }
+        static Base_t GetPrimaryBase() { return settings.PrimaryBase; }
         /**
          * Setter for PrimaryBase.
          */
@@ -79,7 +80,7 @@ class Settings final
          * Getter for SecondaryBase.
          * @return Member of { BINARY, OCTAL, DECIMAL, HEXADECIMAL }
          */
-        static Base_t GetSecondaryBase(void) { return settings.SecondaryBase; }
+        static Base_t GetSecondaryBase() { return settings.SecondaryBase; }
         /**
          * Setter for SecondaryBase.
          */
@@ -87,7 +88,7 @@ class Settings final
         /**
          * AlwaysShow base getter
          */
-        static bool AlwaysShowHex(void) { return settings.AlwaysShowHex; }
+        static bool AlwaysShowHex() { return settings.AlwaysShowHex; }
         /**
          * AlwaysShow base setter
          */
@@ -95,7 +96,7 @@ class Settings final
         /**
          * AlwaysShow base getter
          */
-        static bool AlwaysShowDec(void) { return settings.AlwaysShowDec; }
+        static bool AlwaysShowDec() { return settings.AlwaysShowDec; }
         /**
          * AlwaysShow base setter
          */
@@ -103,7 +104,7 @@ class Settings final
         /**
          * AlwaysShow base getter
          */
-        static bool AlwaysShowOct(void) { return settings.AlwaysShowOct; }
+        static bool AlwaysShowOct() { return settings.AlwaysShowOct; }
         /**
          * AlwaysShow base setter
          */
@@ -111,11 +112,19 @@ class Settings final
         /**
          * AlwaysShow base getter
          */
-        static bool AlwaysShowBin(void) { return settings.AlwaysShowBin; }
+        static bool AlwaysShowBin() { return settings.AlwaysShowBin; }
         /**
          * AlwaysShow base setter
          */
         static void SetAlwaysShowBin(bool value);
+        /**
+         * Checks for StatusBar display
+         */
+        static bool GetStatusBar() { return settings.StatusBarEnabled; }
+        /**
+         * Enables/disables StatusBar.
+         */
+        static void SetStatusBar(bool value);
     private:
         Settings(void);
         ~Settings();
@@ -138,22 +147,22 @@ extern "C" {
 /**
  * Returns a string that gives the short name of a base.
  */
-char* GetBaseShortName(Base_t base);
+const char* GetBaseShortName(Base_t base);
 
 /**
  * Returns a string that gives the short name of a base, in ALL CAPS.
  */
-char* GetBaseShortCapsName(Base_t base);
+const char* GetBaseShortCapsName(Base_t base);
 
 /**
  * Returns a string that gives the long name of a base.
  */
-char* GetBaseLongName(Base_t base);
+const char* GetBaseLongName(Base_t base);
 
 /**
  * Converts a DisplayBits const into a string.
  */
-char* GetDisplayBitsName(uint8_t bytes);
+const char* GetDisplayBitsName(uint8_t bytes);
 
 #ifdef __cplusplus
 }

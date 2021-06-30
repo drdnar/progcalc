@@ -36,10 +36,10 @@ class Label : public Widget
          * Unfocus
          * GetParent
          */
-        Status Focus(void) { return Status::Failure; };
-        Status Disable(void) { return Status::Failure; };
-        bool SendInput(Message& message) { return false; };
-        Status Paint(void);
+        Status Focus() { return Status::Failure; };
+        Status Disable() { return Status::Failure; };
+        bool SendInput(Message& message);
+        Status Paint();
         ~Label();
         /* New routines: */
         /**
@@ -51,11 +51,11 @@ class Label : public Widget
         /**
          * Font ID used for text in this Label.
          */
-        uint8_t _font;
+        uint8_t font;
         /**
          * Pointer to a C-style string that is displayed by this Label.
          */
-        char* _text;
+        char* text;
 };
 
 } /* namespace Forms */

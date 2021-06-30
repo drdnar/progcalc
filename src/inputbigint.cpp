@@ -7,48 +7,26 @@
 #include "bigint.h"
 #include "settings.h"
 #include "rpnui.h"
+#include "forms/textmanager.h"
 
-#include <debug.h>
 
-/**
- * Number currently being entered by user.
- */
-static BigInt_t CurrentInput;
+using namespace Forms;
 
-/**
- * Temporary variable used for input.
- */
-static BigInt_t Addend;
+#define rpnui (*((RPN_UI*)parent))
 
-/**
- * The literal number ten.
- */
-static BigInt_t const Ten = { 0xA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
+const BigInt_t BigIntInput::Ten = { 0xA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
 
-/**
- * The largest decimal number than can accept one more nine.
- */
-static BigInt_t const MaxDecimal = { 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x19 };
+const BigInt_t BigIntInput::MaxDecimal = { 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x19 };
 
-/**
- * Largest possible 32-bit number.
- */
-static BigInt_t const MaxShow32 = { 0xFF, 0xFF, 0xFF, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+const BigInt_t BigIntInput::MaxShow32 = { 0xFF, 0xFF, 0xFF, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-/**
- * Largest possible 64-bit number.
- */
-static BigInt_t const MaxShow64 = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0 };
+const BigInt_t BigIntInput::MaxShow64 = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-/**
- * true if user is entering number, false if not
- */
-static bool EntryActive = false;
+BigInt_t BigIntInput::CurrentInput;
 
-/**
- * Maps key codes to their hexadecimal value.
- */
-static unsigned char const NumberMap[] = 
+BigInt_t BigIntInput::Addend;
+
+const unsigned char BigIntInput::NumberMap[] = 
 {
     0xFF, /* 0 */
     0xFF, /* sk_Down             0x01 */
@@ -107,25 +85,12 @@ static unsigned char const NumberMap[] =
 };
 
 
-void GetBigInt(BigInt_t* n)
+
+bool BigIntInput::SendInput(Message& message)
 {
-    BigIntCopyFromTo(&CurrentInput, n);
-}
-
-
-CharTextWindow_t GetBigInt_Window;
-
-void GetBigInt_Reposition(void)
-{
-    GetBigInt_Window.X = Rpn_Window.X;
-    GetBigInt_Window.Width = Rpn_Window.Width;
-    GetBigInt_Window.Height = Format_GetNumberHeight(Settings::GetPrimaryBase());
-    GetBigInt_Window.Y = Rpn_Window.Y + Rpn_Window.Height - GetBigInt_Window.Height;
-}
-
-
-bool GetBigInt_SendKey(sk_key_t k)
-{
+    if (message.Id != MESSAGE_KEY)
+        return false;
+    sk_key_t k = (sk_key_t)message.ExtendedCode;
     BigInt_t temp, temp2;
     unsigned char msb;
     unsigned char digit = NumberMap[k];
@@ -175,13 +140,15 @@ bool GetBigInt_SendKey(sk_key_t k)
             BigIntCopyFromTo(&temp2, &CurrentInput);
             return false;
         }
-        EntryActive = true;
-        GetBigInt_Redraw();
+        if (entryActive)
+            SetDirty();
+        else
+            beginEntry();
         return true;
     }
     else if (k == sk_Del)
     {
-        if (!EntryActive)
+        if (!entryActive)
             return false;
         switch (Settings::GetPrimaryBase())
         {
@@ -198,45 +165,81 @@ bool GetBigInt_SendKey(sk_key_t k)
                 BigIntCopyFromTo(&temp, &CurrentInput);
                 break;
         }
-        GetBigInt_Redraw();
+        SetDirty();
         return true;
     }
     else if (k == sk_Clear)
     {
-        if (!EntryActive || Rpn_IsScrollingActive())
+        if (!entryActive)
             return false;
-        GetBigInt_Reset();
+        Reset();
         return true;
     }
     return false;
 }
 
 
-bool GetBigInt_IsActive(void)
+Status BigIntInput::Paint()
 {
-    return EntryActive;
-}
-
-
-void GetBigInt_Reset(void)
-{
-    BigIntSetToZero(&CurrentInput);
-    EntryActive = false;
-}
-
-
-void GetBigInt_Redraw(void)
-{
-    CharTextWindow_t oldWindow;
-    if (!EntryActive)
-        return;
-    Style_SaveTextWindow(&oldWindow);
-    Style_RestoreTextWindow(&GetBigInt_Window);
+    if (!dirty)
+        return Status::Success;
+    dirty = false;
+    if (!entryActive)
+        return Status::Success;
+    fontlib_SetWindow(x, y, width, height);
     fontlib_HomeUp();
     Format_PrintInBase(&CurrentInput, Settings::GetPrimaryBase());
     fontlib_HomeUp();
     fontlib_DrawString("#");
-    Style_RestoreTextWindow(&oldWindow);
-    /* This is an evil typecast that arises from me still sometimes thinking like an assembly programmer. */
-    Style_RestoreCursor((Coord_t*)(&GetBigInt_Window));
+    return Status::Success;
+}
+
+
+void BigIntInput::Layout()
+{
+    if (entryActive)
+    {
+        width = rpnui.GetWidth();
+        height = Format_GetNumberHeight(Settings::GetPrimaryBase());
+        x = rpnui.GetX();
+        y = rpnui.GetY() + rpnui.GetHeight() - height;
+    }
+    else
+    {
+        //y += height;
+        height = 0;
+    }
+}
+
+
+void BigIntInput::beginEntry()
+{
+    if (entryActive)
+        return;
+    entryActive = true;
+    Layout();
+    rpnui.Layout();
+}
+
+
+void BigIntInput::endEntry()
+{
+    if (!entryActive)
+        return;
+    entryActive = false;
+    Layout();
+    rpnui.Layout();
+}
+
+
+void BigIntInput::Reset()
+{
+    BigIntSetToZero(&CurrentInput);
+    endEntry();
+}
+
+
+void BigIntInput::GetEntry(BigInt_t* n)
+{
+    BigIntCopyFromTo(&CurrentInput, n);
 }

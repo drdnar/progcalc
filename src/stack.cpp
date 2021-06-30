@@ -1,187 +1,196 @@
 #include <stdlib.h>
 #include <string.h>
 #include "stack.h"
+#include "forms/memcpy.h"
+#include <new>
 
-BigIntStack_t* BigIntStack_ctor(unsigned int maxSize)
+
+#include <graphx.h>
+#include <tice.h>
+
+BigIntStack::BigIntStack(unsigned int max_size)
 {
-    BigIntStack_t* self;
-    if (maxSize == 0) /* ? ? ? */
-        return nullptr;
-    self = (BigIntStack_t*)malloc(sizeof(BigIntStack_t));
-    if (!self)
-        return self;
-    if (!(self->Stack = (BigInt_t*)calloc(maxSize, sizeof(BigInt_t))))
+    if (max_size == 0) /* ? ? ? */
+        max_size = 16;
+    stack = (BigInt_t*)calloc(max_size, sizeof(BigInt_t));
+/** TODO: Get angry and abort.
+    if (!stack)
+        throw std::bad_alloc();
+*/
+/*    if (!stack)
     {
-        free(self);
-        return nullptr;
-    }
-    self->MaxSize = maxSize;
-    self->Size = 0;
-    return self;
-}
-
-
-void BigIntStack_dtor(BigIntStack_t* self)
-{
-    free(self);
-}
-
-
-bool BigIntStack_IsEmpty(BigIntStack_t* self)
-{
-    return self->Size == 0;
-}
-
-
-bool BigIntStack_IsFull(BigIntStack_t* self)
-{
-    return self->Size == self->MaxSize;
-}
-
-
-unsigned int BigIntStack_GetSize(BigIntStack_t* self)
-{
-    return self->Size;
-}
-
-
-unsigned int BigIntStack_GetMaxSize(BigIntStack_t* self)
-{
-    return self->MaxSize;
-}
-
-
-void BigIntStack_Flush(BigIntStack_t* self)
-{
-    self->Size = 0;
-}
-
-
-void BigIntStack_Push(BigIntStack_t* self, const BigInt_t* number)
-{
-    if (self->Size == self->MaxSize)
-    {
-        if (self->MaxSize == 1)
+        gfx_SetTextBGColor(12);
+        gfx_PrintStringXY("  AAAARGH!  ", 1, 1);
+        gfx_PrintUInt(max_size, 3);
+        //do ; while (!os_GetCSC());
+        max_size = 8;
+        stack = (BigInt_t*)calloc(max_size, sizeof(BigInt_t));
+        if (!stack)
         {
-            BigIntCopyFromTo(number, self->Stack);
+            gfx_PrintString("  ? ? ?  ");
+            stack = (BigInt_t*)malloc(max_size * sizeof(BigInt_t));
+            if (!stack)
+                gfx_PrintString("Worked.");
+        }
+    }*/
+
+    maxSize = max_size;
+    size = 0;
+}
+
+
+BigIntStack::~BigIntStack()
+{
+    free(stack);
+}
+
+
+void BigIntStack::Push(BigInt_t* number)
+{
+    if (size == maxSize)
+    {
+        if (maxSize == 1)
+        {
+            BigIntCopyFromTo(number, stack);
             return;
         }
-        memmove(self->Stack, self->Stack + 1, (self->MaxSize - 1) * sizeof(BigInt_t));
-        BigIntCopyFromTo(number, self->Stack + self->MaxSize - 1);
+        memmove_backward(stack, stack + 1, (maxSize - 1) * sizeof(BigInt_t));
+        BigIntCopyFromTo(number, stack + maxSize - 1);
         return;
     }
-    BigIntCopyFromTo(number, self->Stack + self->Size++);
+    BigIntCopyFromTo(number, stack + size++);
 }
 
 
-BigInt_t* BigIntStack_Peek(BigIntStack_t* self)
+BigInt_t* BigIntStack::Peek(void)
 {
-    if (self->Size == 0)
+    if (size == 0)
         return nullptr;
-    return self->Stack + self->Size - 1;
+    return stack + size - 1;
 }
 
 
-BigInt_t* BigIntStack_Pop(BigIntStack_t* self, BigInt_t* destination)
+BigInt_t* BigIntStack::Peek(unsigned int n)
 {
-    if (self->Size == 0)
+    if (n >= size)
         return nullptr;
-    if (destination)
-        BigIntCopyFromTo(self->Stack + self->Size - 1, destination);
-    return self->Stack + --self->Size;
+    return Peek() - n;
 }
 
 
-signed int BigIntStack_Resize(BigIntStack_t* self, unsigned int newSize)
+BigInt_t* BigIntStack::PeekFromBottom(unsigned int n)
 {
-    BigInt_t* newarr;
+    if (n >= size)
+        return nullptr;
+    return stack + n;
+}
+
+
+BigInt_t* BigIntStack::PopStalePointer()
+{
+    if (!size)
+        return nullptr;
+    return stack + --size;
+}
+
+
+bool BigIntStack::Pop(BigInt_t* destination)
+{
+    if (!size)
+        return false;
+    if (!destination)
+        return false;
+    BigIntCopyFromTo(stack + --size, destination);
+    return true;
+}
+
+
+signed int BigIntStack::Resize(unsigned int newSize)
+{
     unsigned int r = 0;
-    if (newSize < self->Size)
-        r = self->Size - newSize;
-    newarr = (BigInt_t*)realloc(self->Stack, newSize * sizeof(BigInt_t));
+    if (newSize < size)
+        r = size - newSize;
+    BigInt_t* newarr = (BigInt_t*)realloc(stack, newSize * sizeof(BigInt_t));
     if (newarr)
-        self->Stack = newarr;
+        stack = newarr;
     else
         return -1;
     return r;
 }
 
 
-void BigIntStack_RotateUp(BigIntStack_t* self)
+void BigIntStack::RotateUp(void)
 {
-    BigInt_t temp;
-    if (self->Size <= 1)
+    if (size <= 1)
         return;
-    BigIntCopyFromTo(self->Stack + self->Size - 1, &temp);
-    memmove(self->Stack + 1, self->Stack, (self->Size - 1) * sizeof(BigInt_t));
-    BigIntCopyFromTo(&temp, self->Stack);
+    BigInt_t temp;
+    BigIntCopyFromTo(stack + size - 1, &temp);
+    memmove_forward(stack + 1, stack, (size - 1) * sizeof(BigInt_t));
+    BigIntCopyFromTo(&temp, stack);
 }
 
 
-void BigIntStack_RotateDown(BigIntStack_t* self)
+void BigIntStack::RotateDown(void)
 {
-    BigInt_t temp;
-    if (self->Size <= 1)
+    if (size <= 1)
         return;
-    BigIntCopyFromTo(self->Stack, &temp);
-    memmove(self->Stack, self->Stack + 1, (self->Size - 1) * sizeof(BigInt_t));
-    BigIntCopyFromTo(&temp, self->Stack + self->Size - 1);
+    BigInt_t temp;
+    BigIntCopyFromTo(stack, &temp);
+    memmove_backward(stack, stack + 1, (size - 1) * sizeof(BigInt_t));
+    BigIntCopyFromTo(&temp, stack + size - 1);
 }
 
 
-void BigIntStack_Exchange(BigIntStack_t* self)
+void BigIntStack::ExchangeTop(void)
 {
-    BigInt_t temp;
-    BigInt_t* top;
-    if (self->Size <= 1)
+    if (size <= 1)
         return;
-    top = BigIntStack_Peek(self);
+    BigInt_t* top = Peek();
+    BigInt_t temp;
     BigIntCopyFromTo(top, &temp);
     BigIntCopyFromTo(top - 1, top);
     BigIntCopyFromTo(&temp, top - 1);
 }
 
 
-BigInt_t* BigIntStack_Get(BigIntStack_t* self, unsigned int n, BigInt_t* destination)
+bool BigIntStack::Get(unsigned int n, BigInt_t* destination)
 {
-    BigInt_t* item = BigIntStack_Peek(self) - n;
-    if (n >= self->Size)
-        return nullptr;
+    if (n >= size)
+        return false;
     if (destination)
-        BigIntCopyFromTo(item, destination);
-    return item;
+        BigIntCopyFromTo(Peek() - n, destination);
+    return true;
 }
 
 
-BigInt_t* BigIntStack_GetFromBottom(BigIntStack_t* self, unsigned int n, BigInt_t* destination)
+bool BigIntStack::GetFromBottom(unsigned int n, BigInt_t* destination)
 {
-    BigInt_t* item = self->Stack + n;
-    if (n >= self->Size)
-        return nullptr;
+    if (n >= size)
+        return false;
     if (destination)
-        BigIntCopyFromTo(item, destination);
-    return item;
+        BigIntCopyFromTo(stack + n, destination);
+    return true;
 }
 
 
-void BigIntStack_Delete(BigIntStack_t* self, unsigned int n)
+void BigIntStack::Delete(unsigned int n)
 {
-    if (n >= self->Size)
+    if (n >= size)
     {
-        self->Size = 0;
+        size = 0;
         return;
     }
-    self->Size -= n;
+    size -= n;
 }
 
 
-void BigIntStack_DeleteFromBottom(BigIntStack_t* self, unsigned int n)
+void BigIntStack::DeleteFromBottom(unsigned int n)
 {
-    if (n >= self->Size)
+    if (n >= size)
     {
-        self->Size = 0;
+        size = 0;
         return;
     }
-    memmove(self->Stack, self->Stack + n, (self->Size - n) * sizeof(BigInt_t));
-    self->Size -= n;
+    memmove_backward(stack, stack + n, (size - n) * sizeof(BigInt_t));
+    size -= n;
 }

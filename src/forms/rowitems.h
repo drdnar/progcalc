@@ -46,11 +46,19 @@ class RowItems : public Container
          */
         void Layout(void);
         /* New routines: */
-        static Widget_def* GetNextItem(Container_def* Template);
-        friend Widget* RowItems_ctor(Widget_def* Template, Widget* parent, Widget_def** Next);
+        /**
+         * Empty constructor.
+         */
+        RowItems();
+        static Widget_def* GetNextItem(Widget_def* Template);
+        /**
+         * Forms initialization magic.
+         */
+        static Widget* form_ctor(Widget_def* Template, Widget* parent, Widget_def** Next);
         HorizontalAlignment GetAlignment(void);
         virtual Status SetAlignment(HorizontalAlignment alignment);
     protected:
+        RowItems(Widget_def* Template, Widget_def** next);
         HorizontalAlignment _alignment;
         unsigned char _padding;
 };

@@ -11,320 +11,143 @@
 #include "style.h"
 #include "inputbigint.h"
 #include "misc.h"
+#include "statusbar.h"
 #include "forms/textmanager.h"
-
-#include <debug.h>
+#include "forms/messages.h"
 
 using namespace Forms;
 
-/**
- * Waiting for user to start typing.
- */
-#define RPN_NO_INPUT 0
-/**
- * User has started typing a number.
- */
-#define RPN_INPUT 1
-/**
- * User is scrolling around the stack.
- */
-#define RPN_SCROLL 2
 
-/**
- * Current input mode.
- */
-static unsigned char InputMode;
 
-/**
- * Main RPN stack.
- */
-static BigIntStack_t* MainStack = NULL;
-
-/**
- * Number currently being entered by user.
- */
-static BigInt_t CurrentInput;
-
-/*static BigInt_t Temp0;*/
-static BigInt_t Temp1;
-static BigInt_t Temp2;
-static BigInt_t Temp3;
-
-/**
- * Current index stack is scrolled to.
- */
-static unsigned int ScrollIndex = 0;
-
-/**
- * Default window for showing stack and user entry.
- */
-CharTextWindow_t Rpn_Window =
+static Widget_def* GetNextItem(Widget_def* Template)
 {
-    0, 0,
-    LCD_WIDTH, LCD_HEIGHT,
-    0, 0,
-    FONT_LARGE_PROP
+    if (Template == nullptr)
+        return nullptr;
+    return reinterpret_cast<Widget_def*>(reinterpret_cast<RPN_UI_def*>(Template) + 1);
+}
+
+
+Widget* RPN_UI::RPN_UI_ctor(Widget_def* Template, Widget* parent, Widget_def** next)
+{
+    RPN_UI* widget = new RPN_UI();
+    widget->definition = Template;
+    widget->parent = parent;
+    if (next != nullptr)
+        *next = reinterpret_cast<Widget_def*>(reinterpret_cast<RPN_UI_def*>(Template) + 1);
+    return widget;
+}
+
+
+extern "C" const Widget_desc RPN_UI_desc
+{
+    /** TODO: Needs to be something other than ID::Label */
+    ID::Label,
+    &RPN_UI::RPN_UI_ctor,
+    &GetNextItem
 };
 
-/**
- * Caches the height of a single stack entry.
- */
-static unsigned char EntryHeight;
+
+BigInt_t RPN_UI::Temp1;
+BigInt_t RPN_UI::Temp2;
+BigInt_t RPN_UI::Temp3;
 
 
-/**
- * Acquires the user's current input and flushes the input buffer.
- */
-static bool AcquireInput(void)
+RPN_UI::RPN_UI()
 {
-    if (!GetBigInt_IsActive())
+    height = LCD_HEIGHT;
+    width = LCD_WIDTH;
+    Add(stackDisplay);
+    Add(input);
+}
+
+
+Forms::Status RPN_UI::Paint()
+{
+    dirty = false;
+    return Container::Paint();
+}
+
+
+void RPN_UI::Layout()
+{
+    // TODO: THIS DOES NOT HANDLE BIGINTINPUT'S SIZE
+    // Specifically, need to divide screen space between Input and Stack.
+    // Also, Input doesn't adjust Stack display size.
+    y = StatusBar::GetInstance().GetHeight();
+    height = LCD_HEIGHT - y;
+    input.Layout();
+    unsigned char stackHeight = height - input.GetHeight();
+    stackDisplay.MoveTo(x, y);
+    stackDisplay.SetSize(width, stackHeight);
+    input.MoveTo(x, y + stackHeight);
+    SetDirtyAll();
+}
+
+
+bool RPN_UI::AcquireInput()
+{
+    if (!input.EntryActive())
         return false;
-    InputMode = RPN_NO_INPUT;
-    GetBigInt(&CurrentInput);
-    GetBigInt_Reset();
-    BigIntStack_Push(MainStack, &CurrentInput);
+    BigInt_t number;
+    input.GetEntry(&number);
+    mainStack.Push(&number);
+    input.Reset();
     return true;
 }
 
 
-/**
- * Caches a pointer to the top of the stack after EnsureBinaryOp().
- */
-static BigInt_t* topOfStack;
-/**
- * Sets up the stack for a binary (two argument) operation.
- * Temp1 will contain the second argument.
- */
-static bool EnsureBinaryOp(void)
+bool RPN_UI::SendInput(Message& message)
 {
-    if (BigIntStack_GetSize(MainStack) < 2)
+    if (message.Id == MESSAGE_SETTINGS_CHANGE)
+    {
+        Layout();
         return false;
-//    BigIntStack_Exchange(MainStack);
-    BigIntStack_Pop(MainStack, &Temp1);
-    topOfStack = BigIntStack_Peek(MainStack);
-    return true;
-}
-
-
-/**
- * Draws a stack entry and its label prefix.
- * @param n Index of stack entry number to draw
- * @return true if the number fits into the current window, false if number does not fit.
- */
-static bool DrawStackEntry(unsigned int n)
-{
-    CursorLoc nextLoc;
-    /* Force promotion so there's no overflow issues. */
-    signed int printY;
-    fontlib_Home();
-    CursorSaver oldLoc;
-    printY = oldLoc.Location.y - EntryHeight;
-    if (n >= BigIntStack_GetSize(MainStack) || printY < Rpn_Window.Y)
-        return false;
-    oldLoc.Location.y = (unsigned char)printY;
-    oldLoc.Location.Restore();
-    Format_PrintInBase(BigIntStack_Get(MainStack, n, NULL), Settings::GetPrimaryBase());
-    nextLoc.Save();
-    oldLoc.Location.Restore();
-    fontlib_DrawUInt(n, 2);
-    fontlib_DrawGlyph(':');
-    if (Settings::GetSecondaryBase() != NO_BASE)
-    {
-        nextLoc.Restore();
-        Format_PrintInBase(BigIntStack_Get(MainStack, n, NULL), Settings::GetSecondaryBase());
     }
-    return true;
-}
-
-
-void Rpn_Redraw(void)
-{
-    CursorLoc upperLeft;
-    unsigned int index;
-    Style_RestoreTextWindow(&Rpn_Window);
-/*    Style_SetLargeFontProp();*/
-    fontlib_SetCursorPosition(Rpn_Window.X, Rpn_Window.Y + Rpn_Window.Height);
-    /* Cache height of an entry. TODO: This might NOT actually be helpful to cache here. */
-    EntryHeight = Format_GetNumberHeight(Settings::GetPrimaryBase()) + Format_GetNumberHeight(Settings::GetSecondaryBase());
-    /*if (InputMode == RPN_INPUT) Shouldn't be necessary to mae this conditional, as the redraw routine already checks this? */
-        GetBigInt_Redraw();
-    upperLeft.Save();
-    if (InputMode == RPN_NO_INPUT || InputMode == RPN_INPUT)
-        index = 0;
-    else
+    if (dirty)
+        Paint();
+    if (message.Id == MESSAGE_KEY)
     {
-        /* TODO: SCROLLING NOT YET IMPLEMENTED */
-        index = ScrollIndex;
-    }
-    if (BigIntStack_GetSize(MainStack))
-    {
-        do
-            ;
-        while (DrawStackEntry(index++));
-        upperLeft.Save();
-    }
-    else if (InputMode == RPN_NO_INPUT)
-    {
-        Style_SetLargeFontProp();
-        upperLeft.y = fontlib_GetCursorY() - fontlib_GetCurrentFontHeight();
-        fontlib_SetCursorPosition(Rpn_Window.X, upperLeft.y);
-        fontlib_DrawString("(Stack is empty.)");
-        fontlib_Newline();
-    }
-    /* Erase remaining portion of window. */
-    gfx_SetColor(fontlib_GetBackgroundColor());
-    gfx_FillRectangle_NoClip(Rpn_Window.X, Rpn_Window.Y, Rpn_Window.Width, upperLeft.y - Rpn_Window.Y);
-}
-
-
-void Rpn_SetInputMode(bool mode)
-{
-    if (mode)
-    {
-        if (InputMode == RPN_INPUT)
-            return;
-        /* else */
-        /* Handle starting entry */
-        InputMode = RPN_INPUT;
-        Rpn_Redraw();
-    }
-    else
-    {
-        if (InputMode == RPN_NO_INPUT)
-            return;
-        /* else */
-        /* Handle stopping entry */
-        InputMode = RPN_NO_INPUT;
-        Rpn_Redraw();
-    }
-    
-}
-
-
-bool Rpn_IsScrollingActive(void)
-{
-    return InputMode == RPN_SCROLL;
-}
-
-
-void Rpn_Reset(void)
-{
-    InputMode = RPN_NO_INPUT;
-    if (MainStack == NULL)
-        MainStack = BigIntStack_ctor(99);
-    Rpn_Redraw();
-}
-
-
-/**
- * Scrolls to the almost-last entry depending on screen space available.
- */
-static void scrollLast(void)
-{
-    unsigned int windowSize = Rpn_Window.Height;
-    if (GetBigInt_IsActive())
-        windowSize -= GetBigInt_Window.Height;
-    ScrollIndex = BigIntStack_GetSize(MainStack) - (windowSize / EntryHeight);
-    InputMode = RPN_SCROLL;
-}
-
-
-bool Rpn_SendKey(sk_key_t k)
-{
-    bool r;
-    unsigned int i;
-    if (k == sk_Enter && InputMode != RPN_SCROLL)
-    {
-        r = AcquireInput();
-        Rpn_Redraw();
-        return r;
-    }
-    if (BigIntStack_IsEmpty(MainStack))
-        return false;
-    if (Rpn_IsScrollingActive())
-    {
-        switch (k)
+        if (Broadcast(message))
+            return true;
+        if (stackDisplay.IsScrollingActive())
+            return false;
+        bool r;
+        unsigned int i;
+        BigInt_t* topOfStack;
+        switch ((sk_key_t)message.ExtendedCode)
         {
-            case sk_Up:
-                if (ScrollIndex == 0)
-                    return false;
-                ScrollIndex--;
-                break;
-            case sk_Down:
-                if (ScrollIndex == BigIntStack_GetSize(MainStack) - 1)
-                    return false;
-                ScrollIndex++;
-                break;
-            case sk_2nd_Down:
-                scrollLast();
-                break;
-            case sk_Clear:
-            case sk_2nd_Clear:
-            case sk_2nd_Up:
-            case sk_Del:
-            case sk_Ins:
-            case sk_Mode:
             case sk_Enter:
-                ScrollIndex = 0;
-                if (GetBigInt_IsActive())
-                    InputMode = RPN_INPUT;
-                else
-                    InputMode = RPN_NO_INPUT;
-                break;
-            default:
-                /* If scrolling is active, then don't allow other actions. */
-                return false;
-        }
-        if (ScrollIndex == 0)
-        {
-            if (GetBigInt_IsActive())
-                InputMode = RPN_INPUT;
-            else
-                InputMode = RPN_NO_INPUT;
-        }
-    }
-    else
-    {
-        switch (k)
-        {
+                return AcquireInput();
+            case sk_Quit:
+                MessageLoop::EnqueueMessage( { .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = MESSAGE_NONE } );
+                return true;
             case sk_Del:
-                r = !!BigIntStack_Pop(MainStack, NULL);
-                Rpn_Redraw();
+                r = !!mainStack.PopStalePointer();
+                stackDisplay.SetDirty();
                 return r;
             case sk_Ins:
-                if (InputMode == RPN_NO_INPUT)
-                    if (BigIntStack_GetSize(MainStack) > 0)
-                        BigIntStack_Push(MainStack, BigIntStack_Peek(MainStack));
+                if (!input.EntryActive())
+                    if (mainStack.GetSize() > 0)
+                        mainStack.Push(mainStack.Peek());
                     else
                         return false;
                 else
                     return false;
                 break;
-            case sk_Down:
-                if (BigIntStack_GetSize(MainStack) < 2)
-                    return false;
-                InputMode = RPN_SCROLL;
-                ScrollIndex = 1;
-                break;
-            case sk_2nd_Down:
-                if (BigIntStack_GetSize(MainStack) < 2)
-                    return false;
-                scrollLast();
-                break;
             case sk_Chs:
-                BigIntNegate(BigIntStack_Peek(MainStack));
+                BigIntNegate(mainStack.Peek());
                 break;
             case sk_DecPnt:
-                BigIntNot(BigIntStack_Peek(MainStack));
+                BigIntNot(mainStack.Peek());
                 break;
             case sk_Comma:
-                BigIntStack_Exchange(MainStack);
+                mainStack.ExchangeTop();
                 break;
             case sk_LParen:
-                BigIntStack_RotateDown(MainStack);
+                mainStack.RotateDown();
                 break;
             case sk_RParen:
-                BigIntStack_RotateUp(MainStack);
+                mainStack.RotateUp();
                 break;
             case sk_Add:
             case sk_Sub:
@@ -340,9 +163,11 @@ bool Rpn_SendKey(sk_key_t k)
             case sk_2nd_Div:
             case sk_2nd_Mul:
                 AcquireInput();
-                if (!EnsureBinaryOp())
+                if (mainStack.GetSize() < 2)
                     return false;
-                switch (k)
+                mainStack.Pop(&Temp1);
+                topOfStack = mainStack.Peek();
+                switch ((sk_key_t)message.ExtendedCode)
                 {
                     case sk_Add:
                         BigIntAdd(topOfStack, &Temp1);
@@ -351,21 +176,21 @@ bool Rpn_SendKey(sk_key_t k)
                         BigIntSubtract(topOfStack, &Temp1);
                         break;
                     case sk_Mul:
-                        BigIntMultiply(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2);
-                        BigIntStack_Push(MainStack, &Temp2);
+                        BigIntMultiply(mainStack.PopStalePointer(), &Temp1, &Temp2);
+                        mainStack.Push(&Temp2);
                         break;
                     case sk_Div:
-                        BigIntDivide(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2, &Temp3);
-                        BigIntStack_Push(MainStack, &Temp2);
+                        BigIntDivide(mainStack.PopStalePointer(), &Temp1, &Temp2, &Temp3);
+                        mainStack.Push(&Temp2);
                         break;
                     case sk_2nd_Div:
-                        BigIntDivide(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2, &Temp3);
-                        BigIntStack_Push(MainStack, &Temp3);
+                        BigIntDivide(mainStack.PopStalePointer(), &Temp1, &Temp2, &Temp3);
+                        mainStack.Push(&Temp3);
                         break;
                     case sk_2nd_Mul:
-                        BigIntDivide(BigIntStack_Pop(MainStack, NULL), &Temp1, &Temp2, &Temp3);
-                        BigIntStack_Push(MainStack, &Temp3);
-                        BigIntStack_Push(MainStack, &Temp2);
+                        BigIntDivide(mainStack.PopStalePointer(), &Temp1, &Temp2, &Temp3);
+                        mainStack.Push(&Temp3);
+                        mainStack.Push(&Temp2);
                         break;
                     case sk_Square:
                         i = BigIntToNativeInt(&Temp1);
@@ -408,7 +233,17 @@ bool Rpn_SendKey(sk_key_t k)
             default:
                 return false;
         }
+        stackDisplay.SetDirty();
     }
-    Rpn_Redraw();
-    return true;
+    else
+        return Broadcast(message);
+    return false;
+}
+
+
+void RPN_UI::Reset()
+{
+    stackDisplay.Reset();
+    input.Reset();
+    Layout();
 }

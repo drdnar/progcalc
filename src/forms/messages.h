@@ -35,7 +35,7 @@ class MessageSource
         /**
          * Requests an event source to look for an event.
          */
-        virtual Message GetMessage(void);
+        virtual Message GetMessage(void) = 0;
         MessageSource(void);
         virtual ~MessageSource()/* = default*/;
 };
@@ -53,7 +53,7 @@ class MessageSink
          * @return Return true to signal the message has been handled.
          * Return false to signal the next MessageSink should get the message.
          */
-        virtual bool SendMessage(Message& message);
+        virtual bool SendMessage(Message& message) = 0;
         MessageSink(unsigned char priority);
         virtual ~MessageSink()/* = default*/;
         /**
@@ -206,13 +206,19 @@ class MessageLoop final
          * Generates the next circular buffer index.
          */
         static inline unsigned char incrementMessageQueueIndex(unsigned char i)
-            { return ++i >= MAX_PENDING_MESSAGES + 1 ? 0 : i; }
-        
+            { return ++i >= MAX_PENDING_MESSAGES ? 0 : i; }
+        /**
+         * Processes pending messages.
+         */
         static void processPendingMessages(void);
         /**
          * Internal routine that tries to find a MessageSink to handle an event.
          */
         static bool sinkEvent(Message& message);
+        /**
+         * Flag to exit processing loop.
+         */
+        static bool quitting;
 };
 
 } /* namespace Forms */

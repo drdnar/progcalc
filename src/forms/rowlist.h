@@ -38,8 +38,17 @@ class RowList : public Container
          */
         void Layout(void);
         /* New routines: */
-        static Widget_def* GetNextItem(Container_def* Template);
-        friend Widget* RowList_ctor(Widget_def* Template, Widget* parent, Widget_def** Next);
+        /**
+         * Empty constructor.
+         */
+        RowList();
+        static Widget_def* GetNextItem(Widget_def* Template);
+        /**
+         * Forms initialization magic.
+         */
+        static Widget* form_ctor(Widget_def* Template, Widget* parent, Widget_def** Next);
+    protected:
+        RowList(Widget_def* Template, Widget_def** next);
 };
 
 } /* namespace Forms */

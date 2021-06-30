@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <tice.h>
 #include <fontlibc.h>
-#include <graphx.h>
 
 using namespace Forms;
 
@@ -25,6 +24,25 @@ Container* GUI::active_dialog { nullptr };
 GUI::GUI() : MessageSink(SINK_PRIORITY_NORMAL)
 {
     MessageLoop::RegisterMessageSink(*this);
+    hasFocus = true;
+}
+
+
+Status GUI::Paint()
+{
+    if (active_dialog)
+        return active_dialog->Paint();
+    else
+        return Status::Failure;
+}
+
+
+bool GUI::SendInput(Message& message)
+{
+    if (active_dialog)
+        return active_dialog->SendInput(message);
+    else
+        return false;
 }
 
 
@@ -41,43 +59,52 @@ bool GUI::SendMessage(Message& message)
     }
     else
     {
-        return active_dialog->SendInput(message);
+        if (active_dialog)
+            return active_dialog->SendInput(message);
+        else
+            return false;
     }
 }
 
 
 void GUI::begin_dialog(Widget_def* widget)
 {
-    active_dialog = (Container*)widget->TypeDescriptor->ctor(widget, nullptr, nullptr);
+    // This should never happen.
+    //if (dialog_count == MAX_DIALOGS)
+    //    return;
+    if (dialog_count)
+        active_dialog->Unfocus();
+    active_dialog = (Container*)widget->TypeDescriptor->ctor(widget, &instance, nullptr);
     dialogs[dialog_count++] = active_dialog;
     active_dialog->Layout();
+    active_dialog->Focus();
 }
 
 
-void GUI::end_dialog(void)
+void GUI::end_dialog()
 {
-    if (dialog_count == 0)
+    if (!dialog_count)
         return;
     delete active_dialog;
     dialogs[--dialog_count] = nullptr;
-    if (dialog_count > 0)
+    if (dialog_count)
+    {
         active_dialog = dialogs[dialog_count - 1];
+        active_dialog->Focus();
+    }
     else
         active_dialog = nullptr;
 }
 
 
-void GUI::flush_dialogs(void)
+void GUI::flush_dialogs()
 {
-    Container** item = &dialogs[0];
-    for (unsigned char i = MAX_DIALOGS; i > 0; i--)
-        delete item++;
-    dialog_count = 0;
+    while (dialog_count)
+        end_dialog();
 }
 
 
-GUI::~GUI(void)
+GUI::~GUI()
 {
     flush_dialogs();
 }
-

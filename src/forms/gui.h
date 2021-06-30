@@ -9,23 +9,30 @@ namespace Forms
 
 /**
  * This class handles all user interaction for a Forms GUI.
+ * It implements the Widget class so that there is an easy way for the active
+ * dialog to get the main window bounds.
  */
-class GUI : public MessageSink
+class GUI : public MessageSink, public Widget
 {
     public:
+        static GUI& GetInstance() { return instance; }
+        Status Paint();
+        Status Unfocus() { return Status::Failure; }
+        Status Disable() { return Status::Failure; }
+        Status Hide() { return Status::Failure; }
+        bool SendInput(Message& message);
         /**
          * Returns GUI singleton.
          */
-        GUI GetInstance(void) { return instance; }
         bool SendMessage(Message& message);
         /**
          * Maximum number of nested modal dialogs supported.
          */
         static const unsigned char MAX_DIALOGS = 16;
-        static Container* GetActiveDialog(void) { return active_dialog; }
+        static Container* GetActiveDialog() { return active_dialog; }
     private:
-        GUI(void);
-        ~GUI(void);
+        GUI();
+        ~GUI();
         static GUI instance;
         /**
          * Stack of active dialogs.
@@ -44,7 +51,7 @@ class GUI : public MessageSink
         /**
          * Tears down all active dialogs.
          */
-        static void flush_dialogs(void);
+        static void flush_dialogs();
         /**
          * Internal routine that starts a dialog.
          */
@@ -52,7 +59,7 @@ class GUI : public MessageSink
         /**
          * Internal routine that cleans up a closed dialog.
          */
-        static void end_dialog(void);
+        static void end_dialog();
 };
 
 } /* namespace Forms */

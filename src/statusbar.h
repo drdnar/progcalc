@@ -20,6 +20,7 @@ class StatusBar final : public Widget, public MessageSink
         Status MoveTo(x_t x, y_t y);
         Status Paint(void);
         bool SendInput(Message& message);
+        bool SendMessage(Message& message);
         Status Hide(void);
         Status Show(void);
         /**
@@ -55,13 +56,7 @@ class StatusBar final : public Widget, public MessageSink
         /**
          * The status bar's location is fixed.
          */
-        const TextWindow window =
-        {
-            0, 0,
-            LCD_WIDTH, 0,
-            0, 0,
-            FONT_SMALL_PROP_BOLD
-        };
+        static const TextWindow window;
         static uint16_t battery_pips[7];
 };
 

@@ -3,6 +3,15 @@
 
 include 'forms/forms.inc'
 
+defwidget RPN_UI
+
+public _RPN_UI_Dialog
+_RPN_UI_Dialog:
+	RPN_UI
+
+
+
+
 teststr:
     db  "Test label", 0
 

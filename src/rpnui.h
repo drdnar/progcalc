@@ -3,47 +3,63 @@
 #include <stdbool.h>
 #include <tice.h>
 #include "style.h"
+#include "forms/container.h"
+#include "stack.h"
+#include "stackdisplay.h"
+#include "inputbigint.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/**
- * Specifies the screen space available for the RPN UI.
- */
-extern CharTextWindow_t Rpn_Window;
+extern "C" const Forms::Widget_desc RPN_UI_desc;
 
 /**
- * Handles a keypress, performing any actions required.
- * @param k Key code to handle
- * @return True if keypress was handled, false if not.
+ * Describes an RPN_UI Widget.  This doesn't actually have any configurable
+ * options.
  */
-bool Rpn_SendKey(sk_key_t k);
+struct RPN_UI_def
+{
+    /**
+     * Data common to all widget definitions.
+     */
+    Forms::Widget_def Widget;
+};
 
-/**
- * Forces redraw of the stack and user input.
- */
-void Rpn_Redraw(void);
 
-/**
- * Resets/initializes RPN entry.
- */
-void Rpn_Reset(void);
+class RPN_UI final : public Forms::Container
+{
+    public:
+        // Forms::Status MoveTo(Forms::x_t x, Forms::y_t y);
+        // Forms::Status SetSize(Forms::x_t x, Forms::y_t y);
+        Forms::Status Paint();
+        bool SendInput(Forms::Message& message);
+        
+        void Layout();
 
-/**
- * Informs the RPN UI whether the user is currently entering a number.
- * If stack scrolling is active, then stack scrolling is exited.
- * @param mode True if the user is entering a number, false if not.
- */
-void Rpn_SetInputMode(bool mode);
-
-/**
- * Returns whether the UI is in stack scrolling mode.
- */
-bool Rpn_IsScrollingActive(void);
-
-#ifdef __cplusplus
-}
-#endif
+        void Reset();
+        /**
+         * Used by the Widget definition fasmg magic.
+         */
+        static Forms::Widget* RPN_UI_ctor(Forms::Widget_def* Template, Forms::Widget* parent, Forms::Widget_def** next);
+        RPN_UI();
+    private:
+        
+        BigIntStack mainStack { 99 };
+        BigIntStack& GetMainStack() { return mainStack; }
+        StackDisplay stackDisplay { };
+        BigIntInput input { };
+        /**
+         * Acquires the user's current input and flushes the input buffer.
+         */
+        bool AcquireInput();
+        /**
+         * Sets up the stack for a binary (two argument) operation.
+         * Temp1 will contain the second argument.
+         */
+        bool EnsureBinaryOp();
+        static BigInt_t Temp1;
+        static BigInt_t Temp2;
+        static BigInt_t Temp3;
+        
+    friend class StackDisplay;
+    friend class BigIntInput;
+};
 
 #endif /* RPN_UI_H */

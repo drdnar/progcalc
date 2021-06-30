@@ -9,111 +9,77 @@ Widget::~Widget()
 }
 
 
-Status Widget::MoveTo(x_t x, y_t y)
+Status Widget::MoveTo(x_t xx, y_t yy)
 {
-    _x = x;
-    _y = y;
+    x = xx;
+    y = yy;
     return Status::Success;
 }
 
 
-x_t Widget::GetX(void) const
+Status Widget::SetSize(x_t newwidth, y_t newheight)
 {
-    return _x;
-}
-
-
-y_t Widget::GetY(void) const
-{
-    return _y;
-}
-
-
-Status Widget::SetSize(x_t width, y_t height)
-{
-    if (width < _min_width || height < _min_height)
+    if (newwidth < min_width || newheight < min_height)
         return Status::Failure;
-    _width = width;
-    _height = height;
+    width = newwidth;
+    height = newheight;
     return Status::Success;
 }
 
 
-x_t Widget::GetWidth(void) const
+Status Widget::Focus()
 {
-    return _width;
-}
-
-
-y_t Widget::GetHeight(void) const
-{
-    return _height;
-}
-
-
-Status Widget::Focus(void)
-{
-    _hasFocus = true;
+    hasFocus = true;
     Paint();
     return Status::Success;
 }
         
 
-Status Widget::Unfocus(void)
+Status Widget::Unfocus()
 {
-    _hasFocus = false;
+    hasFocus = false;
     Paint();
     return Status::Success;
 }
 
 
-bool Widget::HasFocus(void)
+Widget* Widget::GetParent()
 {
-    return _hasFocus;
+    return parent;
 }
 
 
-Widget* Widget::GetParent(void)
+Status Widget::Disable()
 {
-    return _parent;
-}
-
-
-bool Widget::IsDisabled(void)
-{
-    return _disabled;
-}
-
-
-Status Widget::Disable(void)
-{
-    _disabled = true;
+    disabled = true;
     return Status::Success;
 }
 
 
-Status Widget::Enable(void)
+Status Widget::Enable()
 {
-    _disabled = false;
+    disabled = false;
     return Status::Success;
 }
 
 
-bool Widget::IsHidden(void)
+Status Widget::Hide()
 {
-    return _hidden;
-}
-
-
-Status Widget::Hide(void)
-{
-    _hidden = true;
+    hidden = true;
     return Status::Success;
 }
 
 
-Status Widget::Show(void)
+Status Widget::Show()
 {
-    _hidden = false;
+    hidden = false;
     return Status::Success;
+}
+
+
+void Widget::SetDirty()
+{
+    dirty = true;
+    if (parent && !parent->dirty)
+        parent->SetDirty();
 }

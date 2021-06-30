@@ -3,7 +3,7 @@
 using namespace Forms;
 
 
-static Widget_def* GetNextItem(Widget_def* Template)
+Widget_def* RowItems::GetNextItem(Widget_def* Template)
 {
     if (Template == nullptr)
         return nullptr;
@@ -11,41 +11,47 @@ static Widget_def* GetNextItem(Widget_def* Template)
 }
 
 
-Widget* Forms::RowItems_ctor(Widget_def* Template, Widget* parent, Widget_def** Next)
+Widget* RowItems::form_ctor(Widget_def* Template, Widget* parent, Widget_def** Next)
 {
-    RowItems* rowitems = new RowItems();
-    rowitems->_definition = Template;
-    rowitems->_parent = parent;
+    RowItems* rowitems = new RowItems(Template, Next);
+    rowitems->definition = Template;
+    rowitems->parent = parent;
     rowitems->_alignment = ((RowItems_def*)Template)->Alignment;
     rowitems->_padding = ((RowItems_def*)Template)->Padding;
     // Initialize children
-    Container_ctor(&((RowItems_def*)Template)->Contents, *rowitems, Next);
     // Compute size
     unsigned int height;
     Widget** widget = rowitems->_children;
-    for (Container_size_t i = rowitems->_count; i > 0; i--)
+    for (Container_size_t i = rowitems->count; i > 0; i--)
     {
-        if (rowitems->_height < (height = (*widget)->GetHeight()))
-            rowitems->_height = height;
-        rowitems->_width += (*widget++)->GetWidth() + rowitems->_padding;
+        if (rowitems->height < (height = (*widget)->GetHeight()))
+            rowitems->height = height;
+        rowitems->width += (*widget++)->GetWidth() + rowitems->_padding;
     }
-    rowitems->_width -= rowitems->_padding;
+    rowitems->width -= rowitems->_padding;
     return rowitems;
+}
+
+
+RowItems::RowItems(Widget_def* Template, Widget_def** next)
+ : Container(&((RowItems_def*)Template)->Contents, next)
+{
+    //
 }
 
 
 extern "C" const Widget_desc RowItems_desc
 {
     ID::Label,
-    &RowItems_ctor,
-    &GetNextItem
+    &RowItems::form_ctor,
+    &RowItems::GetNextItem
 };
 
 
-void RowItems::Layout(void)
+void RowItems::Layout()
 {
-    x_t x = _x;
-    y_t y = _y;
+    x_t xx = x;
+    y_t yy = y;
     Widget** widget = _children;
     switch (_alignment)
     {
@@ -53,21 +59,21 @@ void RowItems::Layout(void)
             // No need to do anything.
             break;
         case HorizontalAlignment::Center:
-            x += (_width - _min_width) / 2;
+            xx += (width - min_width) / 2;
             break;
         case HorizontalAlignment::Right:
-            x += _width - _min_width;
+            xx += width - min_width;
             break;
     }
-    for (Container_size_t i = _count; i > 0; i--)
+    for (Container_size_t i = count; i > 0; i--)
     {
-        (*widget)->MoveTo(x, y);
-        x += (*widget++)->GetWidth() + _padding;
+        (*widget)->MoveTo(xx, yy);
+        xx += (*widget++)->GetWidth() + _padding;
     }
 }
 
 
-HorizontalAlignment RowItems::GetAlignment(void)
+HorizontalAlignment RowItems::GetAlignment()
 {
     return _alignment;
 }

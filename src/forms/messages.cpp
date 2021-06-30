@@ -1,59 +1,29 @@
 #include "messages.h"
 #include "apd.h"
-#include <string.h>
-
-#ifdef _EZ80
-/**
- * Same as <string.h> memmove, but the destination MUST be after (at a higher
- * memory address than) the source, and forces efficient inline eZ80 assembly.
- * @param destination Target address, e.g. &somearr[i + 2]
- * @param source Source address, e.g. &somearr[i]
- * @param count Number of bytes to move
- */
-static inline void memmove_forward(void* destination, const void* source, size_t count)
-{
-    __asm__("lddr":: "l"(source), "e"(destination), "c"(count));
-}
-/**
- * Same as <string.h> memmove, but the destination MUST be before (at a lower
- * memory address than) the source, and forces efficient inline eZ80 assembly.
- * @param destination Target address, e.g. &somearr[i - 2]
- * @param source Source address, e.g. &somearr[i]
- * @param count Number of bytes to move
- */
-static inline void memmove_backward(void* destination, const void* source, size_t count)
-{
-    __asm__("ldir":: "l"(source), "e"(destination), "c"(count));
-}
-#else
-/**
- * This is the same as memmove() in <string.h>.  On the eZ80, this forces a
- * slightly more efficient inline LDDR instruction.
- */
-#define memmove_forward memmove
-/**
- * This is the same as memmove() in <string.h>.  On the eZ80, this forces a
- * slightly more efficient inline LDIR instruction.
- */
-#define memmove_backward memmove
-#endif
-
+#include "memcpy.h"
+#include "ignorewarning.h"
+#include "gui.h"
 
 using namespace Forms;
+
 
 MessageSource::MessageSource(void)
 {
     
 }
 
+
 MessageSource::~MessageSource(void)
 {
 
 }
 
+
+IGNORE_WARNING_UNUSED_PARAMETER
 Message MessageSource::GetMessage(void)
+END_IGNORE_WARNING
 {
-    return {MESSAGE_NONE, MESSAGE_NONE};
+    return { .Id = MESSAGE_NONE, .ExtendedCode = MESSAGE_NONE };
 }
 
 
@@ -69,11 +39,15 @@ MessageSink::~MessageSink(void)
 }
 
 
+IGNORE_WARNING_UNUSED_PARAMETER
 bool MessageSink::SendMessage(Message& message)
+END_IGNORE_WARNING
 {
     return false;
 }
 
+
+bool MessageLoop::quitting { false };
 
 MessageSource *MessageLoop::synchronousMessageSources[MAX_SYNCHRONOUS_MESSAGE_SOURCES]
 {
@@ -155,34 +129,25 @@ bool MessageLoop::RegisterMessageSink(MessageSink& sink)
     if (messageSinksCount >= MAX_MESSAGE_SINKS)
         return false;
     MessageSink **entry = &messageSinks[0];
-    if (messageSinksCount == 0)
+    for (unsigned char i = MAX_MESSAGE_SINKS; i > 0; i--, entry++)
     {
-        *entry = &sink;
-        messageSinksCount++;
-        return true;
-    }
-    else
-    {
-        for (unsigned char i = MAX_MESSAGE_SINKS; i > 0; i--, entry++)
+        if (*entry == nullptr)
         {
-            if (*entry == nullptr)
-            {
-                *entry = &sink;
-                messageSinksCount++;
-                return true;
-            }
-            else if ((*entry)->Priority > sink.Priority)
-            {
-                // Welcome to the wonderful world of not having an STL!
-                memmove_forward(entry + 1, entry, sizeof(MessageSink*) * (MAX_MESSAGE_SINKS - 1 - i));
-                *entry = &sink;
-                messageSinksCount++;
-                return true;
-            }
+            *entry = &sink;
+            messageSinksCount++;
+            return true;
         }
-        // Uuuuh?
-        return false;
+        if ((*entry)->Priority > sink.Priority)
+        {
+            // Welcome to the wonderful world of not having an STL!
+            memmove(entry + 1, entry, sizeof(MessageSink*) * (i - 1));
+            *entry = &sink;
+            messageSinksCount++;
+            return true;
+        }
     }
+    // Uuuuh?
+    return false;
 }
 
 
@@ -190,7 +155,7 @@ bool MessageLoop::sinkEvent(Message& message)
 {
     MessageSink** sink = &messageSinks[0];
     for (unsigned char j = MAX_MESSAGE_SINKS; j > 0; j--, sink++)
-        if ((*sink)->SendMessage(message))
+        if (*sink && (*sink)->SendMessage(message))
             return true;
     return false;
 }
@@ -198,14 +163,13 @@ bool MessageLoop::sinkEvent(Message& message)
 
 void MessageLoop::Begin(void)
 {
-    MessageSource** source = &synchronousMessageSources[0];
     Message message;
-    bool quitting = false;
+    quitting = false;
     do
     {
-        #ifdef _EZ80
+        processPendingMessages();
+        MessageSource** source = &synchronousMessageSources[0];
         bool hadMessage = false;
-        #endif
         for (unsigned char i = MAX_SYNCHRONOUS_MESSAGE_SOURCES; i > 0; i--, source++)
         {
             if (!*source)
@@ -213,27 +177,23 @@ void MessageLoop::Begin(void)
             message = (*source)->GetMessage();
             if (message.Id == MESSAGE_NONE)
                 continue;
-            #ifdef _EZ80
             hadMessage = true;
-            #endif
-            if (message.Id == MESSAGE_APD && message.ExtendedCode == APD_TURN_OFF)
-            {
-                quitting = true;
-                EnqueueMessage({ .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = MESSAGE_NONE });
-            }
-            sinkEvent(message);
+            EnqueueMessage(message);
             processPendingMessages();
-            if (message.Id == MESSAGE_EXIT_EVENT_LOOP)
-                quitting = true;
         }
-        #ifdef _EZ80
         if (!hadMessage)
         {
-            // Wait for an interrupt since nothing is happening.
-            __asm__("ei");
-            __asm__("halt");
+            if (GUI::GetInstance().IsDirty())
+                GUI::GetInstance().Paint();
+            #ifdef _EZ80
+            else
+            {
+                // Wait for an interrupt since nothing is happening.
+                __asm__("ei");
+                __asm__("halt");
+            }
+            #endif
         }
-        #endif
     } while (!quitting);
 }
 
@@ -248,7 +208,6 @@ bool MessageLoop::EnqueueMessage(Message message)
 {
     if (pendingMessagesCount + 1 >= MAX_PENDING_MESSAGES)
         return false;
-    pendingMessagesCount++;
     pendingMessages[pendingMessagesWrite] = message;
     pendingMessagesWrite = incrementMessageQueueIndex(pendingMessagesWrite);
     pendingMessagesCount++;
@@ -262,7 +221,12 @@ void MessageLoop::processPendingMessages(void)
         PollAsynchronousMessageSources();
     while (pendingMessagesCount > 0)
     {
-        sinkEvent(pendingMessages[pendingMessagesRead]);
+        Message& message = pendingMessages[pendingMessagesRead];
+        if (message.Id == MESSAGE_APD && message.ExtendedCode == APD_TURN_OFF)
+            EnqueueMessage( { .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = MESSAGE_NONE } );
+        if (message.Id == MESSAGE_EXIT_EVENT_LOOP)
+            quitting = true;
+        sinkEvent(message);
         pendingMessagesRead = incrementMessageQueueIndex(pendingMessagesRead);
         pendingMessagesCount--;
         PollAsynchronousMessageSources();

@@ -24,7 +24,7 @@ Settings_t Settings::settings
     .AlwaysShowDec = false,
     .AlwaysShowOct = false,
     .AlwaysShowBin = false,
-    .StatusBarEnabled = false
+    .StatusBarEnabled = true
 };
 
 
@@ -37,7 +37,7 @@ struct FileSettings_t
 };
 
 
-Settings::Settings(void)
+Settings::Settings()
 {
     ti_var_t file;
     FileSettings_t *fileData;
@@ -122,7 +122,6 @@ void Settings::SetDisplayBits(uint8_t bits)
     MessageLoop::EnqueueMessage({ .Id = MESSAGE_SETTINGS_CHANGE, .ExtendedCode = SETTINGS_DISPLAY_BITS_CHANGE });
     /** TODO: These need to catch the settings change messages instead. */
     Format_ConfigureDisplaySizes();
-    GetBigInt_Reposition();
 }
 
 
@@ -138,7 +137,6 @@ void Settings::SetPrimaryBase(Base_t base)
     }
     settings.PrimaryBase = base;
     MessageLoop::EnqueueMessage({ .Id = MESSAGE_SETTINGS_CHANGE, .ExtendedCode = SETTINGS_PRIMARY_BASE_CHANGE });
-    GetBigInt_Reposition();
 }
 
 
@@ -187,42 +185,51 @@ void Settings::SetAlwaysShowBin(bool value)
 }
 
 
-char* displayBitsNames[] = 
+void Settings::SetStatusBar(bool value)
+{
+    if (value == settings.StatusBarEnabled)
+        return;
+    settings.StatusBarEnabled = value;
+    MessageLoop::EnqueueMessage({ .Id = MESSAGE_SETTINGS_CHANGE, .ExtendedCode = SETTINGS_STATUS_BAR_CHANGE });
+}
+
+
+const char* displayBitsNames[] = 
 {
     "32", "64", "128"
 };
 
-char* GetDisplayBitsName(uint8_t bytes)
+const char* GetDisplayBitsName(uint8_t bytes)
 {
     return displayBitsNames[bytes];
 }
 
-static char* shortBaseNames[] =
+static const char* shortBaseNames[] =
 {
     "bin", "oct", "dec", "hex", ""
 };
 
-static char* shortCapsBaseNames[] =
+static const char* shortCapsBaseNames[] =
 {
     "BIN", "OCT", "DEC", "HEX", ""
 };
 
-static char* longBaseNames[] =
+static const char* longBaseNames[] =
 {
     "Binary", "Octal", "Decimal", "Hexadecimal", ""
 };
 
-char* GetBaseShortName(Base_t base)
+const char* GetBaseShortName(Base_t base)
 {
     return shortBaseNames[base];
 }
 
-char* GetBaseShortCapsName(Base_t base)
+const char* GetBaseShortCapsName(Base_t base)
 {
     return shortCapsBaseNames[base];
 }
 
-char* GetBaseLongName(Base_t base)
+const char* GetBaseLongName(Base_t base)
 {
     return longBaseNames[base];
 }

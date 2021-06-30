@@ -1,6 +1,7 @@
 #include "label.h"
 #include <fontlibc.h>
 #include "../style.h"
+#include "ignorewarning.h"
 
 using namespace Forms;
 
@@ -16,14 +17,14 @@ static Widget_def* GetNextItem(Widget_def* Template)
 Widget* Forms::Label_ctor(Widget_def* Template, Widget* parent, Widget_def** next)
 {
     Label* widget = new Label();
-    widget->_definition = Template;
-    widget->_parent = parent;
-    widget->_font = ((Label_def*)Template)->Font;
-    widget->_text = ((Label_def*)Template)->Text;
+    widget->definition = Template;
+    widget->parent = parent;
+    widget->font = ((Label_def*)Template)->Font;
+    widget->text = ((Label_def*)Template)->Text;
     //reinterpret_cast<Label_def&>(Template).Font;
-    Style_SetFont(widget->_font);
-    widget->_height = fontlib_GetCurrentFontHeight();
-    widget->_width = fontlib_GetStringWidth(widget->_text);
+    Style_SetFont(widget->font);
+    widget->height = fontlib_GetCurrentFontHeight();
+    widget->width = fontlib_GetStringWidth(widget->text);
     if (next != nullptr)
         *next = (Widget_def*)((Label_def*)Template + 1);
     return widget;
@@ -44,12 +45,20 @@ Label::~Label()
 }
 
 
+IGNORE_WARNING_UNUSED_PARAMETER
+bool Label::SendInput(Message& message)
+END_IGNORE_WARNING
+{
+    return false;
+}
+
+
 Status Label::Paint()
 {
-    if (_hidden)
+    if (hidden)
         return Status::Success;
-    Style_SetFont(_font);
-    fontlib_SetCursorPosition(_x, _y);
-    fontlib_DrawString(_text);
+    Style_SetFont(font);
+    fontlib_SetCursorPosition(x, y);
+    fontlib_DrawString(text);
     return Status::Success;
 }

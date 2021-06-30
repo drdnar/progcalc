@@ -41,8 +41,22 @@ int main(void) {
     Format_InitDisplaySizes();
     // These two are also called by Settings_ChangeDisplayBits
     Format_ConfigureDisplaySizes();
-    GetBigInt_Reposition();
-    Rpn_Reset();
+
+    
+    KeyboardEventSource::Enable2nd();
+    KeyboardEventSource::EnableIndicator();
+    FontManager::SetFont(FONT_LARGE_PROP);
+    KeyboardEventSource::SetIndicatorLocation(LCD_WIDTH - fontlib_GetGlyphWidth(CALC1252_CURSOR_2ND_CHAR), 0);
+    StatusBar& statusBar = StatusBar::GetInstance();
+    statusBar.Show();
+
+
+    MessageLoop::EnqueueMessage( 
+        { .Id = MESSAGE_GUI_CHANGE_DIALOG, .DataPointer = (void*)&RPN_UI_Dialog }
+    );
+    MessageLoop::Begin();
+    
+    /*Rpn_Reset();
     
     KeyboardEventSource& keyboard = KeyboardEventSource::GetInstance();
     KeyboardEventSource::Enable2nd();
@@ -108,7 +122,7 @@ int main(void) {
                 dirty = true;
                 break;
         }
-    } while (k != sk_Quit);
+    } while (k != sk_Quit);*/
     
     /* Pause */
     //while (!os_GetCSC());

@@ -32,7 +32,10 @@ void Style_SaveTextWindow(CharTextWindow_t* saveTarget)
     saveTarget->Height = fontlib_GetWindowHeight();
     saveTarget->CursorX = fontlib_GetCursorX();
     saveTarget->CursorY = fontlib_GetCursorY();
-    saveTarget->FontId = CurrentFont;
+    if (CurrentFont != FONT_SMALL_PROP_ALIGNED)
+        saveTarget->FontId = Forms::FontManager::CurrentFont;
+    else
+        saveTarget->FontId = CurrentFont;
 }
 
 

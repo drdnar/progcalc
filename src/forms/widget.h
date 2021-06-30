@@ -17,6 +17,9 @@ namespace Forms
 
 class Widget;
 
+/**
+ * Widget type IDs used by form definitions.
+ */
 enum class ID : uint8_t
 {
     None,
@@ -28,6 +31,9 @@ enum class ID : uint8_t
     Button
 };
 
+/**
+ * Status codes Widgets use in place of being able to throw exceptions.
+ */
 enum class Status : uint8_t
 {
     Failure,
@@ -247,13 +253,13 @@ class Widget
          * Returns a widget's left-most column.
          * @return X value
          */
-        x_t GetX(void) const;
+        x_t GetX() const { return x; }
 
         /**
          * Returns a widget's top-most row.
          * @return Y value 
          */
-        y_t GetY(void) const;
+        y_t GetY() const { return y; }
 
         /**
          * Resizes the widget, but does not repaint it.
@@ -266,18 +272,18 @@ class Widget
         /**
          * Gets a Widget's width.
          */
-        uint24_t GetWidth(void) const;
+        uint24_t GetWidth() const { return width; }
 
         /**
          * Gets a Widget's height.
          */
-        uint8_t GetHeight(void) const;
+        uint8_t GetHeight() const { return height; };
         
         /**
          * Performs a complete redraw of the object.
          * @return If a value is returned, its meaning is specific to the widget.
          */
-        virtual Status Paint(void) = 0;
+        virtual Status Paint() = 0;
         
         /**
          * Instructs the widget that it now has focus.
@@ -285,52 +291,62 @@ class Widget
          * @return Returns Status::Success, unless the it cannot have focus, in which
          * case Status::Failure is returned.
          */
-        virtual Status Focus(void);
+        virtual Status Focus();
         
         /**
          * Instructs the widget that it no longer has focus.
          * What exactly, if anything, a widget does with this message is widget-specific.
          * @return If a value is returned, its meaning is specific to the widget.
          */
-        virtual Status Unfocus(void);
+        virtual Status Unfocus();
 
         /**
          * Checks whether the Widget has focus, or at least thinks it does.
          * @return True if the Widget has focus.
          */
-        bool HasFocus(void);
+        bool HasFocus() const { return hasFocus; }
 
         /**
          * Checks whether the Widget is disabled (interaction disabled).
          * @return True if interaction with the Widget is disabled.
          */
-        bool IsDisabled(void);
+        bool IsDisabled() const { return disabled; }
 
         /**
          * Requests the Widget disable user interaction.
          */
-        virtual Status Disable(void);
+        virtual Status Disable();
 
         /**
          * Requests the Widget enable user interaction.
          */
-        virtual Status Enable(void);
+        virtual Status Enable();
 
         /**
          * Checks whether the Widget is hidden.
          * @return True if the Widget is hidden.
          */
-        bool IsHidden(void);
+        bool IsHidden() const { return hidden; }
+
+        /**
+         * Checks whether the Widget thinks it should repaint itself.
+         */
+        bool IsDirty() const { return dirty; }
+
+        /**
+         * Requests the Widget repaint itself, but, like, not right now, man.
+         */
+        virtual void SetDirty();
 
         /**
          * Requests the Widget become hidden.
          */
-        virtual Status Hide(void);
+        virtual Status Hide();
 
         /**
          * Requests the Widget stop being hidden.
          */
-        virtual Status Show(void);
+        virtual Status Show();
 
         /**
          * Sends an input message to an object.
@@ -345,7 +361,7 @@ class Widget
          * Returns a pointer to a Widget's container.  This may be NULL.
          * @return Pointer to parent, or NULL if it is a top-most container.
          */
-        virtual Widget* GetParent(void);
+        virtual Widget* GetParent();
         
         /**
          * Virtual destructor.
@@ -356,59 +372,65 @@ class Widget
         /**
          * Column coordinate.
          */
-        x_t _x = 0;
+        x_t x = 0;
 
         /**
          * Row coordinate.
          */
-        y_t _y = 0;
+        y_t y = 0;
 
         /**
          * Width.
          */
-        x_t _width = 0;
+        x_t width = 0;
 
         /**
          * Height.
          */
-        y_t _height = 0;
+        y_t height = 0;
 
         /**
          * Caches a Widget's minimum size, for reference.
          */
-        x_t _min_width = 0;
+        x_t min_width = 0;
         
         /**
          * Caches a Widget's minimum size, for reference.
          */
-        y_t _min_height = 0;
+        y_t min_height = 0;
 
         /**
          * Pointer back to Widget's definition struct.
          * May be NULL.
          */
-        Widget_def* _definition = nullptr;
+        Widget_def* definition = nullptr;
         
         /**
          * Pointer to Widget's parent widget.
          * NULL if the Widget is a top-most container.
          */
-        Widget* _parent = nullptr;
+        Widget* parent = nullptr;
 
         /**
          * True if the Widget is disabled, preventing user interaction.
          */
-        bool _disabled = false;
+        bool disabled = false;
 
         /**
          * True if the Widget is hidden, so it won't be drawn.
          */
-        bool _hidden = false;
+        bool hidden = false;
         
         /**
          * True if the Widget currently has focus.
          */
-        bool _hasFocus = false;
+        bool hasFocus = false;
+
+        /**
+         * True if the Widget should be repainted at an unspecified time in the
+         * future.
+         */
+        bool dirty = false;
 };
 
 } /* namespace Forms */

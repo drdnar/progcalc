@@ -36,47 +36,66 @@ class Container : public Widget
          * GetParent
          */
         Status MoveTo(x_t x, y_t y);
-        Status Focus(void);
-        Status Unfocus(void);
+        Status Focus();
+        Status Unfocus();
         bool SendInput(Message& message);
-        Status Paint(void);
+        Status Paint();
         /* New routines: */
+        Container();
+        /**
+         * Creates a Container with an initial backing array size.
+         */
+        Container(Container_size_t initialSize);
+        /**
+         * Initializes a Container and runs parsing logic for a Container template.
+         * @note It is not valid to initialize a zero-size Container.
+         */
+        Container(Container_def* Template, Widget_def** Next);
         ~Container();
         static Widget_def* GetNextItem(Container_def* Template);
-        friend void Container_ctor(Container_def* Template, Container& self, Widget_def** next);
+        /**
+         * Sends a message to every child, recursively if possible.  Containers
+         * get Broadcast(), while non-Containers get SendInput().  The broadcast
+         * will stop if a child returns true.
+         */
+        virtual bool Broadcast(Message& message);
+        /**
+         * Marks all children as dirty.
+         */
+        virtual void SetDirtyAll();
         /**
          * Rotates focus to the next Widget.
          * Widgets that refuse focus are skipped.
          * This will wrap from the end of the child list back to the start.
          */
-        virtual Status FocusNext(void);
+        virtual Status FocusNext();
         /**
          * Rotates focus to the previous Widget.
          * Widgets that refuse focus are skipped.
          * This will wrap from the start of the child list back to the end.
          */
-        virtual Status FocusPrevious(void);
+        virtual Status FocusPrevious();
         /**
          * Instructs the Container to run its layout logic.
          * TODO: This should be pure virtual but there's a toolchain bug at the moment.
          */
-        virtual void Layout(void) { };
-        //virtual void Layout(void) = 0;
+        virtual void Layout() { };
+        //virtual void Layout() = 0;
         /**
          * Instructs the Container that you're doing a bunch of stuff to it all
          * at once, so it shouldn't repaint until you're done.
          */
-        void BeginUpdate(void);
+        void BeginUpdate();
         /**
          * Instructs the Container that you're done doing a bunch of stuff, so
          * it can go ahead and repaint.
          */
-        void EndUpdate(void);
+        void EndUpdate();
         /* CONTAINER TYPE */
         /**
          * Gets the number of child Widgets in this Container.
          */
-        Container_size_t Count(void) { return _count; }
+        Container_size_t Count() { return count; }
         /**
          * Returns the widget at a given index.
          * Note that we don't have exceptions, so this does not attempt to
@@ -120,11 +139,11 @@ class Container : public Widget
         /**
          * Physical size of _children array.
          */
-        Container_size_t _size = 0;
+        Container_size_t size = 0;
         /**
          * Number of live pointers in array.
          */
-        Container_size_t _count = 0;
+        Container_size_t count = 0;
         /**
          * Array of pointers to children.
          * This array owns the primary reference to the children.
@@ -139,14 +158,14 @@ class Container : public Widget
          * Cycles an index to the next valid child index.
          * This will wrap from the end of the child array back to the start forever.
          * @param i Input index to increment
-         * @return i + 1, or zero if i == _count - 1
+         * @return i + 1, or zero if i == count - 1
          */
         Container_size_t _increment_index(Container_size_t i);
         /**
          * Cycles an index to the previous valid child index.
          * This will wrap from the start of the child array back to the end forever.
          * @param i Input index to decrement
-         * @return i - 1, or _count - 1 if i == 0
+         * @return i - 1, or count - 1 if i == 0
          */
         Container_size_t _decrement_index(Container_size_t i);
         /**
@@ -163,7 +182,7 @@ class Container : public Widget
          * to this method being called.
          * The default implementation does nothing.
          */
-        virtual void _begin_update(void);
+        virtual void _begin_update();
         /**
          * This is internally called by EndUpdate().
          * If you need to do something special after a bulk update, you can
@@ -171,7 +190,7 @@ class Container : public Widget
          * this method is called.
          * The default implementation just calls Paint();
          */
-        virtual void _end_update(void);
+        virtual void _end_update();
         /**
          * Internal routine that enlarges the Container, typically by 50 %, but
          * less if the child count would exceed the maximum allowed by the size
@@ -180,7 +199,7 @@ class Container : public Widget
          * @return Returns the new value of _children, or nullptr if resizing
          * failed.
          */
-        Widget** _enlarge(void);
+        Widget** _enlarge();
 };
 
 

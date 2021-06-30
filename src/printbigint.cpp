@@ -138,7 +138,7 @@ static CharTextWindow_t oldWindow;
  */
 static void windowize(unsigned int width)
 {
-/* TODO: Not sure which way to do this is better.
+/** TODO: Not sure which way to do this is better.
     unsigned int x = fontlib_GetWindowXMin() + fontlib_GetWindowWidth() - width;
     uint8_t y = fontlib_GetCursorY();
     Style_SaveTextWindow(&oldWindow);
@@ -157,7 +157,7 @@ static void windowize(unsigned int width)
 
 static unsigned int PrintBaseLabel(Base_t base, unsigned char height)
 {
-    char* baseName;
+    const char* baseName;
     bool altHex = false;
     unsigned int x;
     if (base == HEXADECIMAL && Settings::GetDisplayBits() >= SHOW_128)
@@ -187,7 +187,7 @@ static void unwindowize(void)
 {
     uint8_t y = fontlib_GetCursorY();
     Style_RestoreTextWindow(&oldWindow);
-/* TODO: Not sure which way is better.
+/** TODO: Not sure which way is better.
     fontlib_SetCursorPosition(fontlib_GetCursorX(), y);
 */
     fontlib_SetCursorPosition(oldWindow.CursorX, y);

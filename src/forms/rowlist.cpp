@@ -3,7 +3,7 @@
 using namespace Forms;
 
 
-static Widget_def* GetNextItem(Widget_def* Template)
+Widget_def* RowList::GetNextItem(Widget_def* Template)
 {
     if (Template == nullptr)
         return nullptr;
@@ -11,44 +11,49 @@ static Widget_def* GetNextItem(Widget_def* Template)
 }
 
 
-Widget* Forms::RowList_ctor(Widget_def* Template, Widget* parent, Widget_def** Next)
+Widget* RowList::form_ctor(Widget_def* Template, Widget* parent, Widget_def** Next)
 {
-    RowList* rowlist = new RowList();
-    rowlist->_definition = Template;
-    rowlist->_parent = parent;
-    // Initialize children
-    Container_ctor(&((RowList_def*)Template)->Contents, *rowlist, Next);
+    RowList* rowlist = new RowList(Template, Next);
+    rowlist->definition = Template;
+    rowlist->parent = parent;
     // Compute size
     unsigned int width = 0, temp;
     unsigned char height = 0;
     Widget** widget = rowlist->_children;
-    for (Container_size_t i = rowlist->_count; i > 0; i--)
+    for (Container_size_t i = rowlist->count; i > 0; i--)
     {
         if (width < (temp = (*widget)->GetWidth()))
             width = temp;
         height += (*widget++)->GetHeight();
     }
-    rowlist->_height = rowlist->_min_height = height;
-    rowlist->_width = rowlist->_min_width = width;
+    rowlist->height = rowlist->min_height = height;
+    rowlist->width = rowlist->min_width = width;
     return rowlist;
+}
+
+
+RowList::RowList(Widget_def* Template, Widget_def** next)
+ : Container(&((RowList_def*)Template)->Contents, next)
+{
+    //
 }
 
 
 extern "C" const Widget_desc RowList_desc
 {
     ID::Label,
-    &RowList_ctor,
-    &GetNextItem
+    &RowList::form_ctor,
+    &RowList::GetNextItem
 };
 
 
 void RowList::Layout(void)
 {
-    unsigned int x = _x;
-    unsigned char y = _y;
-    for (Container_size_t i = 0; i < _count; i--)
+    unsigned int xx = x;
+    unsigned char yy = y;
+    for (Container_size_t i = 0; i < count; i--)
     {
-        _children[i]->MoveTo(x, y);
-        y += _children[i]->GetHeight();
+        _children[i]->MoveTo(xx, yy);
+        yy += _children[i]->GetHeight();
     }
 }

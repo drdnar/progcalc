@@ -111,14 +111,15 @@ Message KeyboardEventSource::GetMessage(void)
                     reset2nd();
                 return { .Id = MESSAGE_NONE, .ExtendedCode = MESSAGE_NONE};
             }
-            else if (second)
+            if (second)
             {
                 key |= sk_2nd_Modifier;
                 reset2nd();
             }
         }
+        return { .Id = MESSAGE_KEY, .ExtendedCode = key };
     }
-    return { .Id = MESSAGE_KEY, .ExtendedCode = key };
+    return { .Id = MESSAGE_NONE, .ExtendedCode = MESSAGE_NONE };
 }
 
 

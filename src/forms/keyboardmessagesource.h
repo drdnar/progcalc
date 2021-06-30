@@ -74,7 +74,6 @@ class KeyboardEventSource final : public MessageSource
          */
         static bool Is2ndPressed(void) { return second; }
     private:
-        unsigned int count = 0;
         /**
          * This is magic hook that ensures this gets initialized.
          */
