@@ -9,7 +9,7 @@ extern "C" const unsigned int ApdQuitTime = 120;
 
 /******************************************************************************/
 
-bool Is83Premium(void)
+bool Is83Premium()
 {
     return os_GetSystemInfo()->hardwareType;
 }
@@ -35,7 +35,7 @@ class FontInitHook final : FontManager
 {
     private:
         static FontInitHook instance;
-        FontInitHook(void)
+        FontInitHook()
         {
             /* This is bad but I dislike the alternatives more. */
             FontDescriptor* const_hack = (FontDescriptor*)FontsList;

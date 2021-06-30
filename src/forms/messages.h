@@ -35,8 +35,8 @@ class MessageSource
         /**
          * Requests an event source to look for an event.
          */
-        virtual Message GetMessage(void) = 0;
-        MessageSource(void);
+        virtual Message GetMessage() = 0;
+        MessageSource();
         virtual ~MessageSource()/* = default*/;
 };
 
@@ -86,7 +86,7 @@ class MessageLoop final
         /**
          * Returns the total number of registered synchronous message sources.
          */
-        static unsigned char GetSynchronousMessageSourceCount(void) { return synchronousMessageSourcesCount; }
+        static unsigned char GetSynchronousMessageSourceCount() { return synchronousMessageSourcesCount; }
         /**
          * Maximum number of asynchronous message sources that can be registered.
          */
@@ -94,7 +94,7 @@ class MessageLoop final
         /**
          * Returns the total number of registered asynchronous message sources.
          */
-        static unsigned char GetAsynchronousMessageSourceCount(void) { return asynchronousMessageSourcesCount; }
+        static unsigned char GetAsynchronousMessageSourceCount() { return asynchronousMessageSourcesCount; }
         /**
          * Maximum number of message sinks that can be registered.
          */
@@ -106,7 +106,7 @@ class MessageLoop final
         /**
          * Returns the total number of registered message sinks.
          */
-        static unsigned char GetMessageSinkCount(void) { return messageSinksCount; }
+        static unsigned char GetMessageSinkCount() { return messageSinksCount; }
         /**
          * @brief Registers a synchronous message source.
          * 
@@ -146,7 +146,7 @@ class MessageLoop final
          * 
          * Asynchronous messages attempt to simulate having interrupt handlers.
          */
-        static void PollAsynchronousMessageSources(void);
+        static void PollAsynchronousMessageSources();
         /**
          * Registers an message sink.
          * @return Returns false if registration failed, probably because of too many sinks.
@@ -155,7 +155,7 @@ class MessageLoop final
         /**
          * Begins pumping message.
          */
-        static void Begin(void);
+        static void Begin();
         /**
          * Adds a message to the end of the pending message queue.
          * @return Returns false if the queue is full, causing the message to be ignored.
@@ -210,7 +210,7 @@ class MessageLoop final
         /**
          * Processes pending messages.
          */
-        static void processPendingMessages(void);
+        static void processPendingMessages();
         /**
          * Internal routine that tries to find a MessageSink to handle an event.
          */

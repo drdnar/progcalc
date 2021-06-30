@@ -36,7 +36,7 @@ class RowList : public Container
          * Paint
          * MoveTo
          */
-        void Layout(void);
+        void Layout();
         /* New routines: */
         /**
          * Empty constructor.

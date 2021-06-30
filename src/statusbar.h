@@ -16,31 +16,31 @@ class StatusBar final : public Widget, public MessageSink
         /**
          * There can only be one.  This is the one.
          */
-        static StatusBar& GetInstance(void) { return instance; }
+        static StatusBar& GetInstance() { return instance; }
         Status MoveTo(x_t x, y_t y);
-        Status Paint(void);
+        Status Paint();
         bool SendInput(Message& message);
         bool SendMessage(Message& message);
-        Status Hide(void);
-        Status Show(void);
+        Status Hide();
+        Status Show();
         /**
          * Requests that the StatusBar consider updating the battery level.
          * This will only actually check for a battery level change every few
          * seconds.
          */
-        void UpdateBatteryLevel(void);
+        void UpdateBatteryLevel();
     private:
         static StatusBar instance;
-        StatusBar(void);
+        StatusBar();
         /**
          * Handles physical painting of the battery icon, as well as making sure
          * the level displayed matches the latest battery level measurement.
          */
-        void _draw_battery_icon(void);
+        void _draw_battery_icon();
         /**
          * Measures the battery level and caches the result.
          */
-        bool _update_battery_level(void);
+        bool _update_battery_level();
         /**
          * Cached measurement of the battery's charge level.
          */
@@ -67,7 +67,7 @@ extern "C" {
  * Checks if the calculator is currently charging.
  * @return Either 0 or a non-zero number (not necessarily only 0 or 1).
  */
-#define boot_IsCharging ((unsigned char (*)(void))0x3CC)
+#define boot_IsCharging ((unsigned char (*)())0x3CC)
 
 } /* extern "C" */
 

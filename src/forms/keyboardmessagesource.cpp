@@ -23,7 +23,7 @@ gfx_sprite_t* KeyboardEventSource::under_indicator = nullptr;
 
 
 
-KeyboardEventSource::KeyboardEventSource(void)
+KeyboardEventSource::KeyboardEventSource()
 {
     fontlib_font_t* font = fontlib_GetFontByStyle("DrSans", 14, 14, FONTLIB_BOLD, FONTLIB_BOLD, 0, 0);
     if (font)
@@ -42,7 +42,7 @@ KeyboardEventSource::~KeyboardEventSource()
 }
 
 
-void KeyboardEventSource::EnableIndicator(void)
+void KeyboardEventSource::EnableIndicator()
 {
     cursor_enabled = true;
     if (second)
@@ -50,7 +50,7 @@ void KeyboardEventSource::EnableIndicator(void)
 }
 
 
-void KeyboardEventSource::DisableIndicator(void)
+void KeyboardEventSource::DisableIndicator()
 {
     unshow_cursor();
     cursor_enabled = false;
@@ -68,7 +68,7 @@ void KeyboardEventSource::SetIndicatorLocation(x_t x, y_t y)
 }
 
 
-void KeyboardEventSource::show_cursor(void)
+void KeyboardEventSource::show_cursor()
 {
     if (!cursor_enabled)
         return;
@@ -86,7 +86,7 @@ void KeyboardEventSource::show_cursor(void)
 }
 
 
-void KeyboardEventSource::unshow_cursor(void)
+void KeyboardEventSource::unshow_cursor()
 {
     if (!cursor_shown)
         return;
@@ -95,7 +95,7 @@ void KeyboardEventSource::unshow_cursor(void)
 }
 
 
-Message KeyboardEventSource::GetMessage(void)
+Message KeyboardEventSource::GetMessage()
 {
     sk_key_t key = GetCSC_Breakable();
     if (key)
@@ -123,20 +123,20 @@ Message KeyboardEventSource::GetMessage(void)
 }
 
 
-void KeyboardEventSource::Enable2nd(void)
+void KeyboardEventSource::Enable2nd()
 {
     second_enabled = true;
 }
 
 
-void KeyboardEventSource::Disable2nd(void)
+void KeyboardEventSource::Disable2nd()
 {
     reset2nd();
     second_enabled = false;
 }
 
 
-void KeyboardEventSource::set2nd(void)
+void KeyboardEventSource::set2nd()
 {
     if (!second_enabled)
         return;
@@ -145,7 +145,7 @@ void KeyboardEventSource::set2nd(void)
 }
 
 
-void KeyboardEventSource::reset2nd(void)
+void KeyboardEventSource::reset2nd()
 {
     if (!second_enabled)
         return;

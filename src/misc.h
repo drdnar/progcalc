@@ -78,7 +78,7 @@ typedef uint8_t Key_t;
  * Checks whether the device is an 83 Premium CE with the different key layout.
  * @return Hopefully returns true if the device is an 83 Premium CE.
  */
-bool Is83Premium(void);
+bool Is83Premium();
 
 
 

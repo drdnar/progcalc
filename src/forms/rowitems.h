@@ -44,7 +44,7 @@ class RowItems : public Container
          * Paint
          * MoveTo
          */
-        void Layout(void);
+        void Layout();
         /* New routines: */
         /**
          * Empty constructor.
@@ -55,7 +55,7 @@ class RowItems : public Container
          * Forms initialization magic.
          */
         static Widget* form_ctor(Widget_def* Template, Widget* parent, Widget_def** Next);
-        HorizontalAlignment GetAlignment(void);
+        HorizontalAlignment GetAlignment();
         virtual Status SetAlignment(HorizontalAlignment alignment);
     protected:
         RowItems(Widget_def* Template, Widget_def** next);

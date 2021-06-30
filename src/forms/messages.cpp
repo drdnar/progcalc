@@ -7,20 +7,20 @@
 using namespace Forms;
 
 
-MessageSource::MessageSource(void)
+MessageSource::MessageSource()
 {
     
 }
 
 
-MessageSource::~MessageSource(void)
+MessageSource::~MessageSource()
 {
 
 }
 
 
 IGNORE_WARNING_UNUSED_PARAMETER
-Message MessageSource::GetMessage(void)
+Message MessageSource::GetMessage()
 END_IGNORE_WARNING
 {
     return { .Id = MESSAGE_NONE, .ExtendedCode = MESSAGE_NONE };
@@ -33,7 +33,7 @@ MessageSink::MessageSink(unsigned char priority) : Priority(priority)
 }
 
 
-MessageSink::~MessageSink(void)
+MessageSink::~MessageSink()
 {
 
 }
@@ -101,7 +101,7 @@ bool MessageLoop::RegisterAsynchronousMessageSource(MessageSource& source)
 }
 
 
-void MessageLoop::PollAsynchronousMessageSources(void)
+void MessageLoop::PollAsynchronousMessageSources()
 {
     if (asynchronousMessageSourcesCount == 0)
         return;
@@ -161,7 +161,7 @@ bool MessageLoop::sinkEvent(Message& message)
 }
 
 
-void MessageLoop::Begin(void)
+void MessageLoop::Begin()
 {
     Message message;
     quitting = false;
@@ -215,7 +215,7 @@ bool MessageLoop::EnqueueMessage(Message message)
 }
 
 
-void MessageLoop::processPendingMessages(void)
+void MessageLoop::processPendingMessages()
 {
     if (pendingMessagesCount == 0)
         PollAsynchronousMessageSources();

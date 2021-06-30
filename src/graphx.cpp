@@ -8,7 +8,7 @@
 class GraphX
 {
     public:
-        GraphX(void)
+        GraphX()
         {
             gfx_Begin();
             gfx_SetPalette(Palette_Global, sizeof_Palette_Global, 0);

@@ -18,7 +18,9 @@
 using namespace Forms;
 
 
-
+/******************************************************************************
+ * Forms stuff
+ ******************************************************************************/
 static Widget_def* GetNextItem(Widget_def* Template)
 {
     if (Template == nullptr)
@@ -47,8 +49,14 @@ extern "C" const Widget_desc RPN_UI_desc
 };
 
 
+/******************************************************************************
+ * Implementation stuff
+ ******************************************************************************/
+
 BigInt_t RPN_UI::Temp1;
+
 BigInt_t RPN_UI::Temp2;
+
 BigInt_t RPN_UI::Temp3;
 
 
@@ -70,9 +78,6 @@ Forms::Status RPN_UI::Paint()
 
 void RPN_UI::Layout()
 {
-    // TODO: THIS DOES NOT HANDLE BIGINTINPUT'S SIZE
-    // Specifically, need to divide screen space between Input and Stack.
-    // Also, Input doesn't adjust Stack display size.
     y = StatusBar::GetInstance().GetHeight();
     height = LCD_HEIGHT - y;
     input.Layout();

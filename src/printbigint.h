@@ -29,12 +29,12 @@ extern Coord_t Format_HexSize;
 /**
  * Initializes some stuff.
  */
-void Format_InitDisplaySizes(void);
+void Format_InitDisplaySizes();
 
 /**
  * Call this after changing the displayed bits setting.
  */
-void Format_ConfigureDisplaySizes(void);
+void Format_ConfigureDisplaySizes();
 
 /**
  * Buffer for temporary storage of a number converted to ASCII for display.

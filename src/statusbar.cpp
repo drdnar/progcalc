@@ -83,6 +83,7 @@ bool StatusBar::SendMessage(Message& message)
     }
     if (dirty)
         Paint();
+    UpdateBatteryLevel();
     return false;
 }
 
@@ -106,7 +107,7 @@ bool StatusBar::_update_battery_level()
     unsigned char charging = battery_charging;
     battery_level = boot_GetBatteryStatus();
     battery_charging = boot_IsCharging();
-    battery_timer = GetRtcSeconds() + 10;
+    battery_timer = GetRtcSeconds() + 30;
     return level != battery_level || charging != battery_charging;
 }
 

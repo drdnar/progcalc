@@ -44,12 +44,12 @@ struct CursorLoc final
     /**
      * Gets FontLib's cursor location.
      */
-    void Save(void) ;//{ x = fontlib_GetCursorX(); y = fontlib_GetCursorY(); }
+    void Save() ;//{ x = fontlib_GetCursorX(); y = fontlib_GetCursorY(); }
     /**
      * Sets FontLib's cursor location.
      */
-    void Restore(void) const ;//{ fontlib_SetCursorPosition(x, y); }
-    CursorLoc(void) = default;
+    void Restore() const ;//{ fontlib_SetCursorPosition(x, y); }
+    CursorLoc() = default;
     //CursorLoc(Coord c) : x(c.x), y(c.y) { }
     //CursorLoc(x_t x, y_t y) : x(x), y(y) { }
     CursorLoc(CursorLoc& c) = default;
@@ -71,8 +71,8 @@ struct TextWindow final
     x_t CursorX;
     y_t CursorY;
     FontId FontId;
-    void Save(void);
-    void Restore(void) const;
+    void Save();
+    void Restore() const;
 };
 
 
@@ -83,7 +83,7 @@ struct TextWindow final
 struct CursorSaver final
 {
     CursorLoc Location;
-    CursorSaver(void) { Location.Save(); }
+    CursorSaver() { Location.Save(); }
     CursorSaver(x_t x, y_t y) { Location.Save(); fontlib_SetCursorPosition(x, y); }
     CursorSaver(CursorLoc c) { Location.Save(); c.Restore(); }
     CursorSaver(CursorLoc& c) { Location.Save(); c.Restore(); }
@@ -100,7 +100,7 @@ struct CursorSaver final
 struct WindowSaver final
 {
     TextWindow Window;
-    WindowSaver(void) { Window.Save(); }
+    WindowSaver() { Window.Save(); }
     WindowSaver(TextWindow& w) { Window.Save(); w.Restore(); }
     WindowSaver(WindowSaver& w) = delete;
     WindowSaver(WindowSaver&& w) = delete;
@@ -148,7 +148,7 @@ class FontManager
          * Some operations may cause font data to be moved around in memory.
          * This fetches the locations of all fonts again.
          */
-        static void ReloadFonts(void);
+        static void ReloadFonts();
         /**
          * Maximum fonts that can be used.
          */
@@ -162,14 +162,14 @@ class FontManager
          */
         static fontlib_font_t* GetFont(FontId font) { return fonts[font]; }
     protected:
-        FontManager(void) { load_fonts(); };
+        FontManager() { load_fonts(); };
     public:
         /**
          * Initialization hook.
          */
         static FontManager instance;
 //        unsigned char asdf;
-        static void load_fonts(void);
+        static void load_fonts();
         static fontlib_font_t* fonts[MAX_FONTS];
         static bool initial_loading;
 };

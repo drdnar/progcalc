@@ -39,25 +39,25 @@ class Checkbox : public Widget
          * GetY
          * GetParent
          */
-        Status Focus(void);
-        Status Unfocus(void);
+        Status Focus();
+        Status Unfocus();
         bool SendInput(Message& message);
-        Status Paint(void);
+        Status Paint();
         /* New routines: */
         friend Widget* Checkbox_ctor(Widget_def* Template, Widget* parent, Widget_def** next);
     protected:
         /**
          * Font ID used for text in this Label.
          */
-        uint8_t _font;
+        uint8_t font;
         /**
          * Pointer to a C-style string that is displayed by this Label.
          */
-        char* _text;
+        char* text;
         /**
          * Pointer to a simple variable that this Checkbox toggles.
          */
-        bool* _variable;
+        bool* variable;
 };
 
 } /* namespace Forms */

@@ -21,27 +21,27 @@ class BigIntStack final
          * Checks if the stack is empty.
          * @return True if the stack is empty.
          */
-        bool IsEmpty(void) const { return size == 0; }
+        bool IsEmpty() const { return size == 0; }
         /**
          * Checks if the stack is full.
          * @return True if the stack is full.
          */
-        bool IsFull(void) const { return size == maxSize; }
+        bool IsFull() const { return size == maxSize; }
         /**
          * Returns the number of entries currently on the stack.
          * @return Number of live entries
          */
-        unsigned int GetSize(void) const { return size; }
+        unsigned int GetSize() const { return size; }
         /**
          * Returns the maximum number of entries the stack can hold.
          * @return Maximum number of possible entries
          */
-        unsigned int GetMaxSize(void) const { return maxSize; }
+        unsigned int GetMaxSize() const { return maxSize; }
         /**
          * Clears the stack to empty.
          * @param self Pointer to stack
          */
-        void Flush(void) { size = 0; }
+        void Flush() { size = 0; }
         /**
          * Pushes a number onto the stack.
          * If the stack is full, the bottommost entry in the stack is removed.
@@ -52,7 +52,7 @@ class BigIntStack final
          * Returns a pointer to the number on top of the stack.
          * @return Pointer to number on top of stack, or NULL if the stack is empty.
          */
-        BigInt_t* Peek(void);
+        BigInt_t* Peek();
         /**
          * Gets a number from the stack based on its index counting down from the top.
          * The topmost entry is index zero, the next is one, &c.
@@ -72,7 +72,7 @@ class BigIntStack final
          * @return Returns a now-stale pointer to the top of stack.  Potentially useful if you plan to immediately use the number.
          * Will return NULL if the stack is empty.
          */
-        BigInt_t* PopStalePointer(void);
+        BigInt_t* PopStalePointer();
         /**
          * Removes a number from the stack.
          * @param destination Pointer to location to write popped number.
@@ -90,16 +90,16 @@ class BigIntStack final
          * Rotates the stack such that the second entry on the stack becomes the first, 
          * and the first becomes the bottom.
          */
-        void RotateUp(void);
+        void RotateUp();
         /**
          * Rotates the stack such that the bottom entry on the stack becomes the top,
          * and the top becomes the second.
          */
-        void RotateDown(void);
+        void RotateDown();
         /**
          * Swaps the first and second items on the stack.
          */
-        void ExchangeTop(void);
+        void ExchangeTop();
         /**
          * Gets a number from the stack based on its index counting down from the top.
          * The topmost entry is index zero, the next is one, &c.

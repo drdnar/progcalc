@@ -11,7 +11,7 @@ FontManager FontManager::instance;
 fontlib_font_t* FontManager::fonts[MAX_FONTS];
 bool FontManager::initial_loading;
 
-void TextWindow::Save(void)
+void TextWindow::Save()
 {
     X = fontlib_GetWindowXMin();
     Y = fontlib_GetWindowYMin();
@@ -23,7 +23,7 @@ void TextWindow::Save(void)
 }
 
 
-void TextWindow::Restore(void) const
+void TextWindow::Restore() const
 {
     fontlib_SetWindow(X, Y, Width, Height);
     fontlib_SetCursorPosition(CursorX, CursorY);
@@ -31,7 +31,7 @@ void TextWindow::Restore(void) const
 }
 
 
-void FontManager::ReloadFonts(void)
+void FontManager::ReloadFonts()
 {
     const FontDescriptor* desc = FontsList;
     fontlib_font_t** font = fonts;
@@ -46,7 +46,7 @@ void FontManager::ReloadFonts(void)
 }
 
 
-void FontManager::load_fonts(void)
+void FontManager::load_fonts()
 {
     if (FontsCount > MAX_FONTS)
         InitializationError("Configured Forms::FontsCount > Forms::FontManager::MAX_FONTS");
@@ -67,14 +67,14 @@ void FontManager::SetFont(FontId fontId)
 }
 
 
-void CursorLoc::Save(void)
+void CursorLoc::Save()
 {
     x = fontlib_GetCursorX();
     y = fontlib_GetCursorY();
 }
 
 
-void CursorLoc::Restore(void) const
+void CursorLoc::Restore() const
 {
     fontlib_SetCursorPosition(x, y);
 }

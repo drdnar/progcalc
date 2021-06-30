@@ -34,7 +34,7 @@ void StackDisplay::Reset()
 }
 
 
-Status StackDisplay::Paint(void)
+Status StackDisplay::Paint()
 {
     if (!dirty)
         return Status::Success;

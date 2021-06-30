@@ -47,7 +47,7 @@ extern "C" const Widget_desc RowList_desc
 };
 
 
-void RowList::Layout(void)
+void RowList::Layout()
 {
     unsigned int xx = x;
     unsigned char yy = y;

@@ -2,38 +2,16 @@
 #include <string.h>
 #include "stack.h"
 #include "forms/memcpy.h"
-#include <new>
 
-
-#include <graphx.h>
-#include <tice.h>
 
 BigIntStack::BigIntStack(unsigned int max_size)
 {
     if (max_size == 0) /* ? ? ? */
         max_size = 16;
     stack = (BigInt_t*)calloc(max_size, sizeof(BigInt_t));
-/** TODO: Get angry and abort.
+/** TODO: Get angry and abort. */
     if (!stack)
-        throw std::bad_alloc();
-*/
-/*    if (!stack)
-    {
-        gfx_SetTextBGColor(12);
-        gfx_PrintStringXY("  AAAARGH!  ", 1, 1);
-        gfx_PrintUInt(max_size, 3);
-        //do ; while (!os_GetCSC());
-        max_size = 8;
-        stack = (BigInt_t*)calloc(max_size, sizeof(BigInt_t));
-        if (!stack)
-        {
-            gfx_PrintString("  ? ? ?  ");
-            stack = (BigInt_t*)malloc(max_size * sizeof(BigInt_t));
-            if (!stack)
-                gfx_PrintString("Worked.");
-        }
-    }*/
-
+        exit(1);
     maxSize = max_size;
     size = 0;
 }
@@ -62,7 +40,7 @@ void BigIntStack::Push(BigInt_t* number)
 }
 
 
-BigInt_t* BigIntStack::Peek(void)
+BigInt_t* BigIntStack::Peek()
 {
     if (size == 0)
         return nullptr;
@@ -119,7 +97,7 @@ signed int BigIntStack::Resize(unsigned int newSize)
 }
 
 
-void BigIntStack::RotateUp(void)
+void BigIntStack::RotateUp()
 {
     if (size <= 1)
         return;
@@ -130,7 +108,7 @@ void BigIntStack::RotateUp(void)
 }
 
 
-void BigIntStack::RotateDown(void)
+void BigIntStack::RotateDown()
 {
     if (size <= 1)
         return;
@@ -141,7 +119,7 @@ void BigIntStack::RotateDown(void)
 }
 
 
-void BigIntStack::ExchangeTop(void)
+void BigIntStack::ExchangeTop()
 {
     if (size <= 1)
         return;

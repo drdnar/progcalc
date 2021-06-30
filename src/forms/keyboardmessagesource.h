@@ -18,24 +18,24 @@ namespace Forms
 class KeyboardEventSource final : public MessageSource
 {
     public:
-        Message GetMessage(void);
+        Message GetMessage();
         /**
          * Returns an object that the GUI subsystem can get events from.
          */
-        static KeyboardEventSource& GetInstance(void) { return instance; }
+        static KeyboardEventSource& GetInstance() { return instance; }
         ~KeyboardEventSource();
         /**
          * Turns on display of 2nd/Alpha modifier indicator.
          */
-        static void EnableIndicator(void);
+        static void EnableIndicator();
         /**
          * Turns off display of 2nd/Alpha modifier indicator.
          */
-        static void DisableIndicator(void);
+        static void DisableIndicator();
         /**
          * Checks whether 2nd/Alpha modifier indicator will be shown.
          */
-        static bool IndicatorEnabled(void) { return cursor_enabled; }
+        static bool IndicatorEnabled() { return cursor_enabled; }
         /**
          * Sets the location of the 2nd/Alpha modifier indicator.
          */
@@ -43,36 +43,36 @@ class KeyboardEventSource final : public MessageSource
         /**
          * Gets the location of the 2nd/Alpha modifier indicator.
          */
-        static x_t GetIndicatorX(void) { return cursor_x; }
+        static x_t GetIndicatorX() { return cursor_x; }
         /**
          * Gets the location of the 2nd/Alpha modifier indicator.
          */
-        static y_t GetIndicatorY(void) { return cursor_y; }
+        static y_t GetIndicatorY() { return cursor_y; }
         /**
          * Enables special processing of 2nd key.
          */
-        static void Enable2nd(void);
+        static void Enable2nd();
         /**
          * Disables special processing of 2nd key, so pressing 2nd returns
          * sk_2nd instead of acting as a dead key.
          */
-        static void Disable2nd(void);
+        static void Disable2nd();
         /**
          * Checks whether special process of 2nd key is enabled.
          */
-        static bool Is2ndEnabled(void) { return second_enabled; }
+        static bool Is2ndEnabled() { return second_enabled; }
         /**
          * Clears away the 2nd indicator and state.
          */
-        static void Clear2nd(void) { reset2nd(); }
+        static void Clear2nd() { reset2nd(); }
         /**
          * Simulates pressing 2nd if and only if 2nd processing is enabled.
          */
-        static void Force2nd(void) { set2nd(); }
+        static void Force2nd() { set2nd(); }
         /**
          * Checks whether the 2nd modifier is currently active.
          */
-        static bool Is2ndPressed(void) { return second; }
+        static bool Is2ndPressed() { return second; }
     private:
         /**
          * This is magic hook that ensures this gets initialized.
@@ -82,7 +82,7 @@ class KeyboardEventSource final : public MessageSource
          * Assumed height of the indicator cursor.
          */
         const unsigned char INDICATOR_HEIGHT = 14;
-        KeyboardEventSource(void);
+        KeyboardEventSource();
         /*KeyboardEventSource(KeyboardEventSource const& x) = default;
         KeyboardEventSource(KeyboardEventSource&& x) = default;*/
         /**
@@ -104,11 +104,11 @@ class KeyboardEventSource final : public MessageSource
         /**
          * Internal routine that draws the cursor.
          */
-        static void show_cursor(void);
+        static void show_cursor();
         /**
          * Internal routine that restores whatever the cursor overwrote.
          */
-        static void unshow_cursor(void);
+        static void unshow_cursor();
         /**
          * Controls whether 2nd acts as a dead key.
          */
@@ -120,11 +120,11 @@ class KeyboardEventSource final : public MessageSource
         /**
          * Internally implements 2nd.
          */
-        static void set2nd(void);
+        static void set2nd();
         /**
          * Internally implements 2nd.
          */
-        static void reset2nd(void);
+        static void reset2nd();
         /**
          * Caches state of alpha modifier.
          */

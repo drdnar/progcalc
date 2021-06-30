@@ -6,14 +6,14 @@ using namespace Forms;
 unsigned char RtcMessageSource::last_time;
 RtcMessageSource RtcMessageSource::instance;
 
-RtcMessageSource::RtcMessageSource(void)
+RtcMessageSource::RtcMessageSource()
 {
     MessageLoop::RegisterSynchronousMessageSource(*this);
     last_time = rtc_Seconds;
 }
 
 
-Message RtcMessageSource::GetMessage(void)
+Message RtcMessageSource::GetMessage()
 {
     unsigned char seconds = rtc_Seconds;
     unsigned char delta = seconds - last_time;
