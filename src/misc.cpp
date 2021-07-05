@@ -1,6 +1,10 @@
 #include "misc.h"
 #include <fontlibc.h>
 #include "forms/textmanager.h"
+#include "forms/widget.h"
+#include "forms/gui.h"
+#include "forms/style.h"
+#include "style.h"
 
 using namespace Forms;
 
@@ -27,6 +31,23 @@ const FontDescriptor (&Forms::FontsList)[] =
 };
 
 extern const unsigned char Forms::FontsCount = 5;
+
+
+/******************************************************************************/
+
+static Style gui_style
+{
+    FONT_LARGE_PROP,
+    COLOR_FOREGROUND,
+    COLOR_BACKGROUND,
+    COLOR_HIGHLIGHT,
+    COLOR_STATUS_BAR_BACKGROUND
+};
+
+Style* const Forms::GUI_DefaultStyle = &gui_style;
+
+
+/******************************************************************************/
 
 /**
  * Magic class that ensures the special FONT_SMALL_PROP_ALIGNED gets initialized.

@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <tice.h>
 
 /* This seems like a great place to throw in some template magic, but I'm not
  * bold, at least not yet. */
@@ -15,20 +16,91 @@
 namespace Forms
 {
 
+/**
+ * A processed key code.
+ */
+typedef uint8_t Key_t;
+/**
+ * An unprocess keyboard scan code.
+ */
+typedef uint8_t RawKey_t;
+/**
+ * A color.  Possibly a palette entry.
+ */
+typedef uint8_t Color_t;
+
+
+#define sk_2nd_Modifier 128
+#define sk_2nd_Down         (sk_2nd_Modifier | sk_Down      )
+#define sk_2nd_Left         (sk_2nd_Modifier | sk_Left      )
+#define sk_2nd_Right        (sk_2nd_Modifier | sk_Right     )
+#define sk_2nd_Up           (sk_2nd_Modifier | sk_Up        )
+#define sk_2nd_Enter        (sk_2nd_Modifier | sk_Enter     )
+#define sk_2nd_Clear        (sk_2nd_Modifier | sk_Clear     )
+#define sk_2nd_Alpha        (sk_2nd_Modifier | sk_Alpha     )
+#define sk_2nd_Add          (sk_2nd_Modifier | sk_Add       )
+#define sk_2nd_Sub          (sk_2nd_Modifier | sk_Sub       )
+#define sk_2nd_Mul          (sk_2nd_Modifier | sk_Mul       )
+#define sk_2nd_Div          (sk_2nd_Modifier | sk_Div       )
+#define sk_2nd_Graph        (sk_2nd_Modifier | sk_Graph     )
+#define sk_2nd_Trace        (sk_2nd_Modifier | sk_Trace     )
+#define sk_2nd_Zoom         (sk_2nd_Modifier | sk_Zoom      )
+#define sk_2nd_Window       (sk_2nd_Modifier | sk_Window    )
+#define sk_2nd_Yequ         (sk_2nd_Modifier | sk_Yequ      )
+#define sk_Quit             (sk_2nd_Modifier | sk_Mode      ) /**< 2nd + Mode */
+#define sk_Ins              (sk_2nd_Modifier | sk_Del       ) /**< 2nd + Del */
+#define sk_Recall           (sk_2nd_Modifier | sk_Store     ) /**< 2nd + Sto-> */
+#define sk_2nd_Ln           (sk_2nd_Modifier | sk_Ln        )
+#define sk_2nd_Log          (sk_2nd_Modifier | sk_Log       )
+#define sk_2nd_Square       (sk_2nd_Modifier | sk_Square    )
+#define sk_2nd_Recip        (sk_2nd_Modifier | sk_Recip     )
+#define sk_2nd_Math         (sk_2nd_Modifier | sk_Math      )
+#define sk_2nd_0            (sk_2nd_Modifier | sk_0         )
+#define sk_2nd_1            (sk_2nd_Modifier | sk_1         )
+#define sk_2nd_4            (sk_2nd_Modifier | sk_4         )
+#define sk_2nd_7            (sk_2nd_Modifier | sk_7         )
+#define sk_2nd_2            (sk_2nd_Modifier | sk_2         )
+#define sk_2nd_5            (sk_2nd_Modifier | sk_5         )
+#define sk_2nd_8            (sk_2nd_Modifier | sk_8         )
+#define sk_2nd_3            (sk_2nd_Modifier | sk_3         )
+#define sk_2nd_6            (sk_2nd_Modifier | sk_6         )
+#define sk_2nd_9            (sk_2nd_Modifier | sk_9         )
+#define sk_2nd_Comma        (sk_2nd_Modifier | sk_Comma     )
+#define sk_2nd_Sin          (sk_2nd_Modifier | sk_Sin       )
+#define sk_2nd_Apps         (sk_2nd_Modifier | sk_Apps      )
+#define sk_2nd_GraphVar     (sk_2nd_Modifier | sk_GraphVar  )
+#define sk_2nd_DecPnt       (sk_2nd_Modifier | sk_DecPnt    )
+#define sk_2nd_LParen       (sk_2nd_Modifier | sk_LParen    )
+#define sk_2nd_Cos          (sk_2nd_Modifier | sk_Cos       )
+#define sk_2nd_Prgm         (sk_2nd_Modifier | sk_Prgm      )
+#define sk_2nd_Stat         (sk_2nd_Modifier | sk_Stat      )
+#define sk_2nd_Chs          (sk_2nd_Modifier | sk_Chs       )
+#define sk_2nd_RParen       (sk_2nd_Modifier | sk_RParen    )
+#define sk_2nd_Tan          (sk_2nd_Modifier | sk_Tan       )
+#define sk_2nd_Vars         (sk_2nd_Modifier | sk_Vars      )
+#define sk_2nd_Power        (sk_2nd_Modifier | sk_Power     )
+
+
 class Widget;
 
 /**
  * Widget type IDs used by form definitions.
  */
-enum class ID : uint8_t
+enum ID : uint8_t
 {
-    None,
-//    DIALOG,   
-    RowList,
-    RowItems,
-    Label,
-    Checkbox,
-    Button
+    WIDGET_ID_None,
+//    WIDGET_ID_DIALOG,   
+    WIDGET_ID_Label,
+    WIDGET_ID_Checkbox,
+    WIDGET_ID_Button,
+    WIDGET_ID_Container = 0x40,
+    WIDGET_ID_RowList = WIDGET_ID_Container,
+    WIDGET_ID_RowItems,
+    WIDGET_ID_DialogBox,
+    WIDGET_ID_User = 0x80,
+    WIDGET_ID_StyleOverrides = 0xFE,
+    WIDGET_ID_SingleStyleOverride = WIDGET_ID_StyleOverrides,
+    WIDGET_ID_FullStyleOverride
 };
 
 /**
@@ -57,10 +129,25 @@ struct Widget_def
      * This is necessary for constructing the Widget.
      */
     struct Widget_desc* TypeDescriptor;
+};
+
+/**
+ * Additional information about a Widget description that's not its TypeId.
+ */
+enum WidgetFlags : uint8_t
+{
     /**
-     * Additional information about a widget.
+     * This type of Widget has no special properties.
      */
-    uint8_t Flags;
+    WIDGET_FLAG_NONE = 0,
+    /**
+     * This type of Widget is a Container.
+     */
+    WIDGET_FLAG_CONTAINER = 0x01,
+    /**
+     * This type of Widget is a Style override.
+     */
+    WIDGET_FLAG_STYLE_OVERRIDE = 0x02
 };
 
 /**
@@ -72,6 +159,10 @@ struct Widget_desc
      * Identifies what kind of widget this is.
      */
     ID TypeId;
+    /**
+     * Additional information about a widget.
+     */
+    WidgetFlags Flags;
     /**
      * Pointer to routine that will construct a widget from a definition.
      * @param definition Pointer to definition that describes a Widget
@@ -211,6 +302,10 @@ enum MessageId
      * modal closes.
      */
     MESSAGE_GUI_MODAL_DIALOG,
+    /**
+     * Instructs the GUI to close the current dialog.
+     */
+    MESSAGE_GUI_MODAL_END,
 };
 
 
@@ -231,6 +326,8 @@ typedef uint8_t y_t;
 #else
 typedef unsigned int y_t;
 #endif
+
+class Style;
 
 
 /**
@@ -368,6 +465,29 @@ class Widget
          */
         virtual ~Widget();
 
+        /** 
+         * Default constructor.
+         */
+        Widget();
+
+        /**
+         * Returns a reference to this Widget's Style context.
+         * Use this only for reading.
+         */
+        const Style& GetStyle() { return *getStylePointer(); }
+
+        /**
+         * Returns a mutable reference to this Widget's Style context, allowing
+         * properties of the Widget's style to be changed.
+         */
+        Style& ChangeStyle();
+
+        /**
+         * Forcibly sets the Style to something totally new.
+         * (Or not.)
+         */
+        void OverrideStyle(Style& style);
+
     protected:
         /**
          * Column coordinate.
@@ -431,6 +551,32 @@ class Widget
          * future.
          */
         bool dirty = false;
+
+        /**
+         * Checks for Style customization and applies it if available.
+         * @return True if a customization was applied.
+         */
+        bool loadStyle();
+    
+    private:
+
+        /**
+         * If this Widget has a Style override, this will point to it.
+         */
+        Style* style = nullptr;
+
+        /**
+         * If true, do not delete the Style pointer in destructor.
+         * This is so the GUI can have a statically allocated Style assigned.
+         */
+        bool style_not_deletable = false;
+
+        /**
+         * Internal helper routine to find a Style.
+         */
+        Style* getStylePointer();
+
+        friend class GUI;
 };
 
 } /* namespace Forms */

@@ -37,6 +37,7 @@ int main(void) {
     Format_ConfigureDisplaySizes();
     KeyboardEventSource::Enable2nd();
     KeyboardEventSource::EnableIndicator();
+    FontManager::SetFont(FONT_LARGE_PROP);
     KeyboardEventSource::SetIndicatorLocation(LCD_WIDTH - fontlib_GetGlyphWidth(CALC1252_CURSOR_2ND_CHAR), 0);
 
     MessageLoop::EnqueueMessage( 

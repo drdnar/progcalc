@@ -143,8 +143,9 @@ void Container::SetDirtyAll()
 
 Status Container::Paint()
 {
-    if (!count)
+    if (!dirty || !count)
         return Status::Success;
+    dirty = false;
     Widget** item = _children;
     for (Container_size_t i = count; i > 0; i--, item++)
         (*item)->Paint();
@@ -190,7 +191,7 @@ void Container::EndUpdate()
 
 void Container::_end_update()
 {
-    Paint();
+    Layout();
 }
 
 
@@ -254,6 +255,8 @@ void Container::Replace(Container_size_t index, Widget& item)
 {
     delete _children[index];
     _children[index] = &item;
+    if (!_updating)
+        Layout();
 }
 
 
@@ -281,6 +284,8 @@ Status Container::Add(Widget& widget)
             return Status::Failure;
     _children[count++] = &widget;
     widget.parent = this;
+    if (!_updating)
+        Layout();
     return Status::Success;
 }
 
@@ -292,6 +297,8 @@ Status Container::Insert(Container_size_t index, Widget& widget)
             return Status::Failure;
     memmove(_children + index + 1, _children + index, count++ - index);
     _children[index] = &widget;
+    if (!_updating)
+        Layout();
     return Status::Success;
 }
 
@@ -300,6 +307,8 @@ Widget& Container::Leak(Container_size_t index)
 {
     Widget* widget = _children[index];
     memmove(_children + index, _children + index + 1, --count - index);
+    if (!_updating)
+        Layout();
     return *widget;
 }
 

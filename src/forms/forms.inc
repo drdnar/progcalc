@@ -10,15 +10,14 @@ macro ?!
 
     ;;;;
 	;; Declares a widget structure
-	;; @param type Name of the widget type prefix, must match the name in C, e.g. Label
-	;; @param defflags Should be WIDGET_DEF_CONTAINER if the Widget is a Container.
+	;; @param type Name of the widget type, must match its descriptor.
+	;;     E.g. a name of Label will reference Label_desc
 	;; @param fields List of fields along with their type, e.g. dl someStringPointer.
 	;; Additionally, the final entry may be named "children" without any type.
 	;; This declares that the widget has a list of children, terminated by end, e.g. end RowList.
 	;;;;
-	macro defwidget? type*, userflags:0, fields&
-		local typeid, args, vtname, defflags
-		defflags = userflags
+	macro defwidget? type*, fields&
+		local typeid, args, vtname
 
 		; Increment type ID counter
 		typeid_counter = typeid_counter + 1
@@ -32,8 +31,6 @@ macro ?!
 			match =children, field
 				if % <> %%
 					err 'syntax error: defwidget field children should be last'
-				else
-					defflags = (defflags or WIDGET_DEF_CONTAINER)
 				end if
 				; handled later
 			else match size= name, field
@@ -49,9 +46,7 @@ macro ?!
 		match expand, args
 			macro expand
 				child_counter = child_counter + 1
-;				db typeid
 				dl _#type#_desc
-				db defflags
 				iterate field, fields
 					match =children, field
 						local child_count
@@ -74,18 +69,13 @@ macro ?!
 	purge ?
 end macro
 
-; These must be declared in the same order as in forms.h so that the type IDs match.
-defwidget RowList, , children
-defwidget RowItems, , db Alignment, db Padding, children
-defwidget Label, , db Font, dl Text
-defwidget Checkbox, , db Font, dl Text, dl Variable
-
-; Font IDs matching style.h
-FONT_LARGE_PROP = 0
-FONT_LARGE_MONO = 1
-FONT_SMALL_PROP = 2
-FONT_SMALL_PROP_BOLD = 3
-FONT_SMALL_PROP_ALIGNED = 4
+defwidget SingleStyleOverride, db Property, db Data
+defwidget FullStyleOverride, db OverrideFont, db Font, db OverrideForeground, db Foreground, db OverrideBackground, db Background, db OverrideHighlight, db Highlight, db OverrideShadow, db Shadow
+defwidget RowList, children
+defwidget RowItems, db Alignment, db Padding, children
+defwidget DialogBox, dl Width, db Height, children
+defwidget Label, dl Text
+defwidget Checkbox, dl Text, dl Variable
 
 ; Alignment options for RowItems
 ROW_ITEMS_LEFT = 0

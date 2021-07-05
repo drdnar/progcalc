@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <tice.h>
 #include <fontlibc.h>
+#include "style.h"
 
 using namespace Forms;
 
@@ -25,6 +26,13 @@ GUI::GUI() : MessageSink(SINK_PRIORITY_NORMAL)
 {
     MessageLoop::RegisterMessageSink(*this);
     hasFocus = true;
+    if (Forms::GUI_DefaultStyle)
+    {
+        style = Forms::GUI_DefaultStyle;
+        style_not_deletable = true;
+    }
+    else
+        style = new Style { 0, 0, 0, 0, 0 };
 }
 
 
@@ -57,12 +65,27 @@ bool GUI::SendMessage(Message& message)
         begin_dialog((Widget_def*)message.DataPointer);
         return true;
     }
+    else if (dialog_count > 1 && message.Id == MESSAGE_GUI_MODAL_END)
+    {
+        end_dialog();
+        return true;
+    }
     else
     {
         if (active_dialog)
-            return active_dialog->SendInput(message);
-        else
-            return false;
+        {
+            if (active_dialog->SendInput(message))
+                return true;
+            if (message.Id == MESSAGE_KEY && message.ExtendedCode == sk_Quit)
+            {
+                if (dialog_count > 1)
+                    MessageLoop::EnqueueMessage( { .Id = MESSAGE_GUI_MODAL_END, .ExtendedCode = MESSAGE_NONE } );
+                else
+                    MessageLoop::EnqueueMessage( { .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = MESSAGE_NONE } );
+                return true;
+            }
+        }
+        return false;
     }
 }
 

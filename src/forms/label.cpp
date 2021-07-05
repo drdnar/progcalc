@@ -1,7 +1,8 @@
 #include "label.h"
 #include <fontlibc.h>
-#include "../style.h"
+#include "textmanager.h"
 #include "ignorewarning.h"
+#include "style.h"
 
 using namespace Forms;
 
@@ -19,10 +20,8 @@ Widget* Forms::Label_ctor(Widget_def* Template, Widget* parent, Widget_def** nex
     Label* widget = new Label();
     widget->definition = Template;
     widget->parent = parent;
-    widget->font = ((Label_def*)Template)->Font;
     widget->text = ((Label_def*)Template)->Text;
-    //reinterpret_cast<Label_def&>(Template).Font;
-    Style_SetFont(widget->font);
+    widget->GetStyle().ActivateFont();
     widget->height = fontlib_GetCurrentFontHeight();
     widget->width = fontlib_GetStringWidth(widget->text);
     if (next != nullptr)
@@ -33,7 +32,8 @@ Widget* Forms::Label_ctor(Widget_def* Template, Widget* parent, Widget_def** nex
 
 extern "C" const Widget_desc Label_desc
 {
-    ID::Label,
+    ID::WIDGET_ID_Label,
+    WIDGET_FLAG_NONE,
     &Label_ctor,
     &GetNextItem
 };
@@ -55,9 +55,10 @@ END_IGNORE_WARNING
 
 Status Label::Paint()
 {
-    if (hidden)
+    if (!dirty || hidden)
         return Status::Success;
-    Style_SetFont(font);
+    dirty = false;
+    GetStyle().ActivateFont();
     fontlib_SetCursorPosition(x, y);
     fontlib_DrawString(text);
     return Status::Success;

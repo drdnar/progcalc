@@ -1,11 +1,19 @@
 #include "widget.h"
+#include "gui.h"
+#include "style.h"
 
 using namespace Forms;
 
 
+Widget::Widget() : dirty { true }
+{
+    //
+}
+
 Widget::~Widget()
 {
-    // Do nothing.
+    if (!style_not_deletable)
+        delete style;
 }
 
 
@@ -29,8 +37,12 @@ Status Widget::SetSize(x_t newwidth, y_t newheight)
 
 Status Widget::Focus()
 {
+    if (!(Enable() != Status::Success))
+        return Status::Failure;
+    if (!(Show() != Status::Success))
+        return Status::Failure;
     hasFocus = true;
-    Paint();
+    SetDirty();
     return Status::Success;
 }
         
@@ -38,7 +50,7 @@ Status Widget::Focus()
 Status Widget::Unfocus()
 {
     hasFocus = false;
-    Paint();
+    SetDirty();
     return Status::Success;
 }
 
@@ -51,21 +63,28 @@ Widget* Widget::GetParent()
 
 Status Widget::Disable()
 {
+    Unfocus();
     disabled = true;
+    SetDirty();
     return Status::Success;
 }
 
 
 Status Widget::Enable()
 {
+
+    Show();
     disabled = false;
+    SetDirty();
     return Status::Success;
 }
 
 
 Status Widget::Hide()
 {
+    Unfocus();
     hidden = true;
+    SetDirty();
     return Status::Success;
 }
 
@@ -73,13 +92,63 @@ Status Widget::Hide()
 Status Widget::Show()
 {
     hidden = false;
+    SetDirty();
     return Status::Success;
 }
 
 
 void Widget::SetDirty()
 {
+    if (dirty)
+        return;
     dirty = true;
     if (parent && !parent->dirty)
         parent->SetDirty();
+}
+
+
+Style* Widget::getStylePointer()
+{
+    if (style)
+        return style;
+    if (parent)
+        return parent->getStylePointer();
+    GUI& gui = GUI::GetInstance();
+    Container* c;
+    if (c = gui.GetActiveDialog())
+        return c->getStylePointer();
+    return gui.style;
+}
+
+
+Style& Widget::ChangeStyle()
+{
+    if (style)
+        return *style;
+    style = new Style(*getStylePointer());
+}
+
+
+void Widget::OverrideStyle(Style& newStyle)
+{
+    if (!style_not_deletable)
+        delete style;
+    style = new Style(newStyle);
+}
+
+
+bool Widget::loadStyle()
+{
+    Widget_desc* desc = definition->TypeDescriptor;
+    Widget_def* next = desc->GetNextWidget(definition);
+    if (!next)
+        return false;
+    if (!(next->TypeDescriptor->Flags & WIDGET_FLAG_STYLE_OVERRIDE))
+        return false;
+    if (style) // This . . . shouldn't be able to happen?
+        delete style;
+    style = Style::constructify( (FullStyleOverride_def*)next, getStylePointer() );
+    if (style)
+        return true;
+    return false;
 }

@@ -7,7 +7,7 @@
 #include "settings.h"
 #include "rpnui.h"
 #include "printbigint.h"
-#include "ez80.h"
+#include "forms/ez80.h"
 #include "gfx/gfx.h"
 #include "misc.h"
 #include "forms/widget.h"

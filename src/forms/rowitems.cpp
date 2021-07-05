@@ -42,7 +42,8 @@ RowItems::RowItems(Widget_def* Template, Widget_def** next)
 
 extern "C" const Widget_desc RowItems_desc
 {
-    ID::Label,
+    ID::WIDGET_ID_RowItems,
+    WIDGET_FLAG_CONTAINER,
     &RowItems::form_ctor,
     &RowItems::GetNextItem
 };
@@ -50,6 +51,7 @@ extern "C" const Widget_desc RowItems_desc
 
 void RowItems::Layout()
 {
+    dirty = true;
     x_t xx = x;
     y_t yy = y;
     Widget** widget = _children;

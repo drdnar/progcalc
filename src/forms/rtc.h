@@ -5,6 +5,9 @@
 namespace Forms 
 {
 
+/**
+ * Produces MESSAGE_RTC_TICK messages once a second.
+ */
 class RtcMessageSource : public MessageSource
 {
     public:

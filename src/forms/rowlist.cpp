@@ -41,7 +41,8 @@ RowList::RowList(Widget_def* Template, Widget_def** next)
 
 extern "C" const Widget_desc RowList_desc
 {
-    ID::Label,
+    ID::WIDGET_ID_RowList,
+    WIDGET_FLAG_CONTAINER,
     &RowList::form_ctor,
     &RowList::GetNextItem
 };
@@ -49,11 +50,13 @@ extern "C" const Widget_desc RowList_desc
 
 void RowList::Layout()
 {
+    dirty = true;
     unsigned int xx = x;
     unsigned char yy = y;
-    for (Container_size_t i = 0; i < count; i--)
+    Widget** child = &_children[0];
+    for (Container_size_t i = count; i > 0; i--, child++)
     {
-        _children[i]->MoveTo(xx, yy);
-        yy += _children[i]->GetHeight();
+        (*child)->MoveTo(xx, yy);
+        yy += (*child)->GetHeight();
     }
 }

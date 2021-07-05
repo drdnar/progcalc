@@ -14,6 +14,7 @@
 #include "statusbar.h"
 #include "forms/textmanager.h"
 #include "forms/messages.h"
+#include "testform.h"
 
 using namespace Forms;
 
@@ -42,8 +43,8 @@ Widget* RPN_UI::RPN_UI_ctor(Widget_def* Template, Widget* parent, Widget_def** n
 
 extern "C" const Widget_desc RPN_UI_desc
 {
-    /** TODO: Needs to be something other than ID::Label */
-    ID::Label,
+    (ID)RPN_ID::WIDGET_ID_RPN_UI,
+    WIDGET_FLAG_NONE,
     &RPN_UI::RPN_UI_ctor,
     &GetNextItem
 };
@@ -71,7 +72,6 @@ RPN_UI::RPN_UI()
 
 Forms::Status RPN_UI::Paint()
 {
-    dirty = false;
     return Container::Paint();
 }
 
@@ -108,10 +108,13 @@ bool RPN_UI::SendInput(Message& message)
         Layout();
         return false;
     }
-    if (dirty)
-        Paint();
     if (message.Id == MESSAGE_KEY)
     {
+        if ((sk_key_t)message.ExtendedCode == sk_Mode)
+        {
+            MessageLoop::EnqueueMessage( { .Id = MESSAGE_GUI_MODAL_DIALOG, .DataPointer = (void*)&SettingsDialog } );
+            return true;
+        }
         if (Broadcast(message))
             return true;
         if (stackDisplay.IsScrollingActive())
@@ -123,9 +126,6 @@ bool RPN_UI::SendInput(Message& message)
         {
             case sk_Enter:
                 return AcquireInput();
-            case sk_Quit:
-                MessageLoop::EnqueueMessage( { .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = MESSAGE_NONE } );
-                return true;
             case sk_Del:
                 r = !!mainStack.PopStalePointer();
                 stackDisplay.SetDirty();

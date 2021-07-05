@@ -1,8 +1,8 @@
 #include "checkbox.h"
 #include "calc1252.h"
 #include <fontlibc.h>
-#include "../style.h"
-//#include "../ui.h"
+#include "textmanager.h"
+#include "style.h"
 
 using namespace Forms;
 
@@ -18,10 +18,9 @@ Widget* Forms::Checkbox_ctor(Widget_def* Template, Widget* parent, Widget_def** 
     Checkbox* widget = new Checkbox();
     widget->definition = Template;
     widget->parent = parent;
-    widget->font = ((Checkbox_def*)Template)->Font;
     widget->text = ((Checkbox_def*)Template)->Text;
     widget->variable = ((Checkbox_def*)Template)->Variable;
-    Style_SetFont(widget->font);
+    widget->GetStyle().ActivateFont();
     widget->height = fontlib_GetCurrentFontHeight();
     widget->width = fontlib_GetStringWidth(widget->text)
         + fontlib_GetStringWidth(CALC1252_CURSOR_RIGHT " " CALC1252_RADIO_UNCHECKED "   " CALC1252_CURSOR_LEFT);
@@ -33,7 +32,8 @@ Widget* Forms::Checkbox_ctor(Widget_def* Template, Widget* parent, Widget_def** 
 
 extern "C" const Widget_desc Checkbox_desc
 {
-    ID::Checkbox,
+    ID::WIDGET_ID_Checkbox,
+    WIDGET_FLAG_NONE,
     &Forms::Checkbox_ctor,
     &GetNextItem
 };
@@ -41,24 +41,25 @@ extern "C" const Widget_desc Checkbox_desc
 
 Status Checkbox::Focus()
 {
-    hasFocus = true;
-    Paint();
-    return Status::Success;
+    SetDirty();
+    return Widget::Focus();
 };
 
 
 Status Checkbox::Unfocus()
 {
-    hasFocus = false;
-    Paint();
-    return Status::Success;
+    SetDirty();
+    return Widget::Focus();
 };
 
 
 Status Checkbox::Paint()
 {
+    if (!dirty)
+        return Status::Success;
+    dirty = false;
     char ch;
-    Style_SetFont(font);
+    GetStyle().ActivateFont();
     fontlib_SetCursorPosition(x, y);
     if (hasFocus)
         ch = CALC1252_CURSOR_RIGHT_CHAR;
@@ -87,6 +88,7 @@ bool Checkbox::SendInput(Message& message)
 {
     if (message.Id == MESSAGE_KEY && (message.ExtendedCode == sk_Enter || message.ExtendedCode == sk_2nd))
     {
+        dirty = true;
         *variable = !*variable;
         Paint();
         return true;

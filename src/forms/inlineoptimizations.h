@@ -1,5 +1,5 @@
-#ifndef EZ80_MEMCPY_H
-#define EZ80_MEMCPY_H
+#ifndef EZ80_INLINES_H
+#define EZ80_INLINES_H
 
 #include <string.h>
 
@@ -46,4 +46,4 @@ static inline void memmove_backward(void* destination, const void* source, size_
 #define memmove_backward memmove
 
 #endif
-#endif /* EZ80_MEMCPY_H */
+#endif /* EZ80_INLINES_H */

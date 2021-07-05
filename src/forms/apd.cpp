@@ -1,5 +1,5 @@
 #include "apd.h"
-#include "../ez80.h"
+#include "ez80.h"
 
 using namespace Forms;
 

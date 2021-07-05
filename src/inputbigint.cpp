@@ -91,6 +91,8 @@ bool BigIntInput::SendInput(Message& message)
     if (message.Id != MESSAGE_KEY)
         return false;
     sk_key_t k = (sk_key_t)message.ExtendedCode;
+    if (k > sk_Del)
+        return false;
     BigInt_t temp, temp2;
     unsigned char msb;
     unsigned char digit = NumberMap[k];

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "stack.h"
-#include "forms/memcpy.h"
+#include "forms/inlineoptimizations.h"
 
 
 BigIntStack::BigIntStack(unsigned int max_size)

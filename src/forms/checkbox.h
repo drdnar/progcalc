@@ -17,18 +17,15 @@ struct Checkbox_def
      */
     Widget_def Widget;
     /**
-     * ID of font to use for this label.
-     */
-    uint8_t Font;
-    /**
      * Text to display.
      */
-    char* Text;
+    const char* Text;
     /**
      * Pointer to variable this checkbox edits.
      */
     bool* Variable;
 };
+
 
 class Checkbox : public Widget
 {
@@ -47,13 +44,9 @@ class Checkbox : public Widget
         friend Widget* Checkbox_ctor(Widget_def* Template, Widget* parent, Widget_def** next);
     protected:
         /**
-         * Font ID used for text in this Label.
+         * Pointer to a C-style string that is displayed by this Checkbox.
          */
-        uint8_t font;
-        /**
-         * Pointer to a C-style string that is displayed by this Label.
-         */
-        char* text;
+        const char* text;
         /**
          * Pointer to a simple variable that this Checkbox toggles.
          */

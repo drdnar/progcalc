@@ -17,13 +17,9 @@ struct Label_def
      */
     Widget_def Widget;
     /**
-     * ID of font to use for this label.
-     */
-    uint8_t Font;
-    /**
      * Text to display.
      */
-    char* Text;
+    const char* Text;
 };
 
 class Label : public Widget
@@ -49,13 +45,9 @@ class Label : public Widget
         friend Widget* Label_ctor(Widget_def* Template, Widget* parent, Widget_def** next);
     protected:
         /**
-         * Font ID used for text in this Label.
-         */
-        uint8_t font;
-        /**
          * Pointer to a C-style string that is displayed by this Label.
          */
-        char* text;
+        const char* text;
 };
 
 } /* namespace Forms */

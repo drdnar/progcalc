@@ -3,7 +3,7 @@
 #include <tice.h>
 #include <stdlib.h>
 #include <graphx.h>
-#include "../ez80.h"
+#include "ez80.h"
 #include "calc1252.h"
 #include "textmanager.h"
 #include "misc.h"

@@ -8,6 +8,12 @@ namespace Forms
 {
 
 /**
+ * A pointer to a Style that will act as the default Style for all Widgets.
+ */
+extern Style* const GUI_DefaultStyle;
+
+
+/**
  * This class handles all user interaction for a Forms GUI.
  * It implements the Widget class so that there is an easy way for the active
  * dialog to get the main window bounds.
@@ -29,6 +35,10 @@ class GUI : public MessageSink, public Widget
          * Maximum number of nested modal dialogs supported.
          */
         static const unsigned char MAX_DIALOGS = 16;
+        /**
+         * Returns a pointer to the current active dialog, which might be a
+         * modal or a top-most dialog.
+         */
         static Container* GetActiveDialog() { return active_dialog; }
     private:
         GUI();

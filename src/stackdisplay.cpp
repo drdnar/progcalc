@@ -22,7 +22,7 @@ using namespace Forms;
 
 StackDisplay::StackDisplay()
 {
-    dirty = true;
+    //
 }
 
 
