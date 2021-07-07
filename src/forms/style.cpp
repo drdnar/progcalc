@@ -1,4 +1,5 @@
 #include "style.h"
+#include "ignorewarning.h"
 
 using namespace Forms;
 
@@ -15,7 +16,9 @@ static Widget_def* Full_GetNextItem(Widget_def* Template)
 }
 
 
+IGNORE_WARNING_UNUSED_PARAMETER
 Widget* Style::forms_ctor(Widget_def* Template, Widget* parent, Widget_def** next)
+END_IGNORE_WARNING
 {
     if (next)
     {
@@ -25,16 +28,13 @@ Widget* Style::forms_ctor(Widget_def* Template, Widget* parent, Widget_def** nex
             *next = Single_GetNextItem(Template);
     }
     return nullptr;
-    // Do stuff here
-    // If it's a full override, just iterate over the fields
-    // If it's a single override, check subsequent items and apply them, too
 }
 
 
 extern "C" const Widget_desc SingleStyleOverride_desc
 {
     ID::WIDGET_ID_SingleStyleOverride,
-    WIDGET_FLAG_STYLE_OVERRIDE,
+    WIDGET_FLAG_NON_INSTANTIABLE,
     &Style::forms_ctor,
     &Single_GetNextItem
 };
@@ -43,7 +43,7 @@ extern "C" const Widget_desc SingleStyleOverride_desc
 extern "C" const Widget_desc FullStyleOverride_desc
 {
     ID::WIDGET_ID_FullStyleOverride,
-    WIDGET_FLAG_STYLE_OVERRIDE,
+    WIDGET_FLAG_NON_INSTANTIABLE,
     &Style::forms_ctor,
     &Full_GetNextItem
 };
@@ -53,45 +53,49 @@ Style::Style(FontId font, Color_t foreground, Color_t background, Color_t highli
  : parent { nullptr }
 {
     bool* b = &overrides[0];
-    for (unsigned char i = (int)PropertyID::TotalProperties; i > 0; i--, b++)
+    for (unsigned char i = (unsigned char)PropertyID::TotalProperties; i > 0; i--, b++)
         *b = true;
     AnyIntegralType* value = &values[0];
-    value++->value8 = font;
-    value++->value8 = foreground;
-    value++->value8 = background;
-    value++->value8 = highlight;
-    value++->value8 = shadow;
+    *value++ = {font};
+    *value++ = {foreground};
+    *value++ = {background};
+    *value++ = {highlight};
+    *value++ = {shadow};
 }
 
 
 Style::Style(Style* Parent) : parent { Parent }
 {
     bool* b = &overrides[0];
-    for (unsigned char i = (int)PropertyID::TotalProperties; i > 0; i--, b++)
+    for (unsigned char i = (unsigned char)PropertyID::TotalProperties; i > 0; i--, b++)
         *b = false;
+    overrides[0] = true;
+    values[0] = {1};
 }
 
 
 Style::Style(Style& Parent) : parent { &Parent }
 {
     bool* b = &overrides[0];
-    for (unsigned char i = (int)PropertyID::TotalProperties; i > 0; i--, b++)
+    for (unsigned char i = (unsigned char)PropertyID::TotalProperties; i > 0; i--, b++)
         *b = false;
+    overrides[0] = true;
+    values[0] = {1};
 }
 
 
 Style::AnyIntegralType Style::get(Style::PropertyID property) const
 {
-    if (!overrides[(int)property])
-        return values[(int)property];
+    if (overrides[(unsigned char)property])
+        return values[(unsigned char)property];
     return parent->get(property);
 }
 
 
 void Style::set(Style::PropertyID property, Style::AnyIntegralType value)
 {
-    overrides[(int)property] = true;
-    values[(int)property] = value;
+    overrides[(unsigned char)property] = true;
+    values[(unsigned char)property] = value;
 }
 
 
@@ -99,29 +103,58 @@ void Style::setDefault(Style::PropertyID property)
 {
     if (parent == nullptr)
         return;
-    overrides[(int)property] = false;
+    overrides[(unsigned char)property] = false;
 }
 
 
-Style* Style::constructify(FullStyleOverride_def* input, Style* parent)
+Widget_def* Style::GetNextItem(Widget_def* Template)
 {
-    Widget_def* def = (Widget_def*)input;
-    Style* style = new Style(parent);
     do
     {
-        if (def)
+        if (Template)
         {
-            switch (def->TypeDescriptor->TypeId)
+            switch (Template->TypeDescriptor->TypeId)
+            {
+                case WIDGET_ID_SingleStyleOverride:
+                    Template = (Widget_def*)((SingleStyleOverride_def*)Template + 1);
+                    break;
+                case WIDGET_ID_FullStyleOverride:
+                    Template = (Widget_def*)((FullStyleOverride_def*)Template + 1);
+                    break;
+                default:
+                    return Template;
+            }
+        }
+        else
+            return nullptr;
+    } while (true);
+}
+
+
+Style* Style::constructify(Widget_def* input, Style* parent, Widget_def** next)
+{
+    /*if (!input)
+        return nullptr;
+    Style* style = nullptr;
+    do
+    {
+        if (input)
+        {
+            switch (input->TypeDescriptor->TypeId)
             {
                 case WIDGET_ID_SingleStyleOverride:
                 {
-                    SingleStyleOverride_def* sdef = (SingleStyleOverride_def*)def;
+                    if (!style)
+                        style = new Style(parent);
+                    SingleStyleOverride_def* sdef = (SingleStyleOverride_def*)input;
                     style->set(sdef->Property, sdef->Data);
                     break;
                 }
                 case WIDGET_ID_FullStyleOverride:
                 {
-                    FullStyleOverride_def* fdef = (FullStyleOverride_def*)def;
+                    if (!style)
+                        style = new Style(parent);
+                    FullStyleOverride_def* fdef = (FullStyleOverride_def*)input;
                     // WARNING: This code is fragile.
                     uint8_t* property = (uint8_t*)&fdef->OverrideFont;
                     for (uint8_t i = 0; i < (uint8_t)PropertyID::TotalProperties; i++)
@@ -134,11 +167,18 @@ Style* Style::constructify(FullStyleOverride_def* input, Style* parent)
                     break;
                 }
                 default:
+                    if (next)
+                        *next = input;
                     return style;
             }
-            def = def->TypeDescriptor->GetNextWidget(def);
+            input = input->TypeDescriptor->GetNextWidget(input);
         }
         else
+        {
+            if (next)
+                *next = input;
             return style;
-    } while (true);
+        }
+    } while (true);*/
+    return nullptr;
 }

@@ -10,10 +10,30 @@ Widget::Widget() : dirty { true }
     //
 }
 
+
+Widget::Widget(Widget_def* Template, Widget* Parent, Widget_def** Next)
+ : definition { Template }, parent { Parent }, dirty { true }
+{
+    Widget_def* next = Template->TypeDescriptor->GetNextWidget(Template);
+    if (Next)
+        *Next = next;
+    style = Style::constructify(next, getStylePointer(), Next);
+}
+
+
 Widget::~Widget()
 {
     if (!style_not_deletable)
         delete style;
+}
+
+
+Widget_def* Widget::GetNextItem(Widget_def* item, size_t size) 
+{
+    if (item)
+        return Style::GetNextItem((Widget_def*)((unsigned char*)item + size));
+    else
+        return nullptr;
 }
 
 
@@ -114,8 +134,8 @@ Style* Widget::getStylePointer()
     if (parent)
         return parent->getStylePointer();
     GUI& gui = GUI::GetInstance();
-    Container* c;
-    if (c = gui.GetActiveDialog())
+    Container* c = gui.GetActiveDialog();
+    if (c)
         return c->getStylePointer();
     return gui.style;
 }
@@ -126,6 +146,7 @@ Style& Widget::ChangeStyle()
     if (style)
         return *style;
     style = new Style(*getStylePointer());
+    return *style;
 }
 
 
@@ -143,11 +164,11 @@ bool Widget::loadStyle()
     Widget_def* next = desc->GetNextWidget(definition);
     if (!next)
         return false;
-    if (!(next->TypeDescriptor->Flags & WIDGET_FLAG_STYLE_OVERRIDE))
+    if (!(next->TypeDescriptor->Flags & WIDGET_FLAG_NON_INSTANTIABLE))
         return false;
     if (style) // This . . . shouldn't be able to happen?
         delete style;
-    style = Style::constructify( (FullStyleOverride_def*)next, getStylePointer() );
+    //style = Style::constructify(next, getStylePointer(), next);
     if (style)
         return true;
     return false;

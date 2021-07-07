@@ -121,6 +121,10 @@ class Style final
          */
         void DefaultShadowColor() { setDefault(PropertyID::ShadowColor); }
         static Widget* forms_ctor(Widget_def* Template, Widget* parent, Widget_def** next);
+        /**
+         * Skips over a Style table.
+         */
+        static Widget_def* GetNextItem(Widget_def* Template);
     private:
         Style* const parent;
         Style(Style* parent);
@@ -129,8 +133,9 @@ class Style final
         AnyIntegralType get(PropertyID property) const;
         void set(PropertyID property, AnyIntegralType value);
         void setDefault(PropertyID property);
-        static Style* constructify(FullStyleOverride_def* input, Style* parent);
+        static Style* constructify(Widget_def* input, Style* parent, Widget_def** next);
         friend class Widget;
+        friend class Container;
 };
 
 

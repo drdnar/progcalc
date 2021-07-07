@@ -13,13 +13,11 @@ Widget_def* RowList::GetNextItem(Widget_def* Template)
 
 Widget* RowList::form_ctor(Widget_def* Template, Widget* parent, Widget_def** Next)
 {
-    RowList* rowlist = new RowList(Template, Next);
-    rowlist->definition = Template;
-    rowlist->parent = parent;
+    RowList* rowlist = new RowList(Template, parent, Next);
     // Compute size
     unsigned int width = 0, temp;
     unsigned char height = 0;
-    Widget** widget = rowlist->_children;
+    Widget** widget = rowlist->children;
     for (Container_size_t i = rowlist->count; i > 0; i--)
     {
         if (width < (temp = (*widget)->GetWidth()))
@@ -32,8 +30,8 @@ Widget* RowList::form_ctor(Widget_def* Template, Widget* parent, Widget_def** Ne
 }
 
 
-RowList::RowList(Widget_def* Template, Widget_def** next)
- : Container(&((RowList_def*)Template)->Contents, next)
+RowList::RowList(Widget_def* Template, Widget* Parent, Widget_def** next)
+ : Container(&((RowList_def*)Template)->Contents, Parent, next)
 {
     //
 }
@@ -53,7 +51,7 @@ void RowList::Layout()
     dirty = true;
     unsigned int xx = x;
     unsigned char yy = y;
-    Widget** child = &_children[0];
+    Widget** child = &children[0];
     for (Container_size_t i = count; i > 0; i--, child++)
     {
         (*child)->MoveTo(xx, yy);

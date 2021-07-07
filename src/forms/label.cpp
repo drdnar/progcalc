@@ -7,25 +7,19 @@
 using namespace Forms;
 
 
-static Widget_def* GetNextItem(Widget_def* Template)
+Widget_def* Label::GetNextItem(Widget_def* Template)
 {
-    if (Template == nullptr)
-        return nullptr;
-    return (Widget_def*)((Label_def*)Template + 1);
+    return Widget::GetNextItem(Template, sizeof(Label_def));
 }
 
 
-Widget* Forms::Label_ctor(Widget_def* Template, Widget* parent, Widget_def** next)
+Widget* Label::forms_ctor(Widget_def* Template, Widget* parent, Widget_def** next)
 {
-    Label* widget = new Label();
-    widget->definition = Template;
-    widget->parent = parent;
-    widget->text = ((Label_def*)Template)->Text;
+    Label* widget = new Label(Template, parent, next);
+    widget->text = ((Label_def*)widget->definition)->Text;
     widget->GetStyle().ActivateFont();
     widget->height = fontlib_GetCurrentFontHeight();
     widget->width = fontlib_GetStringWidth(widget->text);
-    if (next != nullptr)
-        *next = (Widget_def*)((Label_def*)Template + 1);
     return widget;
 }
 
@@ -34,8 +28,8 @@ extern "C" const Widget_desc Label_desc
 {
     ID::WIDGET_ID_Label,
     WIDGET_FLAG_NONE,
-    &Label_ctor,
-    &GetNextItem
+    &Label::forms_ctor,
+    &Label::GetNextItem
 };
 
 

@@ -59,6 +59,7 @@ class Button : public Widget
          */
         bool SendInput(Message& message);
         Status Paint();
+        Button();
         ~Button();
         /* New routines: */
         /**
@@ -80,9 +81,9 @@ class Button : public Widget
         virtual uint8_t GetID() { return ((Button_def*)definition)->ID; }
     protected:
         /**
-         * Sets up the proper font.
+         * Forms magic.
          */
-        void ActivateFont() { FontManager::SetFont(((Button_def*)definition)->Font); }
+        Button(Widget_def* Template, Widget* parent, Widget_def** next);
         /**
          * Fetches associated text.
          */

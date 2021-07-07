@@ -36,14 +36,18 @@ class Label : public Widget
         Status Disable() { return Status::Failure; };
         bool SendInput(Message& message);
         Status Paint();
+        Label();
         ~Label();
         /* New routines: */
         /**
          * This whole hack with the friend _ctor is necessary because I don't
          * feel like dealing with mangled C++ names.
          */
-        friend Widget* Label_ctor(Widget_def* Template, Widget* parent, Widget_def** next);
+        static Widget* forms_ctor(Widget_def* Template, Widget* parent, Widget_def** next);
+        static Widget_def* GetNextItem(Widget_def* Template);
     protected:
+        Label(Widget_def* Template, Widget* parent, Widget_def** next)
+         : Widget(Template, parent, next) { }
         /**
          * Pointer to a C-style string that is displayed by this Label.
          */

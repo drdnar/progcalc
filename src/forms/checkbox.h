@@ -27,6 +27,9 @@ struct Checkbox_def
 };
 
 
+/**
+ * Lets the user toggle a boolean value.
+ */
 class Checkbox : public Widget
 {
     public:
@@ -41,8 +44,10 @@ class Checkbox : public Widget
         bool SendInput(Message& message);
         Status Paint();
         /* New routines: */
-        friend Widget* Checkbox_ctor(Widget_def* Template, Widget* parent, Widget_def** next);
+        static Widget* forms_ctor(Widget_def* Template, Widget* parent, Widget_def** next);
+        static Widget_def* GetNextItem(Widget_def* Template);
     protected:
+        Checkbox(Widget_def* Template, Widget* parent, Widget_def** next);
         /**
          * Pointer to a C-style string that is displayed by this Checkbox.
          */

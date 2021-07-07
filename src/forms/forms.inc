@@ -69,6 +69,7 @@ macro ?!
 	purge ?
 end macro
 
+defwidget NullWidget, 
 defwidget SingleStyleOverride, db Property, db Data
 defwidget FullStyleOverride, db OverrideFont, db Font, db OverrideForeground, db Foreground, db OverrideBackground, db Background, db OverrideHighlight, db Highlight, db OverrideShadow, db Shadow
 defwidget RowList, children

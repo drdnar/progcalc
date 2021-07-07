@@ -13,14 +13,14 @@ Widget_def* DialogBox::GetNextItem(Widget_def* Template)
 
 Widget* DialogBox::form_ctor(Widget_def* Template, Widget* parent, Widget_def** Next)
 {
-    DialogBox* dialogbox = new DialogBox(Template, Next);
+    DialogBox* dialogbox = new DialogBox(Template, parent, Next);
     dialogbox->definition = Template;
     dialogbox->parent = parent;
     dialogbox->min_width = ((DialogBox_def*)Template)->MinimumWidth;
     dialogbox->min_height = ((DialogBox_def*)Template)->MinimumHeight;
     // Initialize children
     // Compute size
-    Widget** widget = dialogbox->_children;
+    Widget** widget = dialogbox->children;
     for (Container_size_t i = dialogbox->count; i > 0; i--)
     {
         dialogbox->height += (*widget)->GetHeight();
@@ -30,8 +30,8 @@ Widget* DialogBox::form_ctor(Widget_def* Template, Widget* parent, Widget_def** 
 
 
 
-DialogBox::DialogBox(Widget_def* Template, Widget_def** next)
- : Container(&((DialogBox_def*)Template)->Contents, next)
+DialogBox::DialogBox(Widget_def* Template, Widget* Parent, Widget_def** next)
+ : Container(&((DialogBox_def*)Template)->Contents, Parent, next)
 {
     //
 }
@@ -52,7 +52,7 @@ void DialogBox::Layout()
     dirty = true;
     x_t xx = x;
     y_t yy = y;
-    Widget** widget = _children;
+    Widget** widget = children;
     for (Container_size_t i = count; i > 0; i--)
     {
         (*widget)->MoveTo(xx, yy);

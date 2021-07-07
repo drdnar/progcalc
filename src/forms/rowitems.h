@@ -58,7 +58,7 @@ class RowItems : public Container
         HorizontalAlignment GetAlignment();
         virtual Status SetAlignment(HorizontalAlignment alignment);
     protected:
-        RowItems(Widget_def* Template, Widget_def** next);
+        RowItems(Widget_def* Template, Widget* Parent, Widget_def** next);
         HorizontalAlignment _alignment;
         unsigned char _padding;
 };

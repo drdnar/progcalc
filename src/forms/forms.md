@@ -35,6 +35,13 @@ There are lots of implementations of GUIs with varying complexity. With this imp
     - Since it's easier for me, widget definitions are declared through fasmg macros, which allow them to be stored compactly.
   - When a widget is instantiated, it allocates memory on the heap for its dynamic data, and it gets a reference back to its definition, allowing it to refer back to its fixed data.
 
+### Styles
+
+It became clear that having each Widget handle its own styling information would create a lot of duplicated code, so I implemented a more general system.
+In this system, each Widget can inherit properties from its parent such as font and color settings; if a Widget has no special styling applied, it will search for styling information from its parents.
+In a form definition, after a Widget you can put Style overrides.
+If a Widget detects Style overrides after its own data, it will load the additional styling information.
+
 ### Widgets
 
 `forms.h` is the general include file.

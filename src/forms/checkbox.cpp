@@ -7,26 +7,27 @@
 using namespace Forms;
 
 
-static Widget_def* GetNextItem(Widget_def* Template)
+Widget_def* Checkbox::GetNextItem(Widget_def* Template)
 {
-    return (Widget_def*)((Checkbox_def*)Template + 1);
+    return Widget::GetNextItem(Template, sizeof(Checkbox_def));
 }
 
 
-Widget* Forms::Checkbox_ctor(Widget_def* Template, Widget* parent, Widget_def** next)
+Widget* Checkbox::forms_ctor(Widget_def* Template, Widget* parent, Widget_def** next)
 {
-    Checkbox* widget = new Checkbox();
-    widget->definition = Template;
-    widget->parent = parent;
-    widget->text = ((Checkbox_def*)Template)->Text;
-    widget->variable = ((Checkbox_def*)Template)->Variable;
-    widget->GetStyle().ActivateFont();
-    widget->height = fontlib_GetCurrentFontHeight();
-    widget->width = fontlib_GetStringWidth(widget->text)
+    return new Checkbox(Template, parent, next);
+}
+
+
+Checkbox::Checkbox(Widget_def* Template, Widget* parent, Widget_def** next)
+ : Widget(Template, parent, next)
+{
+    text = ((Checkbox_def*)Template)->Text;
+    variable = ((Checkbox_def*)Template)->Variable;
+    GetStyle().ActivateFont();
+    height = fontlib_GetCurrentFontHeight();
+    width = fontlib_GetStringWidth(text)
         + fontlib_GetStringWidth(CALC1252_CURSOR_RIGHT " " CALC1252_RADIO_UNCHECKED "   " CALC1252_CURSOR_LEFT);
-    if (next != NULL)
-        *next = (Widget_def*)((Checkbox_def*)Template + 1);
-    return widget;
 }
 
 
@@ -34,8 +35,8 @@ extern "C" const Widget_desc Checkbox_desc
 {
     ID::WIDGET_ID_Checkbox,
     WIDGET_FLAG_NONE,
-    &Forms::Checkbox_ctor,
-    &GetNextItem
+    &Checkbox::forms_ctor,
+    &Checkbox::GetNextItem
 };
 
 

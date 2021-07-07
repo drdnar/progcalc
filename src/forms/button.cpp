@@ -3,36 +3,29 @@
 #include "textmanager.h"
 #include "ignorewarning.h"
 #include "ez80.h"
+#include "style.h"
 
 using namespace Forms;
 
 
 Widget_def* Button::GetNextItem(Widget_def* Template)
 {
-    if (Template == nullptr)
-        return nullptr;
-    return (Widget_def*)((Button_def*)Template + 1);
+    return Widget::GetNextItem(Template, sizeof(Button_def));
 }
 
 
 Widget* Button::forms_ctor(Widget_def* Template, Widget* parent, Widget_def** next)
 {
-    Button* widget = new Button();
-    widget->definition = Template;
-    widget->parent = parent;
-    //widget->font = ((Button_def*)Template)->Font;
-    //widget->text = ((Button_def*)Template)->Text;
-    widget->min_width = ((Button_def*)Template)->MinimumWidth;
-    //FontManager::SetFont(widget->font);
-    widget->ActivateFont();
-    widget->height = fontlib_GetCurrentFontHeight() + 4;
-    widget->textWidth = fontlib_GetStringWidth(widget->GetText());
-    widget->width = widget->textWidth + 4;
-    if (widget->width < widget->min_width)
-        widget->width = widget->min_width;
-    if (next != nullptr)
-        *next = (Widget_def*)((Button_def*)Template + 1);
-    return widget;
+    return new Button(Template, parent, next);
+}
+
+
+Button::Button(Widget_def* Template, Widget* parent, Widget_def** next)
+    : Widget(Template, parent, next)
+{
+    min_width = ((Button_def*)Template)->MinimumWidth;
+    GetStyle().ActivateFont();
+    SetSize(fontlib_GetStringWidth(GetText()) + 4, fontlib_GetCurrentFontHeight() + 4);
 }
 
 
@@ -86,7 +79,7 @@ Status Button::Paint()
     // Erase whitespace on left of text
     unsigned int leftpad = (width - 4) / 2 - textWidth / 2;
     gfx_FillRectangle_NoClip(x + 2, y + 2, leftpad, height - 4);
-    ActivateFont();
+    GetStyle().ActivateFont();
     fontlib_SetCursorPosition(x + 2 + leftpad, y + 2);
     fontlib_DrawString(GetText());
     // Erase whitespace on right of text

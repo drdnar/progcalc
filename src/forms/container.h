@@ -46,11 +46,6 @@ class Container : public Widget
          * Creates a Container with an initial backing array size.
          */
         Container(Container_size_t initialSize);
-        /**
-         * Initializes a Container and runs parsing logic for a Container template.
-         * @note It is not valid to initialize a zero-size Container.
-         */
-        Container(Container_def* Template, Widget_def** Next);
         ~Container();
         static Widget_def* GetNextItem(Container_def* Template);
         /**
@@ -137,7 +132,12 @@ class Container : public Widget
         void Delete(Container_size_t index);
     protected:
         /**
-         * Physical size of _children array.
+         * Initializes a Container and runs parsing logic for a Container template.
+         * @note It is not valid to initialize a zero-size Container.
+         */
+        Container(Container_def* Template, Widget* parent, Widget_def** Next);
+        /**
+         * Physical size of children array.
          */
         Container_size_t size = 0;
         /**
@@ -148,58 +148,58 @@ class Container : public Widget
          * Array of pointers to children.
          * This array owns the primary reference to the children.
          */
-        Widget** _children = nullptr;
+        Widget** children = nullptr;
         /**
          * Index of child with focus.  When the Container doesn't have focus,
          * this caches the index of the Widget that did have focus.
          */
-        Container_size_t _active_index = 0;
+        Container_size_t active_index = 0;
         /**
          * Cycles an index to the next valid child index.
          * This will wrap from the end of the child array back to the start forever.
          * @param i Input index to increment
          * @return i + 1, or zero if i == count - 1
          */
-        Container_size_t _increment_index(Container_size_t i);
+        Container_size_t increment_index(Container_size_t i);
         /**
          * Cycles an index to the previous valid child index.
          * This will wrap from the start of the child array back to the end forever.
          * @param i Input index to decrement
          * @return i - 1, or count - 1 if i == 0
          */
-        Container_size_t _decrement_index(Container_size_t i);
+        Container_size_t decrement_index(Container_size_t i);
         /**
          * This flag signals that a bulk update is in progress.
          * Repainting and possibly layout logic should be suppressed when this
          * is true; instead, handle that all at once when the update is
          * finished.
          */
-        bool _updating = false;
+        bool updating = false;
         /**
          * This is internally called by BeginUpdate().
          * If you need to do something special during a bulk update, you can
-         * override this method to handle it.  _updating is set to true prior
+         * override this method to handle it.  updating is set to true prior
          * to this method being called.
          * The default implementation does nothing.
          */
-        virtual void _begin_update();
+        virtual void begin_update();
         /**
          * This is internally called by EndUpdate().
          * If you need to do something special after a bulk update, you can
-         * override this method to handle it.  _updating is set to false AFTER
+         * override this method to handle it.  updating is set to false AFTER
          * this method is called.
          * The default implementation just calls Paint();
          */
-        virtual void _end_update();
+        virtual void end_update();
         /**
          * Internal routine that enlarges the Container, typically by 50 %, but
          * less if the child count would exceed the maximum allowed by the size
          * of Container_size_t.
-         * _children is automatically updated.
-         * @return Returns the new value of _children, or nullptr if resizing
+         * children is automatically updated.
+         * @return Returns the new value of children, or nullptr if resizing
          * failed.
          */
-        Widget** _enlarge();
+        Widget** enlarge();
 };
 
 

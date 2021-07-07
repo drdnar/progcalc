@@ -48,7 +48,7 @@ class RowList : public Container
          */
         static Widget* form_ctor(Widget_def* Template, Widget* parent, Widget_def** Next);
     protected:
-        RowList(Widget_def* Template, Widget_def** next);
+        RowList(Widget_def* Template, Widget* Parent, Widget_def** next);
 };
 
 } /* namespace Forms */

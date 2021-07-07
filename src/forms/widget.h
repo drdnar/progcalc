@@ -145,9 +145,10 @@ enum WidgetFlags : uint8_t
      */
     WIDGET_FLAG_CONTAINER = 0x01,
     /**
-     * This type of Widget is a Style override.
+     * This does not produce an actual Widget, but is some other additional
+     * data, e.g. a Style override.
      */
-    WIDGET_FLAG_STYLE_OVERRIDE = 0x02
+    WIDGET_FLAG_NON_INSTANTIABLE = 0x02
 };
 
 /**
@@ -489,6 +490,16 @@ class Widget
         void OverrideStyle(Style& style);
 
     protected:
+        /**
+         * Handles initializing some generic Widgety stuff.
+         */
+        Widget(Widget_def* Template, Widget* parent, Widget_def** Next);
+
+        /**
+         * Helper routine to bypass any attached data.
+         */
+        static Widget_def* GetNextItem(Widget_def* item, size_t size);
+        
         /**
          * Column coordinate.
          */
