@@ -13,6 +13,8 @@
 #include "forms/widget.h"
 #include "forms/textmanager.h"
 #include "forms/ignorewarning.h"
+#include "forms/gui.h"
+#include "forms/messages.h"
 
 using namespace Forms;
 
@@ -26,6 +28,8 @@ unsigned int StatusBar::battery_timer;
 uint16_t StatusBar::battery_pips[7];
 
 StatusBar StatusBar::instance;
+
+bool StatusBar::size_initialized = false;
 
 const TextWindow StatusBar::window =
 {
@@ -45,10 +49,11 @@ StatusBar::StatusBar() : MessageSink(SINK_PRIORITY_SLIGHTLY_ELEVATED)
         *p++ = lcd_Palette[COLOR_BATTERY_EMPTY_PIP];
     for (i = 0; i < 3; i++)
         *p++ = lcd_Palette[COLOR_BATTERY_PIP];
-    if (Settings::GetStatusBar())
-        Show();
-    else
-        Hide();
+    // Ensure GUI is resized but also ensure that happens after it is initialized.
+    // This works around C++'s inability to force static class instances to be
+    // initialized in a specific order, without requiring a more complicated
+    // singleton implementation for GUI.
+    MessageLoop::EnqueueMessage({ .Id = MESSAGE_SETTINGS_CHANGE, .ExtendedCode = SETTINGS_STATUS_BAR_CHANGE });
 }
 
 
@@ -156,20 +161,33 @@ Status StatusBar::Paint()
 
 Status StatusBar::Show()
 {
+    if (size_initialized && !hidden)
+        return Status::Success;
     hidden = false;
     dirty = true;
     height = SMALL_FONT_HEIGHT + 2;
     _update_battery_level();
+    auto& gui = GUI::GetInstance();
+    gui.SetHeight(gui.GetHeight() - height);
+    gui.MoveTo(0, height);
+    size_initialized = true;
     return Status::Success;
 }
 
 
 Status StatusBar::Hide()
 {
+    if (size_initialized && hidden)
+        return Status::Success;
+    if (size_initialized)
+    {
+        auto& gui = GUI::GetInstance();
+        gui.SetHeight(gui.GetHeight() + height);
+        gui.MoveTo(0, 0);
+    }
     hidden = true;
     dirty = true;
     height = 0;
-    //Rpn_Window.Height += SMALL_FONT_HEIGHT + 2;
-    //Rpn_Window.Y = 0;
+    size_initialized = true;
     return Status::Success;
 }

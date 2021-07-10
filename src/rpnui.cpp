@@ -15,6 +15,7 @@
 #include "forms/textmanager.h"
 #include "forms/messages.h"
 #include "testform.h"
+#include "forms/gui.h"
 
 using namespace Forms;
 
@@ -78,8 +79,9 @@ Forms::Status RPN_UI::Paint()
 
 void RPN_UI::Layout()
 {
-    y = StatusBar::GetInstance().GetHeight();
-    height = LCD_HEIGHT - y;
+    auto& gui = GUI::GetInstance();
+    y = gui.GetY();
+    height = gui.GetHeight();
     input.Layout();
     unsigned char stackHeight = height - input.GetHeight();
     stackDisplay.MoveTo(x, y);

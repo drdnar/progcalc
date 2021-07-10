@@ -15,12 +15,7 @@ Widget_def* Label::GetNextItem(Widget_def* Template)
 
 Widget* Label::forms_ctor(Widget_def* Template, Widget* parent, Widget_def** next)
 {
-    Label* widget = new Label(Template, parent, next);
-    widget->text = ((Label_def*)widget->definition)->Text;
-    widget->GetStyle().ActivateFont();
-    widget->height = fontlib_GetCurrentFontHeight();
-    widget->width = fontlib_GetStringWidth(widget->text);
-    return widget;
+    return new Label(Template, parent, next);
 }
 
 
@@ -31,6 +26,15 @@ extern "C" const Widget_desc Label_desc
     &Label::forms_ctor,
     &Label::GetNextItem
 };
+
+Label::Label(Widget_def* Template, Widget* parent, Widget_def** next)
+ : Widget(Template, parent, next)
+{
+    text = ((Label_def*)Template)->Text;
+    GetStyle().ActivateFont();
+    height = fontlib_GetCurrentFontHeight();
+    width = fontlib_GetStringWidth(text);
+}
 
 
 Label::~Label()

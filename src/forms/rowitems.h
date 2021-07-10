@@ -59,8 +59,14 @@ class RowItems : public Container
         virtual Status SetAlignment(HorizontalAlignment alignment);
     protected:
         RowItems(Widget_def* Template, Widget* Parent, Widget_def** next);
-        HorizontalAlignment _alignment;
-        unsigned char _padding;
+        /**
+         * Alignment: left, right, or center
+         */
+        HorizontalAlignment alignment;
+        /**
+         * Extra space to add between each item.
+         */
+        unsigned char padding;
 };
 
 } /* namespace Forms */

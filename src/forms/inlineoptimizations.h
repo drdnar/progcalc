@@ -31,6 +31,42 @@ static inline void memmove_backward(void* destination, const void* source, size_
         __asm__("ldir":: "l"(source), "e"(destination), "c"(count));
 }
 
+/**
+ * Returns x + 2.
+ */
+static inline unsigned int _ADD2_(unsigned int x)
+{
+    __asm__("inc\thl\n\tinc\thl" : "=l"(x) : "l"(x));
+    return x;
+}
+
+/**
+ * Returns x + 3.
+ */
+static inline unsigned int _SUB2_(unsigned int x)
+{
+    __asm__("dec\thl\n\tdec\thl" : "=l"(x) : "l"(x));
+    return x;
+}
+
+/**
+ * Returns x - 2.
+ */
+static inline unsigned int _ADD3_(unsigned int x)
+{
+    __asm__("inc\thl\n\tinc\thl\n\tinc\thl" : "=l"(x) : "l"(x));
+    return x;
+}
+
+/**
+ * Returns x - 3.
+ */
+static inline unsigned int _SUB3_(unsigned int x)
+{
+    __asm__("dec\thl\n\tdec\thl\n\tdec\thl" : "=l"(x) : "l"(x));
+    return x;
+}
+
 #else
 
 /**
@@ -44,6 +80,11 @@ static inline void memmove_backward(void* destination, const void* source, size_
  * slightly more efficient inline LDIR instruction.
  */
 #define memmove_backward memmove
+
+#define _ADD2_(x) (x + 2)
+#define _ADD3_(x) (x + 3)
+#define _SUB2_(x) (x - 2)
+#define _SUB3_(x) (x - 3)
 
 #endif
 #endif /* EZ80_INLINES_H */

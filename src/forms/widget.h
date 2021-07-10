@@ -362,10 +362,26 @@ class Widget
         /**
          * Resizes the widget, but does not repaint it.
          * @param width New width for widget.
-         * @param height New height for widget.
-         * @return Returns zero on success.
+         * @return Status::Failure if resizing is not possible or size is invalid.
          */
-        virtual Status SetSize(x_t width, y_t height);
+        virtual Status SetWidth(x_t width);
+
+        /**
+         * Resizes the widget, but does not repaint it.
+         * @param height New height for widget.
+         * @return Status::Failure if resizing is not possible or size is invalid.
+         */
+        virtual Status SetHeight(y_t height);
+
+        /**
+         * Resizes the widget, but does not repaint it.
+         * This is exactly equivalent to calling SetWidth() then SetHeight().
+         * If either fails, the old dimensions will be restored.
+         * @param width New width for widget.
+         * @param height New height for widget.
+         * @return Status::Failure if resizing is not possible or size is invalid.
+         */
+        Status SetSize(x_t width, y_t height);
 
         /**
          * Gets a Widget's width.
@@ -529,6 +545,10 @@ class Widget
          * Caches a Widget's minimum size, for reference.
          */
         y_t min_height = 0;
+
+        /**
+         * 
+        y_t baseline = 0;*/
 
         /**
          * Pointer back to Widget's definition struct.

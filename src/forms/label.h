@@ -46,8 +46,7 @@ class Label : public Widget
         static Widget* forms_ctor(Widget_def* Template, Widget* parent, Widget_def** next);
         static Widget_def* GetNextItem(Widget_def* Template);
     protected:
-        Label(Widget_def* Template, Widget* parent, Widget_def** next)
-         : Widget(Template, parent, next) { }
+        Label(Widget_def* Template, Widget* parent, Widget_def** next);
         /**
          * Pointer to a C-style string that is displayed by this Label.
          */

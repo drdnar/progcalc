@@ -31,6 +31,10 @@ class StatusBar final : public Widget, public MessageSink
         void UpdateBatteryLevel();
     private:
         static StatusBar instance;
+        /**
+         * Forces Show()/Hide() to do their work.
+         */
+        static bool size_initialized;
         StatusBar();
         /**
          * Handles physical painting of the battery icon, as well as making sure

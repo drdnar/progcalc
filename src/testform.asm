@@ -19,17 +19,33 @@ _RPN_UI_Dialog:
 	RPN_UI
 
 
+strOK:
+	db	"OK", 0
+strCancel:
+	db	"Cancel", 0
 
 public _SettingsDialog
 _SettingsDialog:
-RowList
-	RowItems ROW_ITEMS_CENTER, 1
-		Label strSettings
-	end RowItems
-	RowItems ROW_ITEMS_LEFT, 3
-		Checkbox someCheckboxText, _someBool
-	end RowItems
-end RowList
+
+DialogBox 260, 180
+	RowList
+		RowItems ROW_ITEMS_CENTER, 1
+			Label strSettings
+		end RowItems
+	end RowList
+	RowList
+		RowItems ROW_ITEMS_LEFT, 3
+			Checkbox someCheckboxText, _someBool
+		end RowItems
+	end RowList
+	RowList
+		RowItems ROW_ITEMS_RIGHT, 4
+			Label strOK
+			Label strCancel
+		end RowItems
+	end RowList
+
+end DialogBox
 
 strSettings:
 	db	"SETTINGS", 0

@@ -45,13 +45,39 @@ Status Widget::MoveTo(x_t xx, y_t yy)
 }
 
 
+Status Widget::SetWidth(x_t newwidth)
+{
+    if (newwidth < min_width)
+        return Status::Failure;
+    dirty = true;
+    width = newwidth;
+    return Status::Success;
+}
+
+
+Status Widget::SetHeight(y_t newheight)
+{
+    if (newheight < min_height)
+        return Status::Failure;
+    dirty = true;
+    height = newheight;
+    return Status::Success;
+}
+
+
 Status Widget::SetSize(x_t newwidth, y_t newheight)
 {
     if (newwidth < min_width || newheight < min_height)
         return Status::Failure;
-    width = newwidth;
-    height = newheight;
-    return Status::Success;
+    x_t oldwidth = width;
+    if (SetWidth(newwidth) != Status::Failure)
+    {
+        if (SetHeight(newheight) != Status::Failure)
+            return Status::Success;
+        else
+            SetWidth(oldwidth);
+    }
+    return Status::Failure;
 }
 
 

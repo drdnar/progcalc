@@ -57,6 +57,8 @@ Style::Style(FontId font, Color_t foreground, Color_t background, Color_t highli
         *b = true;
     AnyIntegralType* value = &values[0];
     *value++ = {font};
+    FontManager::EnsureInitialized();
+    *value++ = {FontManager::GetFont(font)->baseline_height};
     *value++ = {foreground};
     *value++ = {background};
     *value++ = {highlight};
@@ -181,4 +183,11 @@ Style* Style::constructify(Widget_def* input, Style* parent, Widget_def** next)
         }
     } while (true);*/
     return nullptr;
+}
+
+
+void Style::SetFont(FontId font)
+{
+    set(PropertyID::Font, {font});
+    set(PropertyID::FontBaseline, {FontManager::GetFont(font)->baseline_height});
 }

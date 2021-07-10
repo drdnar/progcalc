@@ -4,6 +4,7 @@
 #include "ignorewarning.h"
 #include "ez80.h"
 #include "style.h"
+#include "drawbox.h"
 
 using namespace Forms;
 
@@ -25,7 +26,7 @@ Button::Button(Widget_def* Template, Widget* parent, Widget_def** next)
 {
     min_width = ((Button_def*)Template)->MinimumWidth;
     GetStyle().ActivateFont();
-    SetSize(fontlib_GetStringWidth(GetText()) + 4, fontlib_GetCurrentFontHeight() + 4);
+    SetSize(fontlib_GetStringWidth(GetText()) + DrawBox_HorizontalPadding, fontlib_GetCurrentFontHeight() + DrawBox_VerticalPadding);
 }
 
 
@@ -62,29 +63,17 @@ Status Button::Paint()
     if (!dirty || hidden)
         return Status::Success;
     dirty = false;
-    // Draw box
-    uint8_t fg = fontlib_GetForegroundColor();
-    uint8_t bg = fontlib_GetBackgroundColor();
-    if (!disabled)
-        gfx_SetColor(fg);
-    else
-        gfx_SetColor(bg);
-    gfx_Rectangle_NoClip(x, y, width, height);
-    gfx_SetColor(bg);
-    gfx_SetPixel(x, y);
-    gfx_SetPixel(x + width, y);
-    gfx_SetPixel(x, y + height);
-    gfx_SetPixel(x + width, y + height);
-    gfx_Rectangle_NoClip(x + 1, y + 1, width - 2, height - 2);
+    DrawBox(x, y, width, height);
     // Erase whitespace on left of text
-    unsigned int leftpad = (width - 4) / 2 - textWidth / 2;
-    gfx_FillRectangle_NoClip(x + 2, y + 2, leftpad, height - 4);
+    unsigned int leftpad = (width - DrawBox_HorizontalPadding) / 2 - textWidth / 2;
+    y_t ty = y + DrawBox_TopPadding;
+    gfx_FillRectangle_NoClip(x + DrawBox_LeftPadding, ty, leftpad, height - DrawBox_VerticalPadding);
     GetStyle().ActivateFont();
-    fontlib_SetCursorPosition(x + 2 + leftpad, y + 2);
+    fontlib_SetCursorPosition(x + DrawBox_LeftPadding + leftpad, ty);
     fontlib_DrawString(GetText());
     // Erase whitespace on right of text
     unsigned int xx = fontlib_GetCursorX();
-    gfx_FillRectangle_NoClip(xx, y + 2, x + width - 2 - xx, height - 4);
+    gfx_FillRectangle_NoClip(xx, ty, x + width - DrawBox_RightPadding - xx, height - DrawBox_VerticalPadding);
     return Status::Success;
 }
 

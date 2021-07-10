@@ -33,6 +33,8 @@ GUI::GUI() : MessageSink(SINK_PRIORITY_NORMAL)
     }
     else
         style = new Style { 0, 0, 0, 0, 0 };
+    height = LCD_HEIGHT;
+    width = LCD_WIDTH;
 }
 
 
@@ -130,4 +132,12 @@ void GUI::flush_dialogs()
 GUI::~GUI()
 {
     flush_dialogs();
+}
+
+
+const Style& GUI::GetActiveStyle()
+{
+    if (instance.active_dialog)
+        return instance.active_dialog->GetStyle();
+    return instance.GetStyle();
 }

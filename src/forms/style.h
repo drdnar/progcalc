@@ -42,6 +42,11 @@ class Style final
         enum class PropertyID : uint8_t
         {
             Font,
+            /**
+             * Internally cached value, do not override as Style will overwrite
+             * this at will.
+             */
+            FontBaseline,
             ForegroundColor,
             BackgroundColor,
             HighlightColor,
@@ -64,10 +69,11 @@ class Style final
          * Loads the font specified by this Style.
          */
         void ActivateFont() const { FontManager::SetFont(GetFont()); }
+        unsigned char GetFontBaseline() const { return get(PropertyID::FontBaseline).value8; }
         /**
          * Sets a property.  The property will no longer inherit its value.
          */
-        void SetFont(FontId font) { set(PropertyID::Font, {font}); }
+        void SetFont(FontId font);
         /**
          * Sets a property to inherit its value.  Has no effect on a top-most Style.
          */
@@ -126,19 +132,45 @@ class Style final
          */
         static Widget_def* GetNextItem(Widget_def* Template);
     private:
+        /**
+         * Pointer to a Style this Style gets default properties from.
+         */
         Style* const parent;
         Style(Style* parent);
+        /**
+         * List of flags for which properties are overridden.
+         */
         bool overrides[(int)PropertyID::TotalProperties];
+        /**
+         * List of property values.
+         */
         AnyIntegralType values[(int)PropertyID::TotalProperties];
+        /**
+         * Implements internal logic for finding a Style in the Style tree that
+         * has an active setting for a given property.
+         */
         AnyIntegralType get(PropertyID property) const;
+        /**
+         * Implements internal logic for overriding a property.
+         */
         void set(PropertyID property, AnyIntegralType value);
+        /**
+         * Implements internal logic for restoring a property to its parent's
+         * default.
+         */
         void setDefault(PropertyID property);
+        /**
+         * Implements logic for parsing Style overrides in a form.
+         */
         static Style* constructify(Widget_def* input, Style* parent, Widget_def** next);
         friend class Widget;
         friend class Container;
 };
 
 
+/**
+ * Allows specifying a single property to be overridden for a Widget.
+ */
 struct SingleStyleOverride_def
 {
     /**
@@ -156,6 +188,9 @@ struct SingleStyleOverride_def
 };
 
 
+/**
+ * Allows specifying all Style properties of a Widget.
+ */
 struct FullStyleOverride_def
 {
     /**

@@ -36,6 +36,7 @@ class RowList : public Container
          * Paint
          * MoveTo
          */
+        Status SetWidth(x_t width);
         void Layout();
         /* New routines: */
         /**

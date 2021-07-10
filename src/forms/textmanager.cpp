@@ -10,6 +10,8 @@ FontId FontManager::CurrentFont;
 FontManager FontManager::instance;
 fontlib_font_t* FontManager::fonts[MAX_FONTS];
 bool FontManager::initial_loading;
+bool FontManager::initialized = false;
+
 
 void TextWindow::Save()
 {
@@ -48,6 +50,9 @@ void FontManager::ReloadFonts()
 
 void FontManager::load_fonts()
 {
+    if (initialized)
+        return;
+    initialized = true;
     if (FontsCount > MAX_FONTS)
         InitializationError("Configured Forms::FontsCount > Forms::FontManager::MAX_FONTS");
     initial_loading = true;
@@ -64,6 +69,12 @@ void FontManager::SetFont(FontId fontId)
     unsigned char osb = FontsList[fontId].OverrideSpaceBelow;
     fontlib_SetLineSpacing(osa == (unsigned char)-1 ? fontlib_GetSpaceAbove() : osa, 
                            osb == (unsigned char)-1 ? fontlib_GetSpaceBelow() : osb);
+}
+
+
+void FontManager::EnsureInitialized()
+{
+    load_fonts();
 }
 
 

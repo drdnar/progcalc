@@ -13,27 +13,24 @@ Widget_def* RowList::GetNextItem(Widget_def* Template)
 
 Widget* RowList::form_ctor(Widget_def* Template, Widget* parent, Widget_def** Next)
 {
-    RowList* rowlist = new RowList(Template, parent, Next);
-    // Compute size
-    unsigned int width = 0, temp;
-    unsigned char height = 0;
-    Widget** widget = rowlist->children;
-    for (Container_size_t i = rowlist->count; i > 0; i--)
-    {
-        if (width < (temp = (*widget)->GetWidth()))
-            width = temp;
-        height += (*widget++)->GetHeight();
-    }
-    rowlist->height = rowlist->min_height = height;
-    rowlist->width = rowlist->min_width = width;
-    return rowlist;
+    return new RowList(Template, parent, Next);
 }
 
 
 RowList::RowList(Widget_def* Template, Widget* Parent, Widget_def** next)
  : Container(&((RowList_def*)Template)->Contents, Parent, next)
 {
-    //
+    // Compute size
+    unsigned int temp;
+    Widget** widget = children;
+    for (Container_size_t i = count; i > 0; i--)
+    {
+        if (width < (temp = (*widget)->GetWidth()))
+            width = temp;
+        height += (*widget++)->GetHeight();
+    }
+    min_height = height;
+    min_width = width;
 }
 
 
@@ -55,6 +52,20 @@ void RowList::Layout()
     for (Container_size_t i = count; i > 0; i--, child++)
     {
         (*child)->MoveTo(xx, yy);
+        Container* container = dynamic_cast<Container*>(*child);
+        if (container)
+            container->Layout();
         yy += (*child)->GetHeight();
     }
+}
+
+
+Status RowList::SetWidth(x_t newwidth)
+{
+    auto status = Status::Success;
+    Widget** child = &children[0];
+    for (Container_size_t i = count; i > 0; i--, child++)
+        if ((*child)->SetWidth(newwidth) == Status::Failure)
+            status = Status::Failure;
+    return status;
 }

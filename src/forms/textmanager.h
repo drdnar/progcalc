@@ -140,10 +140,7 @@ extern const unsigned char FontsCount;
 class FontManager
 {
     public:
-        /**
-         * ID of the currently selected font.
-         */
-        static FontId CurrentFont;
+        static FontId GetCurrentFont() { return CurrentFont; }
         /**
          * Some operations may cause font data to be moved around in memory.
          * This fetches the locations of all fonts again.
@@ -161,17 +158,28 @@ class FontManager
          * Gets a raw pointer to a font from the font cache.
          */
         static fontlib_font_t* GetFont(FontId font) { return fonts[font]; }
+        /**
+         * Ensures FontManager is initialized.
+         * This is used instead of a more traditional getting for performance,
+         * as only other static initializers need this.
+         */
+        static void EnsureInitialized();
     protected:
+        /**
+         * ID of the currently selected font.
+         */
+        static FontId CurrentFont;
         FontManager() { load_fonts(); };
-    public:
+    private:
         /**
          * Initialization hook.
          */
         static FontManager instance;
-//        unsigned char asdf;
         static void load_fonts();
         static fontlib_font_t* fonts[MAX_FONTS];
         static bool initial_loading;
+        static bool initialized;
+    friend struct TextWindow;
 };
 
 } /* namespace Forms */

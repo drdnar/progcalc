@@ -20,10 +20,6 @@ struct Button_def
      */
     Widget_def Widget;
     /**
-     * ID of font to use for this Button.
-     */
-    uint8_t Font;
-    /**
      * Text to display.
      */
     const char* Text;

@@ -40,6 +40,10 @@ class GUI : public MessageSink, public Widget
          * modal or a top-most dialog.
          */
         static Container* GetActiveDialog() { return active_dialog; }
+        /**
+         * Returns the Style for the active dialog.
+         */
+        static const Style& GetActiveStyle();
     private:
         GUI();
         ~GUI();
