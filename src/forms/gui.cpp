@@ -78,7 +78,7 @@ bool GUI::SendMessage(Message& message)
         {
             if (active_dialog->SendInput(message))
                 return true;
-            if (message.Id == MESSAGE_KEY && message.ExtendedCode == sk_Quit)
+            if (message.Id == MESSAGE_GUI_KEY && message.ExtendedCode == GUI_KEY_EXIT)
             {
                 if (dialog_count > 1)
                     MessageLoop::EnqueueMessage( { .Id = MESSAGE_GUI_MODAL_END, .ExtendedCode = MESSAGE_NONE } );

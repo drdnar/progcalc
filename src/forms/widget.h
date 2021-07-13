@@ -239,6 +239,10 @@ enum MessageId
      */
     MESSAGE_KEY,
     /**
+     * A GUI contol keypress.
+     */
+    MESSAGE_GUI_KEY,
+    /**
      * A keystroke converted into a typed character.
      * ExtendedCode is an ASCII character (or Unicode, I guess, if you're insane).
      */
@@ -307,6 +311,30 @@ enum MessageId
      * Instructs the GUI to close the current dialog.
      */
     MESSAGE_GUI_MODAL_END,
+};
+
+
+/**
+ * Special GUI key-based events.
+ */
+enum GuiKey
+{
+    GUI_KEY_DOWN = 1,
+    GUI_KEY_LEFT,
+    GUI_KEY_RIGHT,
+    GUI_KEY_UP,
+    GUI_KEY_PAGE_DOWN,
+    GUI_KEY_HOME,
+    GUI_KEY_END,
+    GUI_KEY_PAGE_UP,
+    /**
+     * Enter a modal Widget, e.g. a text box.
+     */
+    GUI_KEY_ENTER,
+    /**
+     * Exit a modal Widget.
+     */
+    GUI_KEY_EXIT,
 };
 
 
@@ -609,6 +637,30 @@ class Widget
 
         friend class GUI;
 };
+
+
+/**
+ * An entry in a table of mappings from an Input number to an Output number.
+ * Lookups are performed through a binary search, so inputs MUST be sorted in
+ * ascending order.
+ */
+struct MapTable final
+{
+    unsigned int Input;
+    unsigned int Output;
+    /**
+     * Performs a binary search for a mapping in a table.
+     * @param table_size Number of entries in the table.
+     * @param target Reference to number to search for.  If a mapping is found,
+     * it is overwritten with the mapped value.  If no mapping is found, then
+     * it is unchanged.
+     * @return true if a mapping was found, false if not.
+     * @internal This abuses the fact that "this" is a pointer and pointers are
+     * convertable to arrays.
+     */
+    bool Map(size_t table_size, unsigned int& target);
+};
+
 
 } /* namespace Forms */
 #endif /* FORMS_H */

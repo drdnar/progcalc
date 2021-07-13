@@ -11,14 +11,29 @@ namespace Forms
 
 /**
  * Processes keyboard events.
+ * 
+ * Keyboard events are processed in three phases.
+ * 
+ * In the first phase, a MESSAGE_RAW_KEY is sent with a raw sk_Key scan code.
+ * This is for Widgets that want to respond directly to a keypress.
+ * 
+ * In the second phase, if nothing has handled the raw key, a MESSAGE_KEY is
+ * sent with a scan code with modifiers such as 2nd.  This should usually be
+ * the normal mode a Widget uses to respond to key events.
+ * 
+ * If still nothing has processed the key, then in the third phase, a
+ * MESSAGE_GUI_KEY is sent, with a GuiKey event code.  This primarily for
+ * navigational messages.
+ * 
  * TODO: In the old C code, this also handled the 2nd indicator.
  * The location of the 2nd indicator is still global state, which should be
  * changed.
  */
-class KeyboardEventSource final : public MessageSource
+class KeyboardEventSource final : public MessageSource, public MessageSink
 {
     public:
         Message GetMessage();
+        bool SendMessage(Message& message);
         /**
          * Returns an object that the GUI subsystem can get events from.
          */
@@ -48,6 +63,18 @@ class KeyboardEventSource final : public MessageSource
          * Gets the location of the 2nd/Alpha modifier indicator.
          */
         static y_t GetIndicatorY() { return cursor_y; }
+        /**
+         * Enables processing of dead keys (2nd, Alpha).
+         */
+        static void EnableModifiers();
+        /**
+         * Disables processing of dead keys (2nd, Alpha).
+         */
+        static void DisableModifiers();
+        /**
+         * Checks whether dead keys (2nd, Alpha) are processed.
+         */
+        static bool AreModifiersEnabled() { return enable_modifiers; }
         /**
          * Enables special processing of 2nd key.
          */
@@ -109,6 +136,10 @@ class KeyboardEventSource final : public MessageSource
          * Internal routine that restores whatever the cursor overwrote.
          */
         static void unshow_cursor();
+        /**
+         * Controls whether dead keys (namely 2nd and Alpha) are processed.
+         */
+        static bool enable_modifiers;
         /**
          * Controls whether 2nd acts as a dead key.
          */

@@ -199,3 +199,29 @@ bool Widget::loadStyle()
         return true;
     return false;
 }
+
+
+bool MapTable::Map(size_t table_size, unsigned int& number)
+{
+    size_t mid = table_size / 2;
+    // C++ really shouldn't allow something like this.
+    MapTable* pivot_point = this + mid;
+    unsigned int pivot = pivot_point->Input;
+    if (number == pivot)
+    {
+        number = pivot_point->Output;
+        return true;
+    }
+    else
+    {
+        if (table_size < 2)
+            return false;
+        mid = table_size - mid;
+        if (number < pivot)
+            return Map(mid, number);
+        else if (table_size > 2)
+            return pivot_point->Map(mid - 1, number);
+        else
+            return false;
+    }
+}
