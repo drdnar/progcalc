@@ -50,9 +50,10 @@ class Button : public Widget
          * MoveTo
          * GetX
          * GetY
-         * Unfocus
          * GetParent
          */
+        //Status Focus();
+        //Status Unfocus();
         bool SendInput(Message& message);
         Status Paint();
         Button();

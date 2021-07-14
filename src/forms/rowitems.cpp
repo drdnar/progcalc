@@ -47,11 +47,6 @@ extern "C" const Widget_desc RowItems_desc
 };
 
 
-
-
-
-#include <graphx.h>
-
 void RowItems::Layout()
 {
     dirty = true;
@@ -78,6 +73,31 @@ void RowItems::Layout()
             container->Layout();
         xx += (*child)->GetWidth() + padding;
     }
+}
+
+
+bool RowItems::SendInput(Message& message)
+{
+    static unsigned int asdf = 0;
+    if (Container::SendInput(message))
+        return true;
+    if (message.Id == MESSAGE_GUI_EVENT)
+    {
+        switch (message.ExtendedCode)
+        {
+            case GUI_EVENT_LEFT:
+                return FocusPrevious() == Status::Success;
+            case GUI_EVENT_RIGHT:
+                return FocusNext() == Status::Success;
+            case GUI_EVENT_HOME:
+                return FocusFirst() == Status::Success;
+            case GUI_EVENT_END:
+                return FocusLast() == Status::Success;
+            default:
+                return false;
+        }
+    }
+    return false;
 }
 
 

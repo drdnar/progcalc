@@ -36,6 +36,7 @@ DialogBox::DialogBox(Widget_def* Template, Widget* Parent, Widget_def** next)
     header->SetWidth(innerwidth);
     footer->SetWidth(innerwidth);
     body->SetSize(innerwidth, height - hheight - fheight - DrawBox_VerticalPadding);
+    active_index = 1;
 }
 
 
@@ -72,12 +73,47 @@ void DialogBox::Layout()
 }
 
 
+bool DialogBox::SendInput(Message& message)
+{
+    if (Container::SendInput(message))
+        return true;
+    if (message.Id == MESSAGE_GUI_EVENT)
+    {
+        switch (message.ExtendedCode)
+        {
+            case GUI_EVENT_UP:
+            case GUI_EVENT_PAGE_UP:
+                if (active_index == 1)
+                    return false;
+                active_index = 1;
+                footer->Unfocus();
+                body->Focus();
+                return true;
+            case GUI_EVENT_DOWN:
+            case GUI_EVENT_PAGE_DOWN:
+                if (active_index == 2)
+                    return false;
+                active_index = 2;
+                body->Unfocus();
+                footer->Focus();
+                return true;
+            default:
+                return false;
+        }
+    }
+    return false;
+}
+
+
 Status DialogBox::Paint()
 {
     if (!dirty)
         return Status::Success;
     DrawBox(x, y, width, height, GetStyle());
-    gfx_SetColor(GetStyle().GetBackgroundColor());
-    gfx_FillRectangle_NoClip(x + DrawBox_LeftPadding, y + DrawBox_TopPadding, width - DrawBox_HorizontalPadding, height - DrawBox_VerticalPadding);
+    if (really_dirty)
+    {
+        gfx_SetColor(GetStyle().GetBackgroundColor());
+        gfx_FillRectangle_NoClip(x + DrawBox_LeftPadding, y + DrawBox_TopPadding, width - DrawBox_HorizontalPadding, height - DrawBox_VerticalPadding);
+    }
     return Container::Paint();
 }

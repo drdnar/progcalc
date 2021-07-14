@@ -44,6 +44,7 @@ class RowItems : public Container
          * Paint
          * MoveTo
          */
+        bool SendInput(Message& message);
         void Layout();
         /* New routines: */
         /**

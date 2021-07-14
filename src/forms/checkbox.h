@@ -39,8 +39,8 @@ class Checkbox : public Widget
          * GetY
          * GetParent
          */
-        Status Focus();
-        Status Unfocus();
+//        Status Focus();
+//        Status Unfocus();
         bool SendInput(Message& message);
         Status Paint();
         /* New routines: */

@@ -60,6 +60,34 @@ void RowList::Layout()
 }
 
 
+bool RowList::SendInput(Message& message)
+{
+    if (Container::SendInput(message))
+        return true;
+    if (message.Id == MESSAGE_GUI_EVENT)
+    {
+        switch (message.ExtendedCode)
+        {
+            case GUI_EVENT_UP:
+                return FocusPrevious() == Status::Success;
+            case GUI_EVENT_DOWN:
+                return FocusNext() == Status::Success;
+            case GUI_EVENT_PAGE_UP:
+                if (active_index == 0)
+                    return false;
+                return FocusFirst() == Status::Success;
+            case GUI_EVENT_PAGE_DOWN:
+                if (active_index == count - 1)
+                    return false;
+                return FocusLast() == Status::Success;
+            default:
+                return false;
+        }
+    }
+    return false;
+}
+
+
 Status RowList::SetWidth(x_t newwidth)
 {
     auto status = Status::Success;

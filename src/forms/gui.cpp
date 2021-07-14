@@ -78,7 +78,7 @@ bool GUI::SendMessage(Message& message)
         {
             if (active_dialog->SendInput(message))
                 return true;
-            if (message.Id == MESSAGE_GUI_KEY && message.ExtendedCode == GUI_KEY_EXIT)
+            if (message.Id == MESSAGE_GUI_EVENT && message.ExtendedCode == GUI_EVENT_EXIT)
             {
                 if (dialog_count > 1)
                     MessageLoop::EnqueueMessage( { .Id = MESSAGE_GUI_MODAL_END, .ExtendedCode = MESSAGE_NONE } );
@@ -116,6 +116,7 @@ void GUI::end_dialog()
     {
         active_dialog = dialogs[dialog_count - 1];
         active_dialog->Focus();
+        active_dialog->SetDirtyAll();
     }
     else
         active_dialog = nullptr;

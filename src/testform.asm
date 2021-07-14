@@ -24,6 +24,7 @@ strOK:
 strCancel:
 	db	"Cancel", 0
 
+
 public _SettingsDialog
 _SettingsDialog:
 
@@ -35,20 +36,44 @@ DialogBox 260, 180
 	end RowList
 	RowList
 		RowItems ROW_ITEMS_LEFT, 3
-			Checkbox someCheckboxText, _someBool
+			Label strDisplayBits
+		end RowItems
+		RowItems ROW_ITEMS_LEFT, 3
+			Label strPrimaryBase
+		end RowItems
+		RowItems ROW_ITEMS_LEFT, 3
+			Label strSecondaryBase
+		end RowItems
+		RowItems ROW_ITEMS_LEFT, 3
+			Checkbox strShowStatusBar, _someBool
+		end RowItems
+		RowItems ROW_ITEMS_LEFT, 3
+			Checkbox strShowStatusBar, _someBool
+		end RowItems
+		RowItems ROW_ITEMS_LEFT, 3
+			Checkbox strShowStatusBar, _someBool
 		end RowItems
 	end RowList
 	RowList
-		RowItems ROW_ITEMS_RIGHT, 4
-			Label strOK
-			Label strCancel
+		RowItems ROW_ITEMS_RIGHT, 6
+			Button strOK, 80, 1, 0
+			Button strCancel, 80, 2, 0
+			;Label strOK
+			;Label strCancel
 		end RowItems
 	end RowList
-
 end DialogBox
 
 strSettings:
 	db	"SETTINGS", 0
+strDisplayBits:
+	db	"Bits to display:", 0
+strPrimaryBase:
+	db	"Primary base:", 0
+strSecondaryBase:
+	db	"Secondary base:", 0
+strShowStatusBar:
+	db	"Show status bar", 0
 
 
 

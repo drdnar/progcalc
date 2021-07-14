@@ -1,11 +1,12 @@
 #include "widget.h"
 #include "gui.h"
 #include "style.h"
+#include "cursorblinker.h"
 
 using namespace Forms;
 
 
-Widget::Widget() : dirty { true }
+Widget::Widget()
 {
     //
 }
@@ -83,11 +84,14 @@ Status Widget::SetSize(x_t newwidth, y_t newheight)
 
 Status Widget::Focus()
 {
-    if (!(Enable() != Status::Success))
+    /*if (!(Enable() != Status::Success))
         return Status::Failure;
     if (!(Show() != Status::Success))
-        return Status::Failure;
+        return Status::Failure;*/
+//    if (hidden || disabled)
+//        return Status::Failure;
     hasFocus = true;
+    CursorBlinker::Restart();
     SetDirty();
     return Status::Success;
 }
@@ -201,11 +205,11 @@ bool Widget::loadStyle()
 }
 
 
-bool MapTable::Map(size_t table_size, unsigned int& number)
+bool MapTable::Map(size_t table_size, unsigned int& number) const
 {
     size_t mid = table_size / 2;
     // C++ really shouldn't allow something like this.
-    MapTable* pivot_point = this + mid;
+    const MapTable* pivot_point = this + mid;
     unsigned int pivot = pivot_point->Input;
     if (number == pivot)
     {
@@ -216,12 +220,9 @@ bool MapTable::Map(size_t table_size, unsigned int& number)
     {
         if (table_size < 2)
             return false;
-        mid = table_size - mid;
         if (number < pivot)
             return Map(mid, number);
-        else if (table_size > 2)
-            return pivot_point->Map(mid - 1, number);
         else
-            return false;
+            return (pivot_point + 1)->Map(table_size - mid - 1, number);
     }
 }

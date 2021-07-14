@@ -239,9 +239,9 @@ enum MessageId
      */
     MESSAGE_KEY,
     /**
-     * A GUI contol keypress.
+     * A GUI contol event.
      */
-    MESSAGE_GUI_KEY,
+    MESSAGE_GUI_EVENT,
     /**
      * A keystroke converted into a typed character.
      * ExtendedCode is an ASCII character (or Unicode, I guess, if you're insane).
@@ -269,6 +269,11 @@ enum MessageId
      * (Might not be one if someone ran some excessively long message handler.)
      */
     MESSAGE_RTC_TICK,
+    /**
+     * The cursor blinking timer has expired.
+     * ExtendedCode is true if the cursor is now on, false if now off.
+     */
+    MESSAGE_BLINK,
     /**
      * A timer used for animations has expired.
      */
@@ -317,24 +322,24 @@ enum MessageId
 /**
  * Special GUI key-based events.
  */
-enum GuiKey
+enum GuiEvent
 {
-    GUI_KEY_DOWN = 1,
-    GUI_KEY_LEFT,
-    GUI_KEY_RIGHT,
-    GUI_KEY_UP,
-    GUI_KEY_PAGE_DOWN,
-    GUI_KEY_HOME,
-    GUI_KEY_END,
-    GUI_KEY_PAGE_UP,
+    GUI_EVENT_DOWN = 1,
+    GUI_EVENT_LEFT,
+    GUI_EVENT_RIGHT,
+    GUI_EVENT_UP,
+    GUI_EVENT_PAGE_DOWN,
+    GUI_EVENT_HOME,
+    GUI_EVENT_END,
+    GUI_EVENT_PAGE_UP,
     /**
      * Enter a modal Widget, e.g. a text box.
      */
-    GUI_KEY_ENTER,
+    GUI_EVENT_ENTER,
     /**
      * Exit a modal Widget.
      */
-    GUI_KEY_EXIT,
+    GUI_EVENT_EXIT,
 };
 
 
@@ -609,7 +614,7 @@ class Widget
          * True if the Widget should be repainted at an unspecified time in the
          * future.
          */
-        bool dirty = false;
+        bool dirty = true;
 
         /**
          * Checks for Style customization and applies it if available.
@@ -646,8 +651,8 @@ class Widget
  */
 struct MapTable final
 {
-    unsigned int Input;
-    unsigned int Output;
+    const unsigned int Input;
+    const unsigned int Output;
     /**
      * Performs a binary search for a mapping in a table.
      * @param table_size Number of entries in the table.
@@ -658,7 +663,7 @@ struct MapTable final
      * @internal This abuses the fact that "this" is a pointer and pointers are
      * convertable to arrays.
      */
-    bool Map(size_t table_size, unsigned int& target);
+    bool Map(size_t table_size, unsigned int& target) const;
 };
 
 

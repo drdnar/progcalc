@@ -34,12 +34,14 @@ Label::Label(Widget_def* Template, Widget* parent, Widget_def** next)
     GetStyle().ActivateFont();
     height = fontlib_GetCurrentFontHeight();
     width = fontlib_GetStringWidth(text);
+    disabled = true;
 }
 
 
 Label::~Label()
 {
     // Do nothing
+    disabled = true;
 }
 
 

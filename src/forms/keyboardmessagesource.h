@@ -22,7 +22,7 @@ namespace Forms
  * the normal mode a Widget uses to respond to key events.
  * 
  * If still nothing has processed the key, then in the third phase, a
- * MESSAGE_GUI_KEY is sent, with a GuiKey event code.  This primarily for
+ * MESSAGE_GUI_EVENT is sent, with a GuiEvent event code.  This primarily for
  * navigational messages.
  * 
  * TODO: In the old C code, this also handled the 2nd indicator.

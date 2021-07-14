@@ -3,6 +3,7 @@
 #include <fontlibc.h>
 #include "textmanager.h"
 #include "style.h"
+#include "cursorblinker.h"
 
 using namespace Forms;
 
@@ -27,7 +28,8 @@ Checkbox::Checkbox(Widget_def* Template, Widget* parent, Widget_def** next)
     GetStyle().ActivateFont();
     height = fontlib_GetCurrentFontHeight();
     width = fontlib_GetStringWidth(text)
-        + fontlib_GetStringWidth(CALC1252_CURSOR_RIGHT " " CALC1252_RADIO_UNCHECKED "   " CALC1252_CURSOR_LEFT);
+        //+ fontlib_GetStringWidth(CALC1252_CURSOR_RIGHT " " CALC1252_RADIO_UNCHECKED "   " CALC1252_CURSOR_LEFT);
+        + fontlib_GetStringWidth(CALC1252_CURSOR_RIGHT " " CALC1252_RADIO_UNCHECKED " " CALC1252_CURSOR_LEFT);
 }
 
 
@@ -40,7 +42,7 @@ extern "C" const Widget_desc Checkbox_desc
 };
 
 
-Status Checkbox::Focus()
+/*Status Checkbox::Focus()
 {
     SetDirty();
     return Widget::Focus();
@@ -51,7 +53,7 @@ Status Checkbox::Unfocus()
 {
     SetDirty();
     return Widget::Focus();
-};
+};*/
 
 
 Status Checkbox::Paint()
@@ -62,32 +64,34 @@ Status Checkbox::Paint()
     char ch;
     GetStyle().ActivateFont();
     fontlib_SetCursorPosition(x, y);
-    if (hasFocus)
+    if (hasFocus && CursorBlinker::IsShowing())
         ch = CALC1252_CURSOR_RIGHT_CHAR;
     else
         ch = CALC1252_CURSOR_BLANK_CHAR;
     fontlib_DrawGlyph(ch);
-    fontlib_DrawGlyph(' ');
+    //fontlib_DrawGlyph(' ');
     if (*variable)
         ch = CALC1252_RADIO_CHECKED_CHAR;
     else
         ch = CALC1252_RADIO_UNCHECKED_CHAR;
     fontlib_DrawGlyph(ch);
-    fontlib_DrawGlyph(' ');
-    fontlib_DrawString(text);
-    fontlib_DrawGlyph(' ');
-    if (hasFocus)
+    if (hasFocus && CursorBlinker::IsShowing())
         ch = CALC1252_CURSOR_LEFT_CHAR;
     else
         ch = CALC1252_CURSOR_BLANK_CHAR;
+    //fontlib_DrawGlyph(' ');
     fontlib_DrawGlyph(ch);
+    fontlib_DrawString(text);
+    fontlib_DrawGlyph(' ');
     return Status::Success;
 }
 
 
 bool Checkbox::SendInput(Message& message)
 {
-    if (message.Id == MESSAGE_KEY && (message.ExtendedCode == sk_Enter || message.ExtendedCode == sk_2nd))
+    if (message.Id == MESSAGE_BLINK)
+        SetDirty();
+    else if (message.Id == MESSAGE_KEY && (message.ExtendedCode == sk_Enter || message.ExtendedCode == sk_2nd))
     {
         dirty = true;
         *variable = !*variable;

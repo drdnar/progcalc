@@ -5,6 +5,8 @@
 #include "ez80.h"
 #include "style.h"
 #include "drawbox.h"
+#include "calc1252.h"
+#include "cursorblinker.h"
 
 using namespace Forms;
 
@@ -24,9 +26,12 @@ Widget* Button::forms_ctor(Widget_def* Template, Widget* parent, Widget_def** ne
 Button::Button(Widget_def* Template, Widget* parent, Widget_def** next)
     : Widget(Template, parent, next)
 {
-    min_width = ((Button_def*)Template)->MinimumWidth;
+    width = min_width = ((Button_def*)Template)->MinimumWidth;
     GetStyle().ActivateFont();
-    SetSize(fontlib_GetStringWidth(GetText()) + DrawBox_HorizontalPadding, fontlib_GetCurrentFontHeight() + DrawBox_VerticalPadding);
+    textWidth = fontlib_GetStringWidth(GetText());
+    textWidth += fontlib_GetGlyphWidth(CALC1252_CURSOR_LEFT_CHAR) * 2;
+    SetWidth(textWidth + DrawBox_HorizontalPadding);
+    SetHeight(fontlib_GetCurrentFontHeight() + DrawBox_VerticalPadding);
 }
 
 
@@ -47,9 +52,11 @@ Button::~Button()
 
 bool Button::SendInput(Message& message)
 {
-    if (message.Id != MESSAGE_KEY)
-        return false;
-    if (message.ExtendedCode == sk_Enter)
+//    if (!hasFocus)
+//        return false;
+    if (message.Id == MESSAGE_BLINK)
+        SetDirty();
+    else if (message.Id == MESSAGE_KEY && message.ExtendedCode == sk_Enter)
     {
         Press();
         return true;
@@ -67,10 +74,21 @@ Status Button::Paint()
     // Erase whitespace on left of text
     unsigned int leftpad = (width - DrawBox_HorizontalPadding) / 2 - textWidth / 2;
     y_t ty = y + DrawBox_TopPadding;
+    gfx_SetColor(GetStyle().GetBackgroundColor());
     gfx_FillRectangle_NoClip(x + DrawBox_LeftPadding, ty, leftpad, height - DrawBox_VerticalPadding);
     GetStyle().ActivateFont();
     fontlib_SetCursorPosition(x + DrawBox_LeftPadding + leftpad, ty);
+    if (hasFocus && CursorBlinker::IsShowing())
+        fontlib_DrawGlyph(CALC1252_CURSOR_RIGHT_CHAR);
+    else
+        fontlib_DrawGlyph(CALC1252_CURSOR_BLANK_CHAR);
+        //fontlib_DrawGlyph(CALC1252_CURSOR_SHADED_CHAR);
     fontlib_DrawString(GetText());
+    if (hasFocus && CursorBlinker::IsShowing())
+        fontlib_DrawGlyph(CALC1252_CURSOR_LEFT_CHAR);
+    else
+        fontlib_DrawGlyph(CALC1252_CURSOR_BLANK_CHAR);
+        //fontlib_DrawGlyph(CALC1252_CURSOR_SHADED_CHAR);
     // Erase whitespace on right of text
     unsigned int xx = fontlib_GetCursorX();
     gfx_FillRectangle_NoClip(xx, ty, x + width - DrawBox_RightPadding - xx, height - DrawBox_VerticalPadding);

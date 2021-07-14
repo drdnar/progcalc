@@ -55,21 +55,43 @@ class Container : public Widget
          */
         virtual bool Broadcast(Message& message);
         /**
-         * Marks all children as dirty.
+         * Marks all children as dirty and the Container's unused pixels, too.
          */
         virtual void SetDirtyAll();
+        /**
+         * Checks whether even the Container's unused pixels should be repainted.
+         */
+        bool IsReallyDirty() { return really_dirty; }
+        /**
+         * Rotates focus to the next Widget.
+         * Widgets that refuse focus are skipped.
+         */
+        virtual Status FocusNext();
         /**
          * Rotates focus to the next Widget.
          * Widgets that refuse focus are skipped.
          * This will wrap from the end of the child list back to the start.
          */
-        virtual Status FocusNext();
+        virtual Status FocusNextCircular();
+        /**
+         * Rotates focus to the previous Widget.
+         * Widgets that refuse focus are skipped.
+         */
+        virtual Status FocusPrevious();
         /**
          * Rotates focus to the previous Widget.
          * Widgets that refuse focus are skipped.
          * This will wrap from the start of the child list back to the end.
          */
-        virtual Status FocusPrevious();
+        virtual Status FocusPreviousCircular();
+        /**
+         * Pushes focus to the first Widget in the Container.
+         */
+        virtual Status FocusFirst();
+        /**
+         * Pushes focus to the last Widget in the Container.
+         */
+        virtual Status FocusLast();
         /**
          * Instructs the Container to run its layout logic.
          * TODO: This should be pure virtual but there's a toolchain bug at the moment.
@@ -200,6 +222,10 @@ class Container : public Widget
          * failed.
          */
         Widget** enlarge();
+        /**
+         * Set to repaint the Container's unused volume, too.
+         */
+        bool really_dirty = true;
 };
 
 

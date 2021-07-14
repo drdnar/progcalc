@@ -77,6 +77,7 @@ defwidget RowItems, db Alignment, db Padding, children
 defwidget DialogBox, dl Width, db Height, children
 defwidget Label, dl Text
 defwidget Checkbox, dl Text, dl Variable
+defwidget Button, dl Text, dl MinimumWidth, db ID, dl OnPress
 
 ; Alignment options for RowItems
 ROW_ITEMS_LEFT = 0

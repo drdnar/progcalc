@@ -59,20 +59,21 @@ Message KeyboardEventSource::GetMessage()
 
 /**
  * Table mapping keys to GUI key events.
+ * @note Remember to keep this sorted properly.
  */
-static MapTable GuiKeyMappings[] = 
+static const MapTable GuiKeyMappings[] = 
 {
-    { sk_Down, GUI_KEY_DOWN },
-    { sk_Left, GUI_KEY_LEFT },
-    { sk_Right, GUI_KEY_RIGHT },
-    { sk_Up, GUI_KEY_UP },
-    { sk_Down | sk_2nd, GUI_KEY_PAGE_DOWN },
-    { sk_Left | sk_2nd, GUI_KEY_HOME },
-    { sk_Right | sk_2nd, GUI_KEY_END },
-    { sk_Up | sk_2nd, GUI_KEY_PAGE_UP },
-    { sk_Quit, GUI_KEY_EXIT },
-    { sk_Clear, GUI_KEY_EXIT },
-    { sk_Enter, GUI_KEY_ENTER },
+    { sk_Down, GUI_EVENT_DOWN },
+    { sk_Left, GUI_EVENT_LEFT },
+    { sk_Right, GUI_EVENT_RIGHT },
+    { sk_Up, GUI_EVENT_UP },
+    { sk_Enter, GUI_EVENT_ENTER },
+    { sk_Clear, GUI_EVENT_EXIT },
+    { sk_Down | sk_2nd_Modifier, GUI_EVENT_PAGE_DOWN },
+    { sk_Left | sk_2nd_Modifier, GUI_EVENT_HOME },
+    { sk_Right | sk_2nd_Modifier, GUI_EVENT_END },
+    { sk_Up | sk_2nd_Modifier, GUI_EVENT_PAGE_UP },
+    { sk_Quit, GUI_EVENT_EXIT },
     //{ sk_, GUI_KEY_ },  
 };
 static const size_t GuiKeyMappingsCount = sizeof(GuiKeyMappings) / sizeof(GuiKeyMappings[0]);
@@ -110,7 +111,7 @@ bool KeyboardEventSource::SendMessage(Message& message)
             // Process a key into a GUI action.
             if (GuiKeyMappings->Map(GuiKeyMappingsCount, key))
             {
-                MessageLoop::EnqueueMessage({ .Id = MESSAGE_GUI_KEY, .ExtendedCode = (MessageCode)key });
+                MessageLoop::EnqueueMessage({ .Id = MESSAGE_GUI_EVENT, .ExtendedCode = (MessageCode)key });
                 return true;
             }
             return false;

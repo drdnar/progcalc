@@ -41,6 +41,7 @@ class DialogBox : public Container
          * SendInput
          * MoveTo
          */
+        bool SendInput(Message& message);
         void Layout();
         Status Paint();
         /* New routines: */

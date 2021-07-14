@@ -62,6 +62,9 @@ Container::Container(Container_def* Template, Widget* Parent, Widget_def** Next)
     }
     if (Next != nullptr)
         *Next = next;
+    hasFocus = true;
+    FocusFirst();
+    Unfocus();
 }
 
 
@@ -97,7 +100,7 @@ Status Container::Focus()
     if (!count)
         return Status::Failure;
     Status r = children[active_index]->Focus();
-    hasFocus = r == Status::Success;
+    hasFocus = r != Status::Failure;
     return r;
 }
 
@@ -107,14 +110,14 @@ Status Container::Unfocus()
     if (!count)
         return Status::Success;
     Status r = children[active_index]->Unfocus();
-    hasFocus = r != Status::Success;
+    hasFocus = r == Status::Failure;
     return r;
 }
 
 
 bool Container::SendInput(Message& message)
 {
-    if (!count)
+    if (count && hasFocus)
         return children[active_index]->SendInput(message);
     return false;
 }
@@ -143,6 +146,7 @@ bool Container::Broadcast(Message& message)
 void Container::SetDirtyAll()
 {
     SetDirty();
+    really_dirty = true;
     if (!count)
         return;
     Widget** item = children;
@@ -161,7 +165,7 @@ Status Container::Paint()
 {
     if (!dirty || !count)
         return Status::Success;
-    dirty = false;
+    dirty = really_dirty = false;
     Widget** item = children;
     for (Container_size_t i = count; i > 0; i--, item++)
         (*item)->Paint();
@@ -218,6 +222,26 @@ Status Container::FocusNext()
     if (!hasFocus)
         return Status::Failure;
     Container_size_t index = active_index;
+    if (children[index]->Unfocus() != Status::Success)
+        return Status::Failure;
+    while (++index < count)
+        if (children[index]->Focus() == Status::Success)
+        {
+            active_index = index;
+            return Status::Success;
+        }
+    children[active_index]->Focus();
+    return Status::Failure;
+}
+
+
+Status Container::FocusNextCircular()
+{
+    if (!count)
+        return Status::Failure;
+    if (!hasFocus)
+        return Status::Failure;
+    Container_size_t index = active_index;
     if (children[active_index]->Unfocus() != Status::Success)
         return Status::Failure;
     while ((index = increment_index(index)) != active_index)
@@ -226,14 +250,34 @@ Status Container::FocusNext()
             active_index = index;
             return Status::Success;
         }
-    /*if (children[active_index]->Focus() != Status::Success) // ? ? ?
-        active_index = 0;*/
     children[active_index]->Focus();
     return Status::Failure;
 }
 
 
 Status Container::FocusPrevious()
+{
+    if (!count)
+        return Status::Failure;
+    if (!hasFocus)
+        return Status::Failure;
+    if (active_index == 0)
+        return Status::Failure;
+    Container_size_t index = active_index;
+    if (children[active_index]->Unfocus() != Status::Success)
+        return Status::Failure;
+    while (index-- != 0)
+        if (children[index]->Focus() == Status::Success)
+        {
+            active_index = index;
+            return Status::Success;
+        }
+    children[active_index]->Focus();
+    return Status::Failure;
+}
+
+
+Status Container::FocusPreviousCircular()
 {
     if (!count)
         return Status::Failure;
@@ -248,9 +292,48 @@ Status Container::FocusPrevious()
             active_index = index;
             return Status::Success;
         }
-    /*if (children[active_index]->Focus() != Status::Success) // ? ? ?
-        active_index = 0;*/
     children[active_index]->Focus();
+    return Status::Failure;
+}
+
+
+Status Container::FocusFirst()
+{
+    if (!count)
+        return Status::Failure;
+    if (!hasFocus)
+        return Status::Failure;
+    if (children[active_index]->Unfocus() != Status::Success)
+        return Status::Failure;
+    for (Container_size_t index = 0; index < count; index++)
+        if (children[index]->Focus() == Status::Success)
+        {
+            active_index = index;
+            return Status::Success;
+        }
+    // This should never happen.
+    //children[active_index]->Focus();
+    return Status::Failure;
+}
+
+
+Status Container::FocusLast()
+{
+    if (!count)
+        return Status::Failure;
+    if (!hasFocus)
+        return Status::Failure;
+    if (children[active_index]->Unfocus() != Status::Success)
+        return Status::Failure;
+    Container_size_t index = count;
+    while (index--)
+        if (children[index]->Focus() == Status::Success)
+        {
+            active_index = index;
+            return Status::Success;
+        }
+    // This should never happen.
+    //children[active_index]->Focus();
     return Status::Failure;
 }
 
