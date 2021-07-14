@@ -14,7 +14,7 @@
 #include "statusbar.h"
 #include "forms/textmanager.h"
 #include "forms/messages.h"
-#include "testform.h"
+#include "settingscontroller.h"
 #include "forms/gui.h"
 
 using namespace Forms;

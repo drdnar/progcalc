@@ -29,8 +29,6 @@ struct RPN_UI_def
 class RPN_UI final : public Forms::Container
 {
     public:
-        const char* getName() { return ".RPNUI."; }
-
         // Forms::Status MoveTo(Forms::x_t x, Forms::y_t y);
         // Forms::Status SetSize(Forms::x_t x, Forms::y_t y);
         Forms::Status Paint();

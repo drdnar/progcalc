@@ -20,6 +20,7 @@ Widget* RowList::form_ctor(Widget_def* Template, Widget* parent, Widget_def** Ne
 RowList::RowList(Widget_def* Template, Widget* Parent, Widget_def** next)
  : Container(&((RowList_def*)Template)->Contents, Parent, next)
 {
+    definition = Template;
     // Compute size
     unsigned int temp;
     Widget** widget = children;

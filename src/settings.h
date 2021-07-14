@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include "forms/dialogbox.h"
 
 
 enum SettingsMessageIds
@@ -125,6 +126,14 @@ class Settings final
          * Enables/disables StatusBar.
          */
         static void SetStatusBar(bool value);
+        /**
+         * Applies changed settings.
+         */
+        static void Apply(Settings_t& newSettings);
+        /**
+         * Copies settings data to another location.
+         */
+        static void CopyTo(Settings_t& target) { target = settings; }
     private:
         Settings(void);
         ~Settings();
@@ -136,8 +145,8 @@ class Settings final
          * A struct that can be memcpy'd.
          */
         static Settings_t settings;
+        friend void SettingsLoadSettings();
 };
-
 
 
 #ifdef __cplusplus

@@ -42,7 +42,6 @@ Container::Container(Container_size_t initialSize)
 Container::Container(Container_def* Template, Widget* Parent, Widget_def** Next)
  : Widget()
 {
-    definition = (Widget_def*)Template;
     parent = Parent;
     Widget_def* next = &Template->FirstChild;
     size = Template->ChildCount;

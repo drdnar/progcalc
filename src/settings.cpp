@@ -194,6 +194,13 @@ void Settings::SetStatusBar(bool value)
 }
 
 
+void Settings::Apply(Settings_t& newSettings)
+{
+    if (newSettings.StatusBarEnabled != settings.StatusBarEnabled)
+        SetStatusBar(newSettings.StatusBarEnabled);
+}
+
+
 const char* displayBitsNames[] = 
 {
     "32", "64", "128"

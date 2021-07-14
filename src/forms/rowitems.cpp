@@ -20,6 +20,7 @@ Widget* RowItems::form_ctor(Widget_def* Template, Widget* parent, Widget_def** N
 RowItems::RowItems(Widget_def* Template, Widget* Parent, Widget_def** next)
  : Container(&((RowItems_def*)Template)->Contents, Parent, next)
 {
+    definition = Template;
     alignment = ((RowItems_def*)Template)->Alignment;
     padding = ((RowItems_def*)Template)->Padding;
     // Initialize children
@@ -78,7 +79,6 @@ void RowItems::Layout()
 
 bool RowItems::SendInput(Message& message)
 {
-    static unsigned int asdf = 0;
     if (Container::SendInput(message))
         return true;
     if (message.Id == MESSAGE_GUI_EVENT)

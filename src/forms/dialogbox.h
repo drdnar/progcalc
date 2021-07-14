@@ -8,6 +8,8 @@ namespace Forms
 
 extern "C" const Widget_desc DialogBox_desc;
 
+class DialogBox;
+
 /**
  * A DialogBox template.
  */
@@ -19,6 +21,7 @@ struct DialogBox_def
     Widget_def Widget;
     uint24_t MinimumWidth;
     uint8_t MinimumHeight;
+    void (*OnLoad)(DialogBox& sender);
     /**
      * Child items list.
      */
@@ -62,6 +65,7 @@ class DialogBox : public Container
         Container* header = nullptr;
         Container* body = nullptr;
         Container* footer = nullptr;
+        bool loaded = false;
 };
 
 } /* namespace Forms */

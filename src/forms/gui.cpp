@@ -115,8 +115,9 @@ void GUI::end_dialog()
     if (dialog_count)
     {
         active_dialog = dialogs[dialog_count - 1];
-        active_dialog->Focus();
+        active_dialog->Layout();
         active_dialog->SetDirtyAll();
+        active_dialog->Focus();
     }
     else
         active_dialog = nullptr;

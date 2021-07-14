@@ -74,7 +74,7 @@ defwidget SingleStyleOverride, db Property, db Data
 defwidget FullStyleOverride, db OverrideFont, db Font, db OverrideForeground, db Foreground, db OverrideBackground, db Background, db OverrideHighlight, db Highlight, db OverrideShadow, db Shadow
 defwidget RowList, children
 defwidget RowItems, db Alignment, db Padding, children
-defwidget DialogBox, dl Width, db Height, children
+defwidget DialogBox, dl Width, db Height, dl OnLoad, children
 defwidget Label, dl Text
 defwidget Checkbox, dl Text, dl Variable
 defwidget Button, dl Text, dl MinimumWidth, db ID, dl OnPress

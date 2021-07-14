@@ -24,6 +24,7 @@ Widget* DialogBox::form_ctor(Widget_def* Template, Widget* parent, Widget_def** 
 DialogBox::DialogBox(Widget_def* Template, Widget* Parent, Widget_def** next)
  : Container(&((DialogBox_def*)Template)->Contents, Parent, next)
 {
+    definition = Template;
     width = min_width = ((DialogBox_def*)Template)->MinimumWidth;
     height = min_height = ((DialogBox_def*)Template)->MinimumHeight;
     Widget** widget = &children[0];
@@ -69,6 +70,13 @@ void DialogBox::Layout()
         if (container)
             container->Layout();
         yy += (*child)->GetHeight();
+    }
+    if (!loaded)
+    {
+        loaded = true;
+        auto callback = ((DialogBox_def*)definition)->OnLoad;
+        if (callback)
+           callback(*this);
     }
 }
 

@@ -25,11 +25,9 @@
 #include "forms/textmanager.h"
 #include "forms/keyboardmessagesource.h"
 #include "forms/calc1252.h"
-#include "testform.h"
+#include "mainform.h"
 
 using namespace Forms;
-
-unsigned char someBool = 1;
 
 /* Main Function */
 int main(void) {

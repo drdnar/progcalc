@@ -99,7 +99,6 @@ Status Button::Paint()
 void Button::Press()
 {
     auto callback = ((Button_def*)definition)->OnPress;
-    if (!callback)
+    if (callback)
         callback(*this);
 }
-
