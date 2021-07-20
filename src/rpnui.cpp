@@ -71,12 +71,6 @@ RPN_UI::RPN_UI()
 }
 
 
-Forms::Status RPN_UI::Paint()
-{
-    return Container::Paint();
-}
-
-
 void RPN_UI::Layout()
 {
     auto& gui = GUI::GetInstance();

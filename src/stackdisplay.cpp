@@ -43,7 +43,8 @@ Status StackDisplay::Paint()
     fontlib_SetWindow(x, y, width, height);
     fontlib_SetCursorPosition(x, topUsed);
     // Cache height of an entry.
-    entryHeight = Format_GetNumberHeight(Settings::GetPrimaryBase()) + Format_GetNumberHeight(Settings::GetSecondaryBase());
+    y_t primary_height = Format_GetNumberHeight(Settings::GetPrimaryBase());
+    entryHeight = primary_height + Format_GetNumberHeight(Settings::GetSecondaryBase());
     unsigned char stackSize = rpnui.GetMainStack().GetSize();
     if (scrollIndex >= stackSize)
         scrollIndex = stackSize - 1;
@@ -66,24 +67,21 @@ Status StackDisplay::Paint()
     else
     {
         BigInt_t* number = rpnui.GetMainStack().Peek(scrollIndex);
-        CursorLoc secondaryLocation;
         unsigned int index = scrollIndex;
-        for (unsigned char i = displayableEntries; i > 0; i--, number--)
+        for (unsigned char i = displayableEntries; i > 0; i--, number--, index++)
         {
             topUsed -= entryHeight;
             fontlib_SetCursorPosition(x, topUsed);
             Format_PrintInBase(number, Settings::GetPrimaryBase());
             if (Settings::GetSecondaryBase() != NO_BASE)
-                secondaryLocation.Save();
+            {
+                fontlib_SetCursorPosition(x, topUsed + primary_height);
+                Format_PrintInBase(number, Settings::GetSecondaryBase());
+            }   
             FontManager::SetFont(FONT_LARGE_PROP);
             fontlib_SetCursorPosition(x, topUsed);
-            fontlib_DrawUInt(index++, 2);
+            fontlib_DrawUInt(index, 2);
             fontlib_DrawGlyph(':');
-            if (Settings::GetSecondaryBase() != NO_BASE)
-            {
-                secondaryLocation.Restore();
-                Format_PrintInBase(number, Settings::GetSecondaryBase());
-            }
         }
     }
     /* Erase remaining portion of window. */
