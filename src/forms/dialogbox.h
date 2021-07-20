@@ -22,6 +22,7 @@ struct DialogBox_def
     uint24_t MinimumWidth;
     uint8_t MinimumHeight;
     void (*OnLoad)(DialogBox& sender);
+    bool (*OnGuiEvent)(DialogBox& sender, MessageCode eventId);
     /**
      * Child items list.
      */

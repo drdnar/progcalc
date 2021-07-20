@@ -12,7 +12,7 @@ Settings_t TemporarySettings {};
 
 static const char* error_message;
 
-extern "C" void LoadErrorDialogMessage([[maybe_unused]] Forms::DialogBox& sender)
+extern "C" void SettingsController_LoadErrorDialogMessage([[maybe_unused]] Forms::DialogBox& sender)
 {
     Forms::Container& body = dynamic_cast<Forms::Container&>(sender.Get(1));
     Forms::Label& label = dynamic_cast<Forms::Label&>(body.Get(0));
@@ -21,37 +21,29 @@ extern "C" void LoadErrorDialogMessage([[maybe_unused]] Forms::DialogBox& sender
 }
 
 
-extern "C" void CloseErrorDialog([[maybe_unused]] Forms::Button& sender)
+extern "C" bool SettingsController_HandleGuiEvent([[maybe_unused]] Forms::Widget& sender, Forms::MessageCode id)
 {
-    Forms::MessageLoop::EnqueueMessage({ .Id = Forms::MESSAGE_GUI_MODAL_END, .ExtendedCode = Forms::MESSAGE_NONE });
-}
-
-
-extern "C" bool TrySaveSettings([[maybe_unused]] Forms::Widget& sender)
-{
-    error_message = Settings::Apply(TemporarySettings);
-    if (error_message)
-    {
-        Forms::MessageLoop::EnqueueMessage( { .Id = Forms::MESSAGE_GUI_MODAL_DIALOG, .DataPointer = &ErrorDialog });
+    if (id != Forms::GUI_EVENT_OK)
         return false;
-    }
-    else
-        return true;
+    if ((error_message = Settings::Apply(TemporarySettings)) == nullptr)
+        return false;
+    Forms::MessageLoop::EnqueueMessage({ .Id = Forms::MESSAGE_GUI_MODAL_DIALOG, .DataPointer = &ErrorDialog});
+    return true;
 }
 
 
-extern "C" void HandleOKCancel(Forms::Button& sender)
+extern "C" void SettingsController_HandleOKCancel(Forms::Button& sender)
 {
+    Forms::MessageCode code;
     if (sender.GetID())
-    {
-        if (!TrySaveSettings(sender))
-            return;
-    }
-    Forms::MessageLoop::EnqueueMessage({ .Id = Forms::MESSAGE_GUI_MODAL_END, .ExtendedCode = Forms::MESSAGE_NONE });
+        code = Forms::GUI_EVENT_OK;
+    else
+        code = Forms::GUI_EVENT_CANCEL;
+    Forms::MessageLoop::EnqueueMessage({ .Id = Forms::MESSAGE_GUI_EVENT, .ExtendedCode = code });
 }
 
 
-extern "C" void LoadSettings([[maybe_unused]] Forms::DialogBox& sender)
+extern "C" void SettingsController_LoadSettings([[maybe_unused]] Forms::DialogBox& sender)
 {
     Settings::CopyTo(TemporarySettings);
 }

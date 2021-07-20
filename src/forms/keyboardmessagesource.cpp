@@ -73,13 +73,28 @@ static const MapTableEntry GuiKeyMappingsTable[] =
     { sk_Left | sk_2nd_Modifier, { GUI_EVENT_HOME } },
     { sk_Right | sk_2nd_Modifier, { GUI_EVENT_END } },
     { sk_Up | sk_2nd_Modifier, { GUI_EVENT_PAGE_UP } },
+    { sk_2nd_Enter, { GUI_EVENT_OK } },
     { sk_Quit, { GUI_EVENT_EXIT } },
-    //{ sk_, { GUI_KEY_ } },  
+    //{ sk_, { GUI_EVENT_ } },
 };
 /**
  * Table mapping keys to GUI key events.
  */
 static ConstMapTable GuiKeyTable = MAP_TABLE(.UInt = 0, Forms::Message::ExtendedCode, GuiKeyMappingsTable);
+
+
+/**
+ * @note Remember to keep this sorted properly.
+ */
+static const MapTableEntry GuiKeyRemappingsTable[] = 
+{
+    { GUI_EVENT_EXIT, { GUI_EVENT_CANCEL } },
+    //{ sk_, { GUI_EVENT_ } },
+};
+/**
+ * Table GUI key events to second-try GUI key events.
+ */
+static const ConstMapTable GuiRetryKeyTable = MAP_TABLE(.UInt = 0, Forms::Message::ExtendedCode, GuiKeyRemappingsTable);
 
 
 bool KeyboardEventSource::SendMessage(Message& message)
@@ -113,6 +128,13 @@ bool KeyboardEventSource::SendMessage(Message& message)
         case MESSAGE_KEY:
             // Process a key into a GUI action.
             if (GuiKeyTable.TryMap(key, (AnyIntegralType*)&key))
+            {
+                MessageLoop::EnqueueMessage({ .Id = MESSAGE_GUI_EVENT, .ExtendedCode = (MessageCode)key });
+                return true;
+            }
+            return false;
+        case MESSAGE_GUI_EVENT:
+            if (GuiRetryKeyTable.TryMap(key, (AnyIntegralType*)&key))
             {
                 MessageLoop::EnqueueMessage({ .Id = MESSAGE_GUI_EVENT, .ExtendedCode = (MessageCode)key });
                 return true;

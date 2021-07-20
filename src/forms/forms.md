@@ -83,6 +83,20 @@ It handles modal dialogs; an active modal dialog supresses events being sent to 
 Primarily useful for blinking a cursor.
 Also used by `APD` class to figure out how long the calculator has been idle.
 
+### Needed
+
+To be a generally useful drop-in library, some additional work is *still* needed.
+
+#### Delegates
+
+A dynamic delegate system is really needed for efficient customization of Widget behavior.
+Unfortunately, I'm not implementing that yet in favor of actually finishing this program.
+
+#### Additional Property Bindings
+
+The Styles system is useful, but even more customizations would be useful.
+This would be especially useful combined with delegates.
+
 ## Basic Widgets
 
 `forms.h` is the general include file.

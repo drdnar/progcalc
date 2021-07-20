@@ -341,6 +341,8 @@ enum GuiEvent
      * Exit a modal Widget.
      */
     GUI_EVENT_EXIT,
+    GUI_EVENT_OK,
+    GUI_EVENT_CANCEL,
 };
 
 

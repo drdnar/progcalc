@@ -3,13 +3,14 @@
 
 include 'widgets.inc'
 
-    extern _HandleOKCancel
-    extern _LoadSettings
+    extern _SettingsController_HandleOKCancel
+    extern _SettingsController_LoadSettings
+	extern _SettingsController_HandleGuiEvent
     extern _TemporarySettings
 	extern _BaseLongNames
 	extern _DisplayBitsNames
-	extern _LoadErrorDialogMessage
-	extern _CloseErrorDialog
+	extern _SettingsController_LoadErrorDialogMessage
+	extern _SettingsController_CloseErrorDialog
 
 DisplayBits = 0
 PrimaryBase = 1
@@ -23,7 +24,7 @@ StatusBarEnabled = 7
 	public _SettingsDialog
 	public _ErrorDialog
 _SettingsDialog:
-	DialogBox 260, 180, _LoadSettings
+	DialogBox 260, 180, _SettingsController_LoadSettings, _SettingsController_HandleGuiEvent
 		RowList
 			RowItems ROW_ITEMS_CENTER, 1
 				Label strSettings
@@ -48,15 +49,15 @@ _SettingsDialog:
 		end RowList
 		RowList
 			RowItems ROW_ITEMS_RIGHT, 6
-				Button strOK, 80, 1, _HandleOKCancel
-				Button strCancel, 80, 0, _HandleOKCancel
+				Button strOK, 80, 1, _SettingsController_HandleOKCancel
+				Button strCancel, 80, 0, _SettingsController_HandleOKCancel
 			end RowItems
 		end RowList
 	end DialogBox
 	NullWidget
 
 _ErrorDialog:
-	DialogBox 240, 120, _LoadErrorDialogMessage
+	DialogBox 240, 120, _SettingsController_LoadErrorDialogMessage, 0
 		RowList
 			RowItems ROW_ITEMS_CENTER, 1
 				Label strInvalidSettings
@@ -67,7 +68,7 @@ _ErrorDialog:
 		end RowList
 		RowList
 			RowItems ROW_ITEMS_RIGHT, 6
-				Button strOK, 80, 1, _CloseErrorDialog
+				Button strOK, 80, 1, _SettingsController_HandleOKCancel
 			end RowItems
 		end RowList
 	end DialogBox

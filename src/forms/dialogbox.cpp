@@ -85,6 +85,10 @@ bool DialogBox::SendInput(Message& message)
 {
     if (message.Id == MESSAGE_GUI_EVENT)
     {
+        auto customHandler = ((DialogBox_def*)definition)->OnGuiEvent;
+        if (customHandler)
+            if (customHandler(*this, message.ExtendedCode))
+                return true;
         switch (message.ExtendedCode)
         {
             case GUI_EVENT_PAGE_UP:
@@ -101,6 +105,10 @@ bool DialogBox::SendInput(Message& message)
                         return true;
                 }
                 break;
+            case GUI_EVENT_OK:
+            case GUI_EVENT_CANCEL:
+                MessageLoop::EnqueueMessage({ .Id = MESSAGE_GUI_MODAL_END, .ExtendedCode = MESSAGE_NONE });
+                return true;
         }
     }
     if (Container::SendInput(message))
