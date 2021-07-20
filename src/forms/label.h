@@ -34,10 +34,8 @@ class Label : public Widget
          */
         Status Focus() { return Status::Failure; };
         Status Disable() { return Status::Failure; };
-        bool SendInput(Message& message);
         Status Paint();
         Label();
-        ~Label();
         /* New routines: */
         /**
          * This whole hack with the friend _ctor is necessary because I don't

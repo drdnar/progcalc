@@ -44,12 +44,6 @@ extern "C" const Widget_desc Button_desc
 };
 
 
-Button::~Button()
-{
-    // Do nothing
-}
-
-
 bool Button::SendInput(Message& message)
 {
 //    if (!hasFocus)

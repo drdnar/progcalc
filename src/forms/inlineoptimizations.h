@@ -253,7 +253,7 @@ static inline unsigned int _SUB3_(unsigned int x)
  */
 #define memmove_backward_short memmove
 
-**
+/**
  * This is the same as memmove() in <string.h>.  On the eZ80, this forces a
  * slightly more efficient inline LDIR instruction.
  */

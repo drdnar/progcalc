@@ -10,21 +10,21 @@ extern "C" {
  * Checks if routine is NULL.  If not, runs routine.
  * @warning CONTAINS SMC, cannon run from flash
  */
-unsigned char CallIfNotNull(void (*)(...), ...);
+//unsigned char CallIfNotNull(void (*)(...), ...);
 
 /**
  * Checks if routine is NULL.  If not, runs routine.
  * @warning CONTAINS SMC, cannon run from flash
  * @return If routine is NULL, returns 0.  Otherwise, returns what the routine returned.
  */
-unsigned char CallIfNotNull8(unsigned char (*)(...), ...);
+//unsigned char CallIfNotNull8(unsigned char (*)(...), ...);
 
 /**
  * Checks if routine is NULL.  If not, runs routine.
  * @warning CONTAINS SMC, cannon run from flash
  * @return If routine is NULL, returns 0.  Otherwise, returns what the routine returned.
  */
-unsigned int CallIfNotNull24(unsigned int (*)(...), ...);
+//unsigned int CallIfNotNull24(unsigned int (*)(...), ...);
 
 /**
  * Switches the LCD to dimmer power-saving mode.

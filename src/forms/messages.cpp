@@ -1,49 +1,14 @@
 #include "messages.h"
 #include "apd.h"
 #include <string.h>
-#include "ignorewarning.h"
 #include "gui.h"
 
 using namespace Forms;
 
 
-MessageSource::MessageSource()
-{
-    
-}
-
-
-MessageSource::~MessageSource()
-{
-
-}
-
-
-IGNORE_WARNING_UNUSED_PARAMETER
 Message MessageSource::GetMessage()
-END_IGNORE_WARNING
 {
     return { .Id = MESSAGE_NONE, .ExtendedCode = MESSAGE_NONE };
-}
-
-
-MessageSink::MessageSink(unsigned char priority) : Priority(priority)
-{
-    
-}
-
-
-MessageSink::~MessageSink()
-{
-
-}
-
-
-IGNORE_WARNING_UNUSED_PARAMETER
-bool MessageSink::SendMessage(Message& message)
-END_IGNORE_WARNING
-{
-    return false;
 }
 
 

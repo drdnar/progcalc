@@ -19,7 +19,6 @@ class StatusBar final : public Widget, public MessageSink
         static StatusBar& GetInstance() { return instance; }
         Status MoveTo(x_t x, y_t y);
         Status Paint();
-        bool SendInput(Message& message);
         bool SendMessage(Message& message);
         Status Hide();
         Status Show();

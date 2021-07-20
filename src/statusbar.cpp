@@ -12,7 +12,6 @@
 #include "misc.h"
 #include "forms/widget.h"
 #include "forms/textmanager.h"
-#include "forms/ignorewarning.h"
 #include "forms/gui.h"
 #include "forms/messages.h"
 #include "forms/inlineoptimizations.h"
@@ -58,20 +57,9 @@ StatusBar::StatusBar() : MessageSink(SINK_PRIORITY_SLIGHTLY_ELEVATED)
 }
 
 
-IGNORE_WARNING_UNUSED_PARAMETER
-Status StatusBar::MoveTo(x_t x, y_t y)
-END_IGNORE_WARNING
+Status StatusBar::MoveTo([[maybe_unused]] x_t x, [[maybe_unused]] y_t y)
 {
     return Status::Failure;
-}
-
-
-
-IGNORE_WARNING_UNUSED_PARAMETER
-bool StatusBar::SendInput(Message& message)
-END_IGNORE_WARNING
-{
-    return false;
 }
 
 
@@ -131,13 +119,11 @@ Status StatusBar::Paint()
     dirty = false;
     if (hidden)
         return Status::Success;
-    //WindowSaver saver;
     window.Restore();
     fontlib_SetColors(COLOR_STATUS_BAR_FOREGROUND, COLOR_STATUS_BAR_BACKGROUND);
     fontlib_HomeUp();
     Style_SetSmallFontPropBold();
     fontlib_SetLineSpacing(1, 1);
-    //fontlib_DrawString(" PROGRAMMER'S CALCULATOR");
     fontlib_DrawString(" Programmer's Calculator");
     fontlib_ClearEOL();
     Style_SetSmallFontPropBold();

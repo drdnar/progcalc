@@ -188,9 +188,6 @@ static void unwindowize(void)
 {
     uint8_t y = fontlib_GetCursorY();
     Style_RestoreTextWindow(&oldWindow);
-/** TODO: Not sure which way is better.
-    fontlib_SetCursorPosition(fontlib_GetCursorX(), y);
-*/
     fontlib_SetCursorPosition(oldWindow.CursorX, y);
 }
 

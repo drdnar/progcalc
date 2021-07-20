@@ -50,7 +50,6 @@ class EnumSelector : public Widget
         bool SendInput(Message& message);
         Status Paint();
         EnumSelector(EnumToString& enum_sel) : enum_string { enum_sel } { };
-        ~EnumSelector();
         /* New routines: */
         /**
          * Forms initialization magic.

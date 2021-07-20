@@ -79,7 +79,7 @@ static const MapTableEntry GuiKeyMappingsTable[] =
 /**
  * Table mapping keys to GUI key events.
  */
-static ConstMapTable GuiKeyTable = MAP_TABLE(.Int = 0, Forms::Message::ExtendedCode, GuiKeyMappingsTable);
+static ConstMapTable GuiKeyTable = MAP_TABLE(.UInt = 0, Forms::Message::ExtendedCode, GuiKeyMappingsTable);
 
 
 bool KeyboardEventSource::SendMessage(Message& message)

@@ -148,6 +148,12 @@ Status Widget::Show()
 }
 
 
+bool Widget::SendInput([[maybe_unused]] Message& message)
+{
+    return false;
+}
+
+
 void Widget::SetDirty()
 {
     if (dirty)
@@ -158,7 +164,7 @@ void Widget::SetDirty()
 }
 
 
-Style* Widget::getStylePointer()
+Style* Widget::getStylePointer() const
 {
     if (style)
         return style;

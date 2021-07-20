@@ -40,12 +40,12 @@ void Forms::DrawBox(x_t x, y_t y, x_t width, y_t height, const Style& style)
     gfx_VertLine_NoClip(xend - 1, y + 1, height - 3); // s
     // Outer BG area
     gfx_SetColor(style.GetBackgroundColor());
-    gfx_SetPixel(x, y); // c
+    /*gfx_SetPixel(x, y); // c
     gfx_SetPixel(x, yend - 1); // d
     gfx_SetPixel(xend, y + 1); // e
     gfx_SetPixel(xend, yend); // f
     gfx_HorizLine_NoClip(xend - 1, y, 2); // g
-    gfx_HorizLine_NoClip(x, yend, 2); // h
+    gfx_HorizLine_NoClip(x, yend, 2); // h*/
     // Inner BG area
     gfx_Rectangle_NoClip(_ADD2_(x), y + 2, width - 4, height - 4); // i
     // Outer drop shadow

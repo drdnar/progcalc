@@ -110,8 +110,6 @@ class KeyboardEventSource final : public MessageSource, public MessageSink
          */
         const unsigned char INDICATOR_HEIGHT = 14;
         KeyboardEventSource();
-        /*KeyboardEventSource(KeyboardEventSource const& x) = default;
-        KeyboardEventSource(KeyboardEventSource&& x) = default;*/
         /**
          * Controls whether a cursor indicator will be shown.
          */

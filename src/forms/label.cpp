@@ -1,7 +1,6 @@
 #include "label.h"
 #include <fontlibc.h>
 #include "textmanager.h"
-#include "ignorewarning.h"
 #include "style.h"
 
 using namespace Forms;
@@ -35,21 +34,6 @@ Label::Label(Widget_def* Template, Widget* parent, Widget_def** next)
     height = fontlib_GetCurrentFontHeight();
     width = fontlib_GetStringWidth(text);
     disabled = true;
-}
-
-
-Label::~Label()
-{
-    // Do nothing
-    disabled = true;
-}
-
-
-IGNORE_WARNING_UNUSED_PARAMETER
-bool Label::SendInput(Message& message)
-END_IGNORE_WARNING
-{
-    return false;
 }
 
 

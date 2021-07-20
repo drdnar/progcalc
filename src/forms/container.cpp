@@ -311,7 +311,7 @@ Status Container::FocusFirst()
             active_index = index;
             return Status::Success;
         }
-    // This should never happen.
+    // This should never happen . . . and yet DialogBox depends on it being able to happen.
     //children[active_index]->Focus();
     return Status::Failure;
 }

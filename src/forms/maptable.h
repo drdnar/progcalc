@@ -13,13 +13,16 @@ namespace Forms
 
 /**
  * Generic type to hold any type of data.
- * Used in place of templates to reduce code size.
+ * Used in place of templates to reduce code duplication.
  */
 union AnyIntegralType
 {
-    unsigned char Char;
-    unsigned short Short;
-    unsigned int Int;
+    unsigned char UChar;
+    unsigned short UShort;
+    unsigned int UInt;
+    signed char SChar;
+    signed short SShort;
+    signed int SInt;
     void* Ptr;
     const void* CPtr;
     void (*Func)();

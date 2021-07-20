@@ -42,7 +42,7 @@ Status StackDisplay::Paint()
     unsigned char topUsed = y + height;
     fontlib_SetWindow(x, y, width, height);
     fontlib_SetCursorPosition(x, topUsed);
-    /* Cache height of an entry. TODO: This might NOT actually be helpful to cache here. */
+    // Cache height of an entry.
     entryHeight = Format_GetNumberHeight(Settings::GetPrimaryBase()) + Format_GetNumberHeight(Settings::GetSecondaryBase());
     unsigned char stackSize = rpnui.GetMainStack().GetSize();
     if (scrollIndex >= stackSize)
@@ -88,7 +88,6 @@ Status StackDisplay::Paint()
     }
     /* Erase remaining portion of window. */
     gfx_SetColor(fontlib_GetBackgroundColor());
-    //gfx_SetColor(3);
     gfx_FillRectangle_NoClip(x, y, width, topUsed - y);
     return Status::Success;
 }

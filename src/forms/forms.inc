@@ -8,14 +8,14 @@ macro ?!
 	typeid_counter = 1
 	child_counter = 0
 
-    ;;;;
-	;; Declares a widget structure
-	;; @param type Name of the widget type, must match its descriptor.
-	;;     E.g. a name of Label will reference Label_desc
-	;; @param fields List of fields along with their type, e.g. dl someStringPointer.
-	;; Additionally, the final entry may be named "children" without any type.
-	;; This declares that the widget has a list of children, terminated by end, e.g. end RowList.
-	;;;;
+    ;;
+	; Declares a widget structure
+	; @param type Name of the widget type, must match its descriptor.
+	;     E.g. a name of Label will reference Label_desc
+	; @param fields List of fields along with their type, e.g. dl someStringPointer.
+	; Additionally, the final entry may be named "children" without any type.
+	; This declares that the widget has a list of children, terminated by end, e.g. end RowList.
+	;;
 	macro defwidget? type*, fields&
 		local typeid, args, vtname
 
@@ -69,6 +69,10 @@ macro ?!
 	purge ?
 end macro
 
+;;
+; After a complete form, you should place a NullWidget to prevent Style from
+; trying to process whatever data comes next as a Style.
+;;
 defwidget NullWidget
 defwidget SingleStyleOverride, db Property, db Data
 defwidget FullStyleOverride, db OverrideFont, db Font, db OverrideForeground, db Foreground, db OverrideBackground, db Background, db OverrideHighlight, db Highlight, db OverrideShadow, db Shadow

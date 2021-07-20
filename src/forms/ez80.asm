@@ -11,9 +11,9 @@
 	public _ClearOnKeyPressed
 	public _RtcTimer_Expired
 	extern _ExitClean
-	public _CallIfNotNull
-	public _CallIfNotNull8
-	public _CallIfNotNull24
+;	public _CallIfNotNull
+;	public _CallIfNotNull8
+;	public _CallIfNotNull24
 
 _GetCSC                    = 002014Ch
 _RestoreLCDBrightness      = 0021AB8h
@@ -24,6 +24,7 @@ rtc_Minutes = 0F30004h
 
 
 ;-------------------------------------------------------------------------------
+if defined NEVER
 _CallIfNotNull:
 _CallIfNotNull8:
 _CallIfNotNull24:
@@ -44,6 +45,7 @@ _CallIfNotNull24:
 	jp	(hl)
 retPoint:
 	jp	0
+end if
 
 
 ;-------------------------------------------------------------------------------

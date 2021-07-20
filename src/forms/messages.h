@@ -36,8 +36,7 @@ class MessageSource
          * Requests an event source to look for an event.
          */
         virtual Message GetMessage() = 0;
-        MessageSource();
-        virtual ~MessageSource()/* = default*/;
+        virtual ~MessageSource() = default;
 };
 
 
@@ -54,8 +53,8 @@ class MessageSink
          * Return false to signal the next MessageSink should get the message.
          */
         virtual bool SendMessage(Message& message) = 0;
-        MessageSink(unsigned char priority);
-        virtual ~MessageSink()/* = default*/;
+        MessageSink(unsigned char priority) : Priority(priority) { }
+        virtual ~MessageSink() = default;
         /**
          * Priority affects the order in which sinks get messages.
          * Lower priority numbers get to see messages before higher priorities.

@@ -503,7 +503,7 @@ class Widget
          * @param Returns false if the object has not processed the input.
          * Returns true if further processing of the message should be disabled.
          */
-        virtual bool SendInput(Message& message) = 0;
+        virtual bool SendInput(Message& message);
 
         /**
          * Returns a pointer to a Widget's container.  This may be NULL.
@@ -525,7 +525,7 @@ class Widget
          * Returns a reference to this Widget's Style context.
          * Use this only for reading.
          */
-        const Style& GetStyle() { return *getStylePointer(); }
+        const Style& GetStyle() const { return *getStylePointer(); }
 
         /**
          * Returns a mutable reference to this Widget's Style context, allowing
@@ -639,7 +639,7 @@ class Widget
         /**
          * Internal helper routine to find a Style.
          */
-        Style* getStylePointer();
+        Style* getStylePointer() const;
 
         friend class GUI;
 };

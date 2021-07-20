@@ -142,6 +142,7 @@ const char* WordWrap::Print(const char* string)
         }
     } while (ch != 0 && ch > first_printable);
     fontlib_SetNewlineOptions(nlopts);
+    return string;
 }
 
 

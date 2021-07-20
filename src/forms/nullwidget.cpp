@@ -1,19 +1,14 @@
 #include "nullwidget.h"
-#include "ignorewarning.h"
 
 using namespace Forms;
 
-IGNORE_WARNING_UNUSED_PARAMETER
-static Widget* null_ctor(Widget_def* Template, Widget* parent, Widget_def** next)
-END_IGNORE_WARNING
+static Widget* null_ctor([[maybe_unused]] Widget_def* Template, [[maybe_unused]] Widget* parent, [[maybe_unused]] Widget_def** next)
 {
     return nullptr;
 }
 
 
-IGNORE_WARNING_UNUSED_PARAMETER
-static Widget_def* null_GetNextItem(Widget_def* Template)
-END_IGNORE_WARNING
+static Widget_def* null_GetNextItem([[maybe_unused]] Widget_def* Template)
 {
     return nullptr;
 }

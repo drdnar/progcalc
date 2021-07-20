@@ -10,8 +10,6 @@
 #define IGNORE_WARNING(X) _Pragma("clang diagnostic push") _Pragma(STR(clang diagnostic ignored X))
 #define END_IGNORE_WARNING _Pragma("clang diagnostic pop")
 
-#define IGNORE_WARNING_UNUSED_PARAMETER IGNORE_WARNING("-Wunused-parameter")
-
 #else /* __clang__ */
 
 #define IGNORE_WARNING(X)

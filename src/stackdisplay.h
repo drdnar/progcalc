@@ -44,7 +44,7 @@ class StackDisplay final : public Forms::Widget
          */
         unsigned int scrollIndex = 0;
         /**
-         * TODO: Maybe not useful to cache this here.
+         * Caches height of an entry for layout purposes.
          */
         unsigned char entryHeight;
     friend class RPN_UI;

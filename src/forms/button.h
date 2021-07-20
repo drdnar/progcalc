@@ -57,7 +57,6 @@ class Button : public Widget
         bool SendInput(Message& message);
         Status Paint();
         Button();
-        ~Button();
         /* New routines: */
         /**
          * Forms initialization magic.

@@ -1,5 +1,4 @@
 #include "style.h"
-#include "ignorewarning.h"
 
 using namespace Forms;
 
@@ -16,9 +15,7 @@ static Widget_def* Full_GetNextItem(Widget_def* Template)
 }
 
 
-IGNORE_WARNING_UNUSED_PARAMETER
-Widget* Style::forms_ctor(Widget_def* Template, Widget* parent, Widget_def** next)
-END_IGNORE_WARNING
+Widget* Style::forms_ctor(Widget_def* Template, [[maybe_unused]] Widget* parent, Widget_def** next)
 {
     if (next)
     {

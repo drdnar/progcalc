@@ -48,16 +48,8 @@ extern "C" const Widget_desc EnumSelector_desc
 };
 
 
-EnumSelector::~EnumSelector()
-{
-    // Do nothing
-}
-
-
 bool EnumSelector::SendInput(Message& message)
 {
-//    if (!hasFocus)
-//        return false;
     if (message.Id == MESSAGE_BLINK)
         SetDirty();
     else if (message.Id == MESSAGE_KEY)

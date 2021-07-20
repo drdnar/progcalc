@@ -55,8 +55,6 @@ Settings::Settings()
         memcpy_inline_nonzero(&settings, &fileData->Settings, fileData->Size);
     } while (false);
     ti_Close(file);
-    /** TODO: if (Settings.StatusBarEnabled)
-        StatusBar_Enable();*/
 }
 
 
@@ -72,8 +70,6 @@ Settings::~Settings()
         if (!file)
             break;
         fileData = (FileSettings_t*)ti_GetDataPtr(file);
-        /* TODO: Fix this warning. */
-        //int strncmp(const char *, const char *, size_t);
         if (strncmp((char*)&fileData->IdString, SETTINGS_FILE_HEADER, sizeof(SETTINGS_FILE_HEADER)))
             return;
         archived = (bool)ti_IsArchived(file);
@@ -250,7 +246,7 @@ static const MapTableEntry baseLongNames[] =
     { OCTAL, {.CPtr = "Octal"} },
     { DECIMAL, {.CPtr = "Decimal"} },
     { HEXADECIMAL, {.CPtr = "Hexadecimal"} },
-    { HEXADECIMAL + 1, {.CPtr = "Unspecified"} },
+    { HEXADECIMAL + 1, {.CPtr = "Off"} },
 };
 static ConstMapTable baseLongNames_ = MAP_TABLE(.CPtr = "?", const char*, baseLongNames);
 const EnumToString BaseLongNames { baseLongNames_, sizeof(Base_t) };
