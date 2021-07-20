@@ -91,9 +91,14 @@ void CursorLoc::Restore() const
 }
 
 
-void WordWrap::GetTextDimensions(const char* string, Coord& size)
+void WordWrap::GetTextDimensions(const char* string, Coord& size, x_t max_width)
 {
     WindowSaver saver;
+    if (max_width)
+    {
+        fontlib_SetWindow(0, 0, max_width, LCD_HEIGHT);
+        fontlib_HomeUp();
+    }
     x_t width = 0, initial_x, line_width;
     y_t height = 0;
     y_t font_height = fontlib_GetCurrentFontHeight();
@@ -103,8 +108,8 @@ void WordWrap::GetTextDimensions(const char* string, Coord& size)
     {
         height += font_height;
         initial_x = fontlib_GetCursorX();
-        string = PrintLine(string, true);
-        line_width = fontlib_GetCursorX() - initial_x;
+        string = PrintLine(string, true, &line_width);
+        line_width = line_width - initial_x;
         if (line_width > width)
             width = line_width;
         ch = (unsigned char)*string;
@@ -134,29 +139,37 @@ const char* WordWrap::Print(const char* string)
     {
         string = PrintLine(string, false);
         ch = (unsigned char)*string;
-        if (ch == '\n')
+        if (ch < first_printable)
         {
-            string++;
-            if (fontlib_Newline() > 0)
+            if (ch == '\n')
+            {
+                string++;
+                if (fontlib_Newline() > 0)
+                    break;
+            }
+            else
                 break;
         }
-    } while (ch != 0 && ch > first_printable);
+        else
+            if (fontlib_Newline() > 0)
+                break;
+    } while (ch != 0 && ch >= first_printable);
     fontlib_SetNewlineOptions(nlopts);
     return string;
 }
 
 
-const char* WordWrap::PrintLine(const char* string, bool fake_print)
+const char* WordWrap::PrintLine(const char* string, bool fake_print, x_t* final_x)
 {
     char old_stop = fontlib_GetAlternateStopCode();
-    unsigned int left = fontlib_GetWindowXMin();
-    unsigned int width = fontlib_GetWindowWidth();
-    unsigned int right = left + width;
-    unsigned int str_width;
-    unsigned int x = fontlib_GetCursorX();
+    x_t left = fontlib_GetWindowXMin();
+    x_t width = fontlib_GetWindowWidth();
+    x_t right = left + width;
+    x_t str_width;
+    x_t x = fontlib_GetCursorX();
     unsigned char first_printable = (unsigned char)fontlib_GetFirstPrintableCodePoint();
     unsigned char c;
-    unsigned int space_width = fontlib_GetGlyphWidth(' ');
+    x_t space_width = fontlib_GetGlyphWidth(' ');
     if (first_printable == '\0')
         first_printable = '\1';
     fontlib_SetAlternateStopCode(' ');
@@ -164,11 +177,14 @@ const char* WordWrap::PrintLine(const char* string, bool fake_print)
     {
         /* Check if the next word can fit on the current line */
         str_width = fontlib_GetStringWidth(string);
-        if (x + str_width < right)
+        if (x + str_width <= right)
+        {
             if (!fake_print)
                 x = fontlib_DrawString(string);
             else
                 x += str_width;
+            string = fontlib_GetLastCharacterRead();
+        }
         else
         {
             /* If the word is super-long such that it won't fit in the window,
@@ -176,12 +192,15 @@ const char* WordWrap::PrintLine(const char* string, bool fake_print)
             if (str_width != 0)
             {
                 if (str_width > width && x == left)
-                    if (!fake_print)    
+                    if (!fake_print)
+                    {
                         x = fontlib_DrawString(string);
+                        string = fontlib_GetLastCharacterRead();
+                    }
                     else
                     {
                         do
-                            x += (str_width = fontlib_GetGlyphWidth(*string++));
+                            x += fontlib_GetGlyphWidth(*string++);
                         while (x < right);
                         string--;
                         break;
@@ -195,8 +214,6 @@ const char* WordWrap::PrintLine(const char* string, bool fake_print)
              * occur, for example, if a control code immediately follows a
              * space. */
         }
-        /* FontLibC will kindly tell us exactly where it left off. */
-        string = fontlib_GetLastCharacterRead();
         /* Now we need to deal with why the last word was terminated. */
         c = (unsigned char)(*string);
         /* If it's a control code, we either process a newline or give up. */
@@ -246,5 +263,7 @@ const char* WordWrap::PrintLine(const char* string, bool fake_print)
     if (!fake_print)
         fontlib_ClearEOL();
     fontlib_SetAlternateStopCode(old_stop);
+    if (final_x)
+        *final_x = x;
     return string;
 }

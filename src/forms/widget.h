@@ -582,6 +582,11 @@ class Widget
 
         /**
          * 
+         */
+        void setWindow();
+
+        /**
+         * 
         y_t baseline = 0;*/
 
         /**

@@ -164,6 +164,12 @@ void Widget::SetDirty()
 }
 
 
+void Widget::setWindow()
+{
+    fontlib_SetWindow(x, y, width, height);
+}
+
+
 Style* Widget::getStylePointer() const
 {
     if (style)

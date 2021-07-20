@@ -26,22 +26,24 @@ extern "C" const Widget_desc Label_desc
     &Label::GetNextItem
 };
 
+
 Label::Label(Widget_def* Template, Widget* parent, Widget_def** next)
  : Widget(Template, parent, next)
 {
+    WindowSaver saver;
     text = ((Label_def*)Template)->Text;
     GetStyle().ActivateFont();
-    height = fontlib_GetCurrentFontHeight();
-    width = fontlib_GetStringWidth(text);
     disabled = true;
+    Coord size;
+    WordWrap::GetTextDimensions(text, size, LCD_WIDTH);
+    width = size.x;
+    height = size.y;
 }
 
 
 void Label::SetText(const char* new_text)
 {
     text = new_text;
-    GetStyle().ActivateFont();
-    width = fontlib_GetStringWidth(text);
     SetDirty();
 }
 
@@ -51,8 +53,10 @@ Status Label::Paint()
     if (!dirty || hidden)
         return Status::Success;
     dirty = false;
+    WindowSaver saver;
+    setWindow();
+    fontlib_HomeUp();
     GetStyle().ActivateFont();
-    fontlib_SetCursorPosition(x, y);
-    fontlib_DrawString(text);
+    WordWrap::Print(text);
     return Status::Success;
 }

@@ -64,7 +64,6 @@ _ErrorDialog:
 		end RowList
 		RowList
 			Label strInvalidSettings
-			;Button strOK, 80, 1, _CloseErrorDialog
 		end RowList
 		RowList
 			RowItems ROW_ITEMS_RIGHT, 6

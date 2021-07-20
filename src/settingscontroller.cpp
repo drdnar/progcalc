@@ -14,8 +14,9 @@ static const char* error_message;
 
 extern "C" void LoadErrorDialogMessage([[maybe_unused]] Forms::DialogBox& sender)
 {
-    Forms::Container& thingy = dynamic_cast<Forms::Container&>(sender.Get(1));
-    Forms::Label& label = dynamic_cast<Forms::Label&>(thingy.Get(0));
+    Forms::Container& body = dynamic_cast<Forms::Container&>(sender.Get(1));
+    Forms::Label& label = dynamic_cast<Forms::Label&>(body.Get(0));
+    label.SetHeight(body.GetHeight());
     label.SetText(error_message);
 }
 

@@ -194,9 +194,9 @@ void Settings::SetStatusBar(bool value)
 const char* Settings::Apply(Settings_t& newSettings)
 {
     if (newSettings.PrimaryBase == NO_BASE)
-        return "Invalid primary base.";
+        return "Primary base cannot be set to Off.";
     if (newSettings.PrimaryBase == newSettings.SecondaryBase)
-        return "Primary and secondary are same.";
+        return "Primary and secondary base cannot be the same.";
     if (newSettings.StatusBarEnabled != settings.StatusBarEnabled)
         SetStatusBar(newSettings.StatusBarEnabled);
     if (newSettings.PrimaryBase != settings.PrimaryBase)

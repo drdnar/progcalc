@@ -194,6 +194,8 @@ namespace WordWrap
  * @param string Text to print
  * @param fake_print Set to true to perform the exact same layout logic, but
  * without actually printing anything.  This allows finding word wrap points.
+ * @param final_x Pointer to variable to receive final X value.  Most useful
+ * with fake_print.
  * @note fake_print DOES care what the current cursor X position is---it uses
  * that to figure out how to deal with words too big to fit into the text
  * window.  Such words will get force-printed starting on their own line.
@@ -201,7 +203,7 @@ namespace WordWrap
  * be '\0', a control code (such as newline), or the first character of the next
  * line of text.
  */
-const char* PrintLine(const char* string, bool fake_print);
+const char* PrintLine(const char* string, bool fake_print, x_t* final_x = nullptr);
 
 /**
  * Prints a multiline string with word wrap.
@@ -218,8 +220,9 @@ const char* Print(const char* string);
  * @note The null string is considered to have a height of one line of text.
  * @param string String to get dimensions of
  * @param size Reference to Coord struct to write size to.
+ * @param max_width Maximum width of formatting window, or 0 to use current.
  */
-void GetTextDimensions(const char* string, Coord& size);
+void GetTextDimensions(const char* string, Coord& size, x_t max_width = 0);
 
 } /* namespace WordWrap */
 
