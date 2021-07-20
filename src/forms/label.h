@@ -45,6 +45,10 @@ class Label : public Widget
          */
         static Widget* forms_ctor(Widget_def* Template, Widget* parent, Widget_def** next);
         static Widget_def* GetNextItem(Widget_def* Template);
+        /**
+         * Changes the Label's text.
+         */
+        void SetText(const char* new_text);
     protected:
         Label(Widget_def* Template, Widget* parent, Widget_def** next);
         /**

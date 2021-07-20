@@ -1,6 +1,6 @@
 #include "messages.h"
 #include "apd.h"
-#include "inlineoptimizations.h"
+#include <string.h>
 #include "ignorewarning.h"
 #include "gui.h"
 

@@ -37,7 +37,7 @@ DialogBox::DialogBox(Widget_def* Template, Widget* Parent, Widget_def** next)
     header->SetWidth(innerwidth);
     footer->SetWidth(innerwidth);
     body->SetSize(innerwidth, height - hheight - fheight - DrawBox_VerticalPadding);
-    active_index = 1;
+    FocusFirst();
 }
 
 
@@ -83,6 +83,26 @@ void DialogBox::Layout()
 
 bool DialogBox::SendInput(Message& message)
 {
+    if (message.Id == MESSAGE_GUI_EVENT)
+    {
+        switch (message.ExtendedCode)
+        {
+            case GUI_EVENT_PAGE_UP:
+                if (FocusFirst() != Status::Failure)
+                {
+                    if (((Container*)children[active_index])->FocusFirst() != Status::Failure)
+                        return true;
+                }
+                break;
+            case GUI_EVENT_PAGE_DOWN:
+                if (FocusLast() != Status::Failure)
+                {
+                    if (((Container*)children[active_index])->FocusFirst() != Status::Failure)
+                        return true;
+                }
+                break;
+        }
+    }
     if (Container::SendInput(message))
         return true;
     if (message.Id == MESSAGE_GUI_EVENT)
@@ -90,23 +110,13 @@ bool DialogBox::SendInput(Message& message)
         switch (message.ExtendedCode)
         {
             case GUI_EVENT_UP:
-            case GUI_EVENT_PAGE_UP:
-                if (active_index == 1)
-                    return false;
-                active_index = 1;
-                footer->Unfocus();
-                body->Focus();
-                return true;
+                if (FocusPrevious() != Status::Failure)
+                    return true;
+                break;
             case GUI_EVENT_DOWN:
-            case GUI_EVENT_PAGE_DOWN:
-                if (active_index == 2)
-                    return false;
-                active_index = 2;
-                body->Unfocus();
-                footer->Focus();
-                return true;
-            default:
-                return false;
+                if (FocusNext() != Status::Failure)
+                    return true;
+                break;
         }
     }
     return false;

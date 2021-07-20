@@ -28,9 +28,10 @@ palettes:
       - color: { index: 11, r: 255, g: 0, b: 0 }
       # Normal background
       - color: { index: 12, r: 255, g: 255, b: 255 }
+      # Shadow
+      - color: { index: 13, r: 192, g: 192, b: 192 }
       # Transparent color
-      - color: { index: 13, r: 240, g: 240, b: 128 }
-
+      - color: { index: 14, r: 240, g: 240, b: 128 }
 
 converts:
   - name: Image_Battery

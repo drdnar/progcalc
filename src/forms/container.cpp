@@ -1,6 +1,7 @@
 #include "container.h"
 #include "style.h"
 #include <string.h>
+#include "inlineoptimizations.h"
 
 using namespace Forms;
 
@@ -368,7 +369,7 @@ Widget**  Container::enlarge()
     Widget** resized = new Widget*[newsize];
     if (resized == nullptr)
         return nullptr;
-    memcpy(resized, children, sizeof(Widget*) * count);
+    memcpy_inline_short(resized, children, sizeof(Widget*) * count);
     delete[] children;
     size = newsize;
     return children = resized;

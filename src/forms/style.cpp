@@ -135,7 +135,7 @@ Widget_def* Style::GetNextItem(Widget_def* Template)
 
 Style* Style::constructify(Widget_def* input, Style* parent, Widget_def** next)
 {
-    /*if (!input)
+    if (!input)
         return nullptr;
     Style* style = nullptr;
     do
@@ -181,7 +181,7 @@ Style* Style::constructify(Widget_def* input, Style* parent, Widget_def** next)
                 *next = input;
             return style;
         }
-    } while (true);*/
+    } while (true);
     return nullptr;
 }
 

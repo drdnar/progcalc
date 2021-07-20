@@ -53,6 +53,15 @@ END_IGNORE_WARNING
 }
 
 
+void Label::SetText(const char* new_text)
+{
+    text = new_text;
+    GetStyle().ActivateFont();
+    width = fontlib_GetStringWidth(text);
+    SetDirty();
+}
+
+
 Status Label::Paint()
 {
     if (!dirty || hidden)

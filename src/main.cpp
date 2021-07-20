@@ -1,27 +1,9 @@
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <tice.h>
-
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-
-#include <graphx.h>
 #include <fontlibc.h>
-#include "bigint.h"
-#include "settings.h"
-#include "style.h"
 #include "printbigint.h"
-#include "rpnui.h"
-#include "inputbigint.h"
-#include "statusbar.h"
-
+#include "misc.h"
 #include "forms/widget.h"
-#include "forms/checkbox.h"
-#include "forms/label.h"
-#include "forms/rowitems.h"
-#include "forms/rowlist.h"
 #include "forms/textmanager.h"
 #include "forms/keyboardmessagesource.h"
 #include "forms/calc1252.h"

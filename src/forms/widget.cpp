@@ -2,6 +2,7 @@
 #include "gui.h"
 #include "style.h"
 #include "cursorblinker.h"
+#include "inlineoptimizations.h"
 
 using namespace Forms;
 
@@ -202,27 +203,4 @@ bool Widget::loadStyle()
     if (style)
         return true;
     return false;
-}
-
-
-bool MapTable::Map(size_t table_size, unsigned int& number) const
-{
-    size_t mid = table_size / 2;
-    // C++ really shouldn't allow something like this.
-    const MapTable* pivot_point = this + mid;
-    unsigned int pivot = pivot_point->Input;
-    if (number == pivot)
-    {
-        number = pivot_point->Output;
-        return true;
-    }
-    else
-    {
-        if (table_size < 2)
-            return false;
-        if (number < pivot)
-            return Map(mid, number);
-        else
-            return (pivot_point + 1)->Map(table_size - mid - 1, number);
-    }
 }

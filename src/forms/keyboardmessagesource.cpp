@@ -6,7 +6,8 @@
 #include "ez80.h"
 #include "calc1252.h"
 #include "textmanager.h"
-#include "misc.h"
+#include "../misc.h"
+#include "maptable.h"
 
 using namespace Forms;
 
@@ -58,25 +59,27 @@ Message KeyboardEventSource::GetMessage()
 
 
 /**
- * Table mapping keys to GUI key events.
  * @note Remember to keep this sorted properly.
  */
-static const MapTable GuiKeyMappings[] = 
+static const MapTableEntry GuiKeyMappingsTable[] = 
 {
-    { sk_Down, GUI_EVENT_DOWN },
-    { sk_Left, GUI_EVENT_LEFT },
-    { sk_Right, GUI_EVENT_RIGHT },
-    { sk_Up, GUI_EVENT_UP },
-    { sk_Enter, GUI_EVENT_ENTER },
-    { sk_Clear, GUI_EVENT_EXIT },
-    { sk_Down | sk_2nd_Modifier, GUI_EVENT_PAGE_DOWN },
-    { sk_Left | sk_2nd_Modifier, GUI_EVENT_HOME },
-    { sk_Right | sk_2nd_Modifier, GUI_EVENT_END },
-    { sk_Up | sk_2nd_Modifier, GUI_EVENT_PAGE_UP },
-    { sk_Quit, GUI_EVENT_EXIT },
-    //{ sk_, GUI_KEY_ },  
+    { sk_Down, { GUI_EVENT_DOWN } },
+    { sk_Left, { GUI_EVENT_LEFT } },
+    { sk_Right, { GUI_EVENT_RIGHT } },
+    { sk_Up, { GUI_EVENT_UP } },
+    { sk_Enter, { GUI_EVENT_ENTER } },
+    { sk_Clear, { GUI_EVENT_EXIT } },
+    { sk_Down | sk_2nd_Modifier, { GUI_EVENT_PAGE_DOWN } },
+    { sk_Left | sk_2nd_Modifier, { GUI_EVENT_HOME } },
+    { sk_Right | sk_2nd_Modifier, { GUI_EVENT_END } },
+    { sk_Up | sk_2nd_Modifier, { GUI_EVENT_PAGE_UP } },
+    { sk_Quit, { GUI_EVENT_EXIT } },
+    //{ sk_, { GUI_KEY_ } },  
 };
-static const size_t GuiKeyMappingsCount = sizeof(GuiKeyMappings) / sizeof(GuiKeyMappings[0]);
+/**
+ * Table mapping keys to GUI key events.
+ */
+static ConstMapTable GuiKeyTable = MAP_TABLE(.Int = 0, Forms::Message::ExtendedCode, GuiKeyMappingsTable);
 
 
 bool KeyboardEventSource::SendMessage(Message& message)
@@ -109,7 +112,7 @@ bool KeyboardEventSource::SendMessage(Message& message)
             return true;
         case MESSAGE_KEY:
             // Process a key into a GUI action.
-            if (GuiKeyMappings->Map(GuiKeyMappingsCount, key))
+            if (GuiKeyTable.TryMap(key, (AnyIntegralType*)&key))
             {
                 MessageLoop::EnqueueMessage({ .Id = MESSAGE_GUI_EVENT, .ExtendedCode = (MessageCode)key });
                 return true;

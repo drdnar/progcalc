@@ -182,6 +182,47 @@ class FontManager
     friend struct TextWindow;
 };
 
+/**
+ * Routines for handling printing of text with word wrap.
+ */
+namespace WordWrap
+{
+
+/**
+ * Prints a string, but with word wrap!
+ * This prints one line at a time; call it in a loop.
+ * @param string Text to print
+ * @param fake_print Set to true to perform the exact same layout logic, but
+ * without actually printing anything.  This allows finding word wrap points.
+ * @note fake_print DOES care what the current cursor X position is---it uses
+ * that to figure out how to deal with words too big to fit into the text
+ * window.  Such words will get force-printed starting on their own line.
+ * @return Returns a pointer to the last character processed, which will either
+ * be '\0', a control code (such as newline), or the first character of the next
+ * line of text.
+ */
+const char* PrintLine(const char* string, bool fake_print);
+
+/**
+ * Prints a multiline string with word wrap.
+ * @return Returns a pointer to the last character processed, which will either
+ * be '\0', an unprocessed control code, or the first character of the next
+ * line of text if the string was too big to fit in the current text window.
+ */
+const char* Print(const char* string);
+
+/**
+ * Gets the width and height of a string printed using the current font and
+ * window.
+ * @note This also cares about cursor position.
+ * @note The null string is considered to have a height of one line of text.
+ * @param string String to get dimensions of
+ * @param size Reference to Coord struct to write size to.
+ */
+void GetTextDimensions(const char* string, Coord& size);
+
+} /* namespace WordWrap */
+
 } /* namespace Forms */
 
 #endif /* FORMS_TEXT_MANAGER_H */

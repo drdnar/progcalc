@@ -89,3 +89,161 @@ void CursorLoc::Restore() const
 {
     fontlib_SetCursorPosition(x, y);
 }
+
+
+void WordWrap::GetTextDimensions(const char* string, Coord& size)
+{
+    WindowSaver saver;
+    x_t width = 0, initial_x, line_width;
+    y_t height = 0;
+    y_t font_height = fontlib_GetCurrentFontHeight();
+    unsigned char ch;
+    unsigned char first = fontlib_GetFirstPrintableCodePoint();
+    do
+    {
+        height += font_height;
+        initial_x = fontlib_GetCursorX();
+        string = PrintLine(string, true);
+        line_width = fontlib_GetCursorX() - initial_x;
+        if (line_width > width)
+            width = line_width;
+        ch = (unsigned char)*string;
+        if (ch == '\n')
+        {
+            string++;
+            fontlib_SetCursorPosition(saver.Window.X, saver.Window.CursorY);
+        }
+    } while (ch != 0 && ch > first);
+    size.x = width;
+    size.y = height;
+}
+
+
+/**
+ * I should probably have documented that fontlib_Newline() returns nonzero on
+ * failure.
+ */
+#define fontlib_Newline (*(unsigned char (*)(void))&fontlib_Newline)
+const char* WordWrap::Print(const char* string)
+{
+    auto nlopts = fontlib_GetNewlineOptions();
+    unsigned char first_printable = (unsigned char)fontlib_GetFirstPrintableCodePoint();
+    fontlib_SetNewlineOptions(FONTLIB_AUTO_CLEAR_TO_EOL | FONTLIB_ENABLE_AUTO_WRAP);
+    unsigned char ch;
+    do
+    {
+        string = PrintLine(string, false);
+        ch = (unsigned char)*string;
+        if (ch == '\n')
+        {
+            string++;
+            if (fontlib_Newline() > 0)
+                break;
+        }
+    } while (ch != 0 && ch > first_printable);
+    fontlib_SetNewlineOptions(nlopts);
+}
+
+
+const char* WordWrap::PrintLine(const char* string, bool fake_print)
+{
+    char old_stop = fontlib_GetAlternateStopCode();
+    unsigned int left = fontlib_GetWindowXMin();
+    unsigned int width = fontlib_GetWindowWidth();
+    unsigned int right = left + width;
+    unsigned int str_width;
+    unsigned int x = fontlib_GetCursorX();
+    unsigned char first_printable = (unsigned char)fontlib_GetFirstPrintableCodePoint();
+    unsigned char c;
+    unsigned int space_width = fontlib_GetGlyphWidth(' ');
+    if (first_printable == '\0')
+        first_printable = '\1';
+    fontlib_SetAlternateStopCode(' ');
+    do
+    {
+        /* Check if the next word can fit on the current line */
+        str_width = fontlib_GetStringWidth(string);
+        if (x + str_width < right)
+            if (!fake_print)
+                x = fontlib_DrawString(string);
+            else
+                x += str_width;
+        else
+        {
+            /* If the word is super-long such that it won't fit in the window,
+             * then forcibly print it starting on a new line. */
+            if (str_width != 0)
+            {
+                if (str_width > width && x == left)
+                    if (!fake_print)    
+                        x = fontlib_DrawString(string);
+                    else
+                    {
+                        do
+                            x += (str_width = fontlib_GetGlyphWidth(*string++));
+                        while (x < right);
+                        string--;
+                        break;
+                    }
+                else
+                    break;
+            }
+            /* If the width returned was zero, that means either another space
+             * is waiting to be printed, which will be handled below; or a
+             * control code is next, which also will be handled below.  This can
+             * occur, for example, if a control code immediately follows a
+             * space. */
+        }
+        /* FontLibC will kindly tell us exactly where it left off. */
+        string = fontlib_GetLastCharacterRead();
+        /* Now we need to deal with why the last word was terminated. */
+        c = (unsigned char)(*string);
+        /* If it's a control code, we either process a newline or give up. */
+        if (c < first_printable)
+        {
+/*            if (c == ZERO_WIDTH_SPACE)
+                string++;
+            else */if (c == '\t')
+            {
+                string++;
+                x += 16;
+                x &= 0xFFFFF0;
+                if (!fake_print)
+                {
+                    fontlib_ClearEOL();
+                    fontlib_SetCursorPosition(x, fontlib_GetCursorY());
+                }
+            }
+            else
+                break;
+        }
+        /* If it's a space, we need to process that manually since DrawString
+         * won't handle it because we set space as a stop code. */
+        if (c == ' ')
+        {
+            string++;
+            /* We do actually need to check if there's space to print the
+             * space. */
+            if (x + space_width < right)
+            {
+                if (!fake_print)
+                    fontlib_DrawGlyph(' ');
+                x += space_width;
+            }
+            else
+            {
+                /* If there isn't room, we need to eat the space; it would look
+                 * weird to print a space at the start of the next line. 
+                 * However, we do not eat ALL the spaces if there's more than
+                 * one, just the first one or two. */
+                if (*string == ' ') /* Take care of possible second space. */
+                    string++;
+                break;
+            }
+        }
+    } while (true);
+    if (!fake_print)
+        fontlib_ClearEOL();
+    fontlib_SetAlternateStopCode(old_stop);
+    return string;
+}

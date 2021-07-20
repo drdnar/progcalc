@@ -7,6 +7,7 @@
 #include "inputbigint.h"
 #include "statusbar.h"
 #include "forms/messages.h"
+#include "forms/inlineoptimizations.h"
 
 #define SETTINGS_FILE_HEADER "Programmer's Calculator settings"
 #define SETTINGS_FILE_NAME "ProgCalc"
@@ -51,7 +52,7 @@ Settings::Settings()
         fileData = (FileSettings_t*)ti_GetDataPtr(file);
         if (strncmp((char*)&fileData->IdString, SETTINGS_FILE_HEADER, sizeof(SETTINGS_FILE_HEADER)))
             break;
-        memcpy(&settings, &fileData->Settings, fileData->Size);
+        memcpy_inline_nonzero(&settings, &fileData->Settings, fileData->Size);
     } while (false);
     ti_Close(file);
     /** TODO: if (Settings.StatusBarEnabled)
@@ -194,49 +195,72 @@ void Settings::SetStatusBar(bool value)
 }
 
 
-void Settings::Apply(Settings_t& newSettings)
+const char* Settings::Apply(Settings_t& newSettings)
 {
+    if (newSettings.PrimaryBase == NO_BASE)
+        return "Invalid primary base.";
+    if (newSettings.PrimaryBase == newSettings.SecondaryBase)
+        return "Primary and secondary are same.";
     if (newSettings.StatusBarEnabled != settings.StatusBarEnabled)
         SetStatusBar(newSettings.StatusBarEnabled);
+    if (newSettings.PrimaryBase != settings.PrimaryBase)
+        SetPrimaryBase(newSettings.PrimaryBase);
+    if (newSettings.SecondaryBase != settings.SecondaryBase)
+        SetSecondaryBase(newSettings.SecondaryBase);
+    if (newSettings.DisplayBits != settings.DisplayBits)
+        SetDisplayBits(newSettings.DisplayBits);
+    if (newSettings.AlwaysShowBin != settings.AlwaysShowBin)
+        SetAlwaysShowBin(newSettings.AlwaysShowBin);
+    if (newSettings.AlwaysShowOct != settings.AlwaysShowOct)
+        SetAlwaysShowOct(newSettings.AlwaysShowOct);
+    if (newSettings.AlwaysShowDec != settings.AlwaysShowDec)
+        SetAlwaysShowDec(newSettings.AlwaysShowDec);
+    if (newSettings.AlwaysShowHex != settings.AlwaysShowHex)
+        SetAlwaysShowHex(newSettings.AlwaysShowHex);
+    return nullptr;
 }
 
 
-const char* displayBitsNames[] = 
+/* Please forgive this syntax. */
+static const MapTableEntry baseShortNames[] = 
 {
-    "32", "64", "128"
+    { BINARY, {.CPtr = "bin"} },
+    { OCTAL, {.CPtr = "oct"} },
+    { DECIMAL, {.CPtr = "dec"} },
+    { HEXADECIMAL, {.CPtr = "hex"} },
 };
+static ConstMapTable baseShortNames_ = MAP_TABLE(.CPtr = "?", const char*, baseShortNames);
+const EnumToString BaseShortNames { baseShortNames_, sizeof(Base_t) };
 
-const char* GetDisplayBitsName(uint8_t bytes)
-{
-    return displayBitsNames[bytes];
-}
 
-static const char* shortBaseNames[] =
+static const MapTableEntry baseShortCapNames[] = 
 {
-    "bin", "oct", "dec", "hex", ""
+    { BINARY, {.CPtr = "BIN"} },
+    { OCTAL, {.CPtr = "OCT"} },
+    { DECIMAL, {.CPtr = "DEC"} },
+    { HEXADECIMAL, {.CPtr = "HEX"} },
 };
+static ConstMapTable baseShortCapNames_ = MAP_TABLE(.CPtr = "?", const char*, baseShortCapNames);
+const EnumToString BaseShortCapNames { baseShortCapNames_, sizeof(Base_t) };
 
-static const char* shortCapsBaseNames[] =
+
+static const MapTableEntry baseLongNames[] = 
 {
-    "BIN", "OCT", "DEC", "HEX", ""
+    { BINARY, {.CPtr = "Binary"} },
+    { OCTAL, {.CPtr = "Octal"} },
+    { DECIMAL, {.CPtr = "Decimal"} },
+    { HEXADECIMAL, {.CPtr = "Hexadecimal"} },
+    { HEXADECIMAL + 1, {.CPtr = "Unspecified"} },
 };
+static ConstMapTable baseLongNames_ = MAP_TABLE(.CPtr = "?", const char*, baseLongNames);
+const EnumToString BaseLongNames { baseLongNames_, sizeof(Base_t) };
 
-static const char* longBaseNames[] =
+
+static const MapTableEntry displayBitsNames_a[] = 
 {
-    "Binary", "Octal", "Decimal", "Hexadecimal", ""
+    { BINARY, {.CPtr = "32"} },
+    { OCTAL, {.CPtr = "64"} },
+    { DECIMAL, {.CPtr = "128"} },
 };
-
-const char* GetBaseShortName(Base_t base)
-{
-    return shortBaseNames[base];
-}
-
-const char* GetBaseShortCapsName(Base_t base)
-{
-    return shortCapsBaseNames[base];
-}
-
-const char* GetBaseLongName(Base_t base)
-{
-    return longBaseNames[base];
-}
+static ConstMapTable displayBitsNames_ = MAP_TABLE(.CPtr = "?", const char*, displayBitsNames_a);
+const EnumToString DisplayBitsNames { displayBitsNames_, sizeof(uint8_t) };

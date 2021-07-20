@@ -41,7 +41,7 @@ static Style gui_style
     COLOR_FOREGROUND,
     COLOR_BACKGROUND,
     COLOR_HIGHLIGHT,
-    COLOR_STATUS_BAR_BACKGROUND
+    COLOR_SHADOW
 };
 
 Style* const Forms::GUI_DefaultStyle = &gui_style;

@@ -108,6 +108,10 @@ Notable properties:
 `Checkbox` is a simple toggle for a boolean value.
 `Variable` is a pointer to a `bool` to toggle.
 
+### `EnumSelector`
+
+`EnumSelector` lets the user select one option from several in an enumeration.
+
 ### `Label`
 
 `Label` simply displays some text.

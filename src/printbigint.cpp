@@ -5,6 +5,7 @@
 #include "style.h"
 #include "misc.h"
 #include "forms/textmanager.h"
+#include "forms/inlineoptimizations.h"
 
 char Format_NumberBuffer[MAX_FORMATTED_NUMBER_SIZE];
 BigInt_t tempn;
@@ -166,7 +167,7 @@ static unsigned int PrintBaseLabel(Base_t base, unsigned char height)
         baseName = "0x";
     }
     else
-        baseName = GetBaseShortName(base);
+        baseName = BaseShortNames.Get(base);
     Style_SetSmallFontPropAligned();
     fontlib_SetLineSpacing(fontlib_GetSpaceAbove(), height - fontlib_GetCurrentFontHeight() + fontlib_GetSpaceBelow());
     x = fontlib_GetCursorX() - fontlib_GetStringWidth(baseName) - (altHex ? 0 : fontlib_GetGlyphWidth(' '));
@@ -249,7 +250,7 @@ static size_t const printPartialCopy[] =
 static void partialCopy(BigInt_t* n)
 {
     BigIntSetToZero(&tempn);
-    memcpy(&tempn, n, printPartialCopy[Settings::GetDisplayBits()]);
+    memcpy_inline_nonzero(&tempn, n, printPartialCopy[Settings::GetDisplayBits()]);
 }
 
 /*

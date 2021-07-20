@@ -32,7 +32,7 @@ void BigIntStack::Push(BigInt_t* number)
             BigIntCopyFromTo(number, stack);
             return;
         }
-        memmove_backward(stack, stack + 1, (maxSize - 1) * sizeof(BigInt_t));
+        memmove(stack, stack + 1, (maxSize - 1) * sizeof(BigInt_t));
         BigIntCopyFromTo(number, stack + maxSize - 1);
         return;
     }
@@ -103,7 +103,7 @@ void BigIntStack::RotateUp()
         return;
     BigInt_t temp;
     BigIntCopyFromTo(stack + size - 1, &temp);
-    memmove_forward(stack + 1, stack, (size - 1) * sizeof(BigInt_t));
+    memmove(stack + 1, stack, (size - 1) * sizeof(BigInt_t));
     BigIntCopyFromTo(&temp, stack);
 }
 
@@ -114,7 +114,7 @@ void BigIntStack::RotateDown()
         return;
     BigInt_t temp;
     BigIntCopyFromTo(stack, &temp);
-    memmove_backward(stack, stack + 1, (size - 1) * sizeof(BigInt_t));
+    memmove(stack, stack + 1, (size - 1) * sizeof(BigInt_t));
     BigIntCopyFromTo(&temp, stack + size - 1);
 }
 
@@ -169,6 +169,6 @@ void BigIntStack::DeleteFromBottom(unsigned int n)
         size = 0;
         return;
     }
-    memmove_backward(stack, stack + n, (size - n) * sizeof(BigInt_t));
+    memmove(stack, stack + n, (size - n) * sizeof(BigInt_t));
     size -= n;
 }

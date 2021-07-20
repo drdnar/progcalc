@@ -41,13 +41,17 @@ extern FontId_t CurrentFont;
  */
 #define COLOR_BACKGROUND 12
 /**
+ * Drop shadow color.
+ */
+#define COLOR_SHADOW 13
+/**
  * Color of highlighted backgrounds.
  */
 #define COLOR_HIGHLIGHT 3
 /**
  * Transparency color
  */
-#define COLOR_TRANSPARENT 13
+#define COLOR_TRANSPARENT 14
 /**
  * Color of leading zeros.
  */

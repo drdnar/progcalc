@@ -93,6 +93,7 @@ enum ID : uint8_t
     WIDGET_ID_Label,
     WIDGET_ID_Checkbox,
     WIDGET_ID_Button,
+    WIDGET_ID_EnumSelector,
     WIDGET_ID_Container = 0x40,
     WIDGET_ID_RowList = WIDGET_ID_Container,
     WIDGET_ID_RowItems,
@@ -642,30 +643,6 @@ class Widget
 
         friend class GUI;
 };
-
-
-/**
- * An entry in a table of mappings from an Input number to an Output number.
- * Lookups are performed through a binary search, so inputs MUST be sorted in
- * ascending order.
- */
-struct MapTable final
-{
-    const unsigned int Input;
-    const unsigned int Output;
-    /**
-     * Performs a binary search for a mapping in a table.
-     * @param table_size Number of entries in the table.
-     * @param target Reference to number to search for.  If a mapping is found,
-     * it is overwritten with the mapped value.  If no mapping is found, then
-     * it is unchanged.
-     * @return true if a mapping was found, false if not.
-     * @internal This abuses the fact that "this" is a pointer and pointers are
-     * convertable to arrays.
-     */
-    bool Map(size_t table_size, unsigned int& target) const;
-};
-
 
 } /* namespace Forms */
 #endif /* FORMS_H */

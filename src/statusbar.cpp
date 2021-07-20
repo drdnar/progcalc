@@ -15,6 +15,7 @@
 #include "forms/ignorewarning.h"
 #include "forms/gui.h"
 #include "forms/messages.h"
+#include "forms/inlineoptimizations.h"
 
 using namespace Forms;
 
@@ -101,7 +102,7 @@ void StatusBar::_draw_battery_icon()
         lcd_Palette[COLOR_BATTERY_OUTLINE] = lcd_Palette[COLOR_BATTERY_DISCHARGED];
     else
         lcd_Palette[COLOR_BATTERY_OUTLINE] = lcd_Palette[COLOR_BATTERY_NORMAL];
-    memcpy((void*)&lcd_Palette[COLOR_BATTERY_LEVEL_1], &battery_pips[battery_level], sizeof(uint16_t) * 3);
+    memcpy_inline_nonzero((void*)&lcd_Palette[COLOR_BATTERY_LEVEL_1], &battery_pips[battery_level], sizeof(uint16_t) * 3);
     gfx_TransparentSprite_NoClip(battery_icon, window.X + window.Width - battery_icon_width - 1, window.Y + 1);
 }
 
@@ -142,15 +143,15 @@ Status StatusBar::Paint()
     Style_SetSmallFontPropBold();
     fontlib_SetLineSpacing(1, 1);
     fontlib_SetCursorPosition(150, 0);
-    fontlib_DrawString(GetDisplayBitsName(Settings::GetDisplayBits()));
+    fontlib_DrawString(DisplayBitsNames.Get(Settings::GetDisplayBits()));
     fontlib_DrawString(" bits");
     fontlib_SetCursorPosition(220, 0);
-    fontlib_DrawString(GetBaseShortCapsName(Settings::GetPrimaryBase()));
+    fontlib_DrawString(BaseShortCapNames.Get(Settings::GetPrimaryBase()));
     fontlib_SetCursorPosition(260, 0);
     if (Settings::GetSecondaryBase() != NO_BASE)
     {
         fontlib_DrawString("(");
-        fontlib_DrawString(GetBaseShortCapsName(Settings::GetSecondaryBase()));
+        fontlib_DrawString(BaseShortCapNames.Get(Settings::GetSecondaryBase()));
         fontlib_DrawGlyph(')');
     }
     fontlib_SetColors(COLOR_FOREGROUND, COLOR_BACKGROUND);

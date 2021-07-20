@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include "forms/dialogbox.h"
+#include "forms/enumtostring.h"
 
 
 enum SettingsMessageIds
@@ -128,8 +129,11 @@ class Settings final
         static void SetStatusBar(bool value);
         /**
          * Applies changed settings.
+         * @return Returns nullptr if the settings are valid.
+         * If settings are invalid, no changes are made and a string describing
+         * the error is returned.
          */
-        static void Apply(Settings_t& newSettings);
+        static const char* Apply(Settings_t& newSettings);
         /**
          * Copies settings data to another location.
          */
@@ -148,33 +152,21 @@ class Settings final
         friend void SettingsLoadSettings();
 };
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
- * Returns a string that gives the short name of a base.
+ * Mappings of base_t to a short base name, e.g. "hex".
  */
-const char* GetBaseShortName(Base_t base);
-
+extern const Forms::EnumToString BaseShortNames;
 /**
- * Returns a string that gives the short name of a base, in ALL CAPS.
+ * Mappings of base_t to a short base name in ALL CAPS, e.g. "HEX".
  */
-const char* GetBaseShortCapsName(Base_t base);
-
+extern const Forms::EnumToString BaseShortCapNames;
 /**
- * Returns a string that gives the long name of a base.
+ * Mappings of base_t to a long base name, e.g. "Hexadecimal".
  */
-const char* GetBaseLongName(Base_t base);
-
+extern const Forms::EnumToString BaseLongNames;
 /**
- * Converts a DisplayBits const into a string.
+ * Mappings of display bits values to a string, e.g. "64" for SHOW_64.
  */
-const char* GetDisplayBitsName(uint8_t bytes);
-
-#ifdef __cplusplus
-}
-#endif
+extern const Forms::EnumToString DisplayBitsNames;
 
 #endif /* SETTINGS_H */

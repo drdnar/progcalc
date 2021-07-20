@@ -69,7 +69,7 @@ macro ?!
 	purge ?
 end macro
 
-defwidget NullWidget, 
+defwidget NullWidget
 defwidget SingleStyleOverride, db Property, db Data
 defwidget FullStyleOverride, db OverrideFont, db Font, db OverrideForeground, db Foreground, db OverrideBackground, db Background, db OverrideHighlight, db Highlight, db OverrideShadow, db Shadow
 defwidget RowList, children
@@ -78,6 +78,7 @@ defwidget DialogBox, dl Width, db Height, dl OnLoad, children
 defwidget Label, dl Text
 defwidget Checkbox, dl Text, dl Variable
 defwidget Button, dl Text, dl MinimumWidth, db ID, dl OnPress
+defwidget EnumSelector, dl Enum, db VariableSize, dl Variable
 
 ; Alignment options for RowItems
 ROW_ITEMS_LEFT = 0
