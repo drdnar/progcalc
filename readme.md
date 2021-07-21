@@ -23,6 +23,8 @@ Keys:
  * 0-9, math, apps, prgm, x^-1, sin, cos: Enter a digit or hexadecimal digit
  * Enter: Push input to stack
  * Del: If currently entering a number, deletes a digit. If not, removes an entry from the stack.
+ * Up and down: Scroll stack view
+ * 2nd + up and down: Scroll stack view to the top or bottom
  * 2nd + del: Duplicate first stack entry
  * Comma ,: Swap the first two items on the stack
  * (: Rotate stack up
