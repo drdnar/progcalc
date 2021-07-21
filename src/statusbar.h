@@ -39,7 +39,7 @@ class StatusBar final : public Widget, public MessageSink
          * Handles physical painting of the battery icon, as well as making sure
          * the level displayed matches the latest battery level measurement.
          */
-        void _draw_battery_icon();
+        void _update_battery_icon();
         /**
          * Measures the battery level and caches the result.
          */

@@ -76,6 +76,7 @@ bool Checkbox::SendInput(Message& message)
         SetDirty();
     else if (message.Id == MESSAGE_KEY && (message.ExtendedCode == sk_Enter || message.ExtendedCode == sk_2nd))
     {
+        CursorBlinker::Restart();
         dirty = true;
         *variable = !*variable;
         Paint();

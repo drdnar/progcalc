@@ -59,6 +59,7 @@ bool EnumSelector::SendInput(Message& message)
         switch (message.ExtendedCode)
         {
             case sk_Left:
+                CursorBlinker::Restart();
                 if (index == (unsigned int)-1)
                 {
                     enum_string.Write(variable, table->List[0].In);
@@ -74,6 +75,7 @@ bool EnumSelector::SendInput(Message& message)
                 else
                     return false;
             case sk_Right:
+                CursorBlinker::Restart();
                 if (index == (unsigned int)-1)
                 {
                     enum_string.Write(variable, table->List[0].In);

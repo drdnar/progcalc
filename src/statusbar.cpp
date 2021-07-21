@@ -82,7 +82,7 @@ bool StatusBar::SendMessage(Message& message)
 }
 
 
-void StatusBar::_draw_battery_icon()
+void StatusBar::_update_battery_icon()
 {
     if (battery_charging)
         lcd_Palette[COLOR_BATTERY_OUTLINE] = lcd_Palette[COLOR_BATTERY_CHARGING];
@@ -91,7 +91,6 @@ void StatusBar::_draw_battery_icon()
     else
         lcd_Palette[COLOR_BATTERY_OUTLINE] = lcd_Palette[COLOR_BATTERY_NORMAL];
     memcpy_inline_nonzero((void*)&lcd_Palette[COLOR_BATTERY_LEVEL_1], &battery_pips[battery_level], sizeof(uint16_t) * 3);
-    gfx_TransparentSprite_NoClip(battery_icon, window.X + window.Width - battery_icon_width - 1, window.Y + 1);
 }
 
 
@@ -112,7 +111,7 @@ void StatusBar::UpdateBatteryLevel()
 {
     if (RtcTimer_Expired(battery_timer))
         if (_update_battery_level())
-            _draw_battery_icon();
+            _update_battery_icon();
 }
 
 
@@ -143,7 +142,8 @@ Status StatusBar::Paint()
         fontlib_DrawGlyph(')');
     }
     fontlib_SetColors(COLOR_FOREGROUND, COLOR_BACKGROUND);
-    _draw_battery_icon();
+    _update_battery_icon();
+    gfx_TransparentSprite_NoClip(battery_icon, window.X + window.Width - battery_icon_width - 1, window.Y + 1);
     return Status::Success;
 }
 

@@ -318,9 +318,9 @@ extern "C" void AboutDialogLoader([[maybe_unused]] Forms::DialogBox& sender)
     Forms::Container& body = dynamic_cast<Forms::Container&>(sender.Get(1));
     Forms::Label& label = dynamic_cast<Forms::Label&>(body.Get(0));
     label.SetHeight(body.GetHeight());
-    label.SetText("by Dr. D'nar " CALC1252_EN_DASH " Version 1.0 20 July 2021\n"
+    label.SetText("by Dr. D'nar " CALC1252_EN_DASH " Version 1.0 21 July 2021\n"
     "Keys:\n"
-    " " CALC1252_RADIO_CHECKED " Enter: Add input to stack\n"
+    " " CALC1252_RADIO_CHECKED " Y=/Mode: Help/Settings\n"
     " " CALC1252_RADIO_CHECKED " + " CALC1252_MINUS " " CALC1252_MULTIPLY " " CALC1252_DIVIDE ": Basic arithmetic\n"
     " " CALC1252_RADIO_CHECKED " 2nd + " CALC1252_MULTIPLY "/" CALC1252_DIVIDE ": Remainder/R + quotient\n"
     " " CALC1252_RADIO_CHECKED " Del/2nd + del: Delete/duplicate entry\n"
