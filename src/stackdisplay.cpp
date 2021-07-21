@@ -41,7 +41,8 @@ Status StackDisplay::Paint()
     dirty = false;
     unsigned char topUsed = y + height;
     fontlib_SetWindow(x, y, width, height);
-    fontlib_SetCursorPosition(x, topUsed);
+    FontManager::SetFont(FONT_LARGE_PROP);
+    //fontlib_SetCursorPosition(x, topUsed);
     // Cache height of an entry.
     y_t primary_height = Format_GetNumberHeight(Settings::GetPrimaryBase());
     entryHeight = primary_height + Format_GetNumberHeight(Settings::GetSecondaryBase());

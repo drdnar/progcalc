@@ -126,12 +126,6 @@ void Settings::SetPrimaryBase(Base_t base)
 {
     if (base == settings.PrimaryBase)
         return;
-    /** TODO: These need to catch the settings change messages instead. */
-    if (base == settings.SecondaryBase)
-    {
-        settings.SecondaryBase = settings.PrimaryBase;
-        MessageLoop::EnqueueMessage({ .Id = MESSAGE_SETTINGS_CHANGE, .ExtendedCode = SETTINGS_SECONDARY_BASE_CHANGE });
-    }
     settings.PrimaryBase = base;
     MessageLoop::EnqueueMessage({ .Id = MESSAGE_SETTINGS_CHANGE, .ExtendedCode = SETTINGS_PRIMARY_BASE_CHANGE });
 }
