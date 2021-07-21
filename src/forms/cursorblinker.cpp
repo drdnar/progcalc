@@ -1,4 +1,5 @@
 #include "cursorblinker.h"
+#include "crystaltimer.h"
 
 using namespace Forms;
 
@@ -14,7 +15,7 @@ CursorBlinker::CursorBlinker()
 
 bool CursorBlinker::SendMessage(Message& message)
 {
-    if (message.Id == MESSAGE_RTC_TICK)
+    if (message.Id == MESSAGE_HW_TIMER_1_EXPIRED)
     {
         blink = !blink;
         MessageLoop::EnqueueMessage({ .Id = MESSAGE_BLINK, .ExtendedCode = blink });
@@ -27,4 +28,5 @@ void CursorBlinker::Restart()
 {
     blink = true;
     MessageLoop::EnqueueMessage({ .Id = MESSAGE_BLINK, .ExtendedCode = blink });
+    CrystalTimer::Reset();
 }

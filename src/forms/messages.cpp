@@ -52,7 +52,7 @@ bool MessageLoop::RegisterAsynchronousMessageSource(MessageSource& source)
 {
     if (asynchronousMessageSourcesCount >= MAX_ASYNCHRONOUS_MESSAGE_SOURCES)
         return false;
-    MessageSource **entry = &asynchronousMessageSources[0];
+/*    MessageSource **entry = &asynchronousMessageSources[0];
     for (unsigned char i = MAX_ASYNCHRONOUS_MESSAGE_SOURCES; i > 0; i--, entry++)
     {
         if (*entry != nullptr)
@@ -61,8 +61,9 @@ bool MessageLoop::RegisterAsynchronousMessageSource(MessageSource& source)
         *entry = &source;
         asynchronousMessageSourcesCount++;
         return true;
-    }
-    return false;
+    }*/
+    asynchronousMessageSources[asynchronousMessageSourcesCount++] = &source;
+    return true;
 }
 
 
@@ -70,7 +71,7 @@ void MessageLoop::PollAsynchronousMessageSources()
 {
     if (asynchronousMessageSourcesCount == 0)
         return;
-    MessageSource** source = &synchronousMessageSources[0];
+    MessageSource** source = &asynchronousMessageSources[0];
     Message message;
     for (unsigned char i = asynchronousMessageSourcesCount; i > 0; i--, source++)
     {
