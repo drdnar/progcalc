@@ -102,6 +102,8 @@ bool StatusBar::_update_battery_level()
     battery_level = boot_GetBatteryStatus();
     battery_charging = boot_IsCharging();
     battery_timer = GetRtcSeconds() + 30;
+    if (battery_level == 0 && !battery_charging)
+        MessageLoop::EnqueueMessage({ .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = MESSAGE_NONE });
     return level != battery_level || charging != battery_charging;
 }
 
@@ -124,14 +126,14 @@ Status StatusBar::Paint()
     fontlib_HomeUp();
     Style_SetSmallFontPropBold();
     fontlib_SetLineSpacing(1, 1);
-    fontlib_DrawString(" Programmer's Calculator");
+    fontlib_DrawString(" Programmer's Calculator v1.0");
     fontlib_ClearEOL();
     Style_SetSmallFontPropBold();
     fontlib_SetLineSpacing(1, 1);
-    fontlib_SetCursorPosition(150, 0);
+    fontlib_SetCursorPosition(176, 0);
     fontlib_DrawString(DisplayBitsNames.Get(Settings::GetDisplayBits()));
     fontlib_DrawString(" bits");
-    fontlib_SetCursorPosition(220, 0);
+    fontlib_SetCursorPosition(230, 0);
     fontlib_DrawString(BaseShortCapNames.Get(Settings::GetPrimaryBase()));
     fontlib_SetCursorPosition(260, 0);
     if (Settings::GetSecondaryBase() != NO_BASE)

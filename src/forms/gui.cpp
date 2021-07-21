@@ -67,9 +67,12 @@ bool GUI::SendMessage(Message& message)
         begin_dialog((Widget_def*)message.DataPointer);
         return true;
     }
-    else if (dialog_count > 1 && message.Id == MESSAGE_GUI_MODAL_END)
+    else if (message.Id == MESSAGE_GUI_MODAL_END)
     {
-        end_dialog();
+        if (dialog_count > 1)
+            end_dialog();
+        else
+            MessageLoop::EnqueueMessage( { .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = MESSAGE_NONE } );
         return true;
     }
     else

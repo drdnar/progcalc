@@ -3,14 +3,10 @@
 
 include 'widgets.inc'
 
-    extern _SettingsController_HandleOKCancel
-    extern _SettingsController_LoadSettings
-	extern _SettingsController_HandleGuiEvent
+    extern _Forms_Button_HandleOKCancel
     extern _TemporarySettings
 	extern _BaseLongNames
 	extern _DisplayBitsNames
-	extern _SettingsController_LoadErrorDialogMessage
-	extern _SettingsController_CloseErrorDialog
 
 DisplayBits = 0
 PrimaryBase = 1
@@ -21,9 +17,11 @@ AlwaysShowOct = 5
 AlwaysShowBin = 6
 StatusBarEnabled = 7
 
-	public _SettingsDialog
-	public _ErrorDialog
+
+public _SettingsDialog
 _SettingsDialog:
+    extern _SettingsController_LoadSettings
+	extern _SettingsController_HandleGuiEvent
 	DialogBox 260, 180, _SettingsController_LoadSettings, _SettingsController_HandleGuiEvent
 		RowList
 			RowItems ROW_ITEMS_CENTER, 1
@@ -49,15 +47,18 @@ _SettingsDialog:
 		end RowList
 		RowList
 			RowItems ROW_ITEMS_RIGHT, 6
-				Button strOK, 80, 1, _SettingsController_HandleOKCancel
-				Button strCancel, 80, 0, _SettingsController_HandleOKCancel
+				Button strOK, 80, 1, _Forms_Button_HandleOKCancel
+				Button strCancel, 80, 0, _Forms_Button_HandleOKCancel
 			end RowItems
 		end RowList
 	end DialogBox
 	NullWidget
 
+
+public _ErrorDialog
 _ErrorDialog:
-	DialogBox 240, 120, _SettingsController_LoadErrorDialogMessage, 0
+	extern _SettingsController_LoadErrorDialogMessage
+	DialogBox 240, 80, _SettingsController_LoadErrorDialogMessage, 0
 		RowList
 			RowItems ROW_ITEMS_CENTER, 1
 				Label strInvalidSettings
@@ -68,11 +69,33 @@ _ErrorDialog:
 		end RowList
 		RowList
 			RowItems ROW_ITEMS_RIGHT, 6
-				Button strOK, 80, 1, _SettingsController_HandleOKCancel
+				Button strOK, 80, 1, _Forms_Button_HandleOKCancel
 			end RowItems
 		end RowList
 	end DialogBox
 	NullWidget
+
+
+public _AboutDialog
+_AboutDialog:
+	extern _AboutDialogLoader
+	DialogBox 260, 196, _AboutDialogLoader, 0
+		RowList
+			RowItems ROW_ITEMS_CENTER, 1
+				Label strTitle
+			end RowItems
+		end RowList
+		RowList
+			Label strTitle
+		end RowList
+		RowList
+			RowItems ROW_ITEMS_RIGHT, 6
+				Button strOK, 80, 1, _Forms_Button_HandleOKCancel
+			end RowItems
+		end RowList
+	end DialogBox
+	NullWidget
+
 
 strSettings:
 	db	"SETTINGS", 0
@@ -90,3 +113,5 @@ strCancel:
 	db	"Cancel", 0
 strInvalidSettings:
 	db	"INVALID SETTINGS", 0
+strTitle:
+	db	"PROGRAMMER'S CALCULATOR", 0

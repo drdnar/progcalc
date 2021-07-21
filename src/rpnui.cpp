@@ -16,6 +16,8 @@
 #include "forms/messages.h"
 #include "settingscontroller.h"
 #include "forms/gui.h"
+#include "forms/calc1252.h"
+#include "forms/label.h"
 
 using namespace Forms;
 
@@ -118,6 +120,8 @@ bool RPN_UI::SendInput(Message& message)
         bool r;
         unsigned int i;
         BigInt_t* topOfStack;
+        auto primary = Settings::GetPrimaryBase();
+        auto secondary = Settings::GetSecondaryBase();
         switch ((sk_key_t)message.ExtendedCode)
         {
             case sk_Enter:
@@ -149,6 +153,65 @@ bool RPN_UI::SendInput(Message& message)
                 break;
             case sk_RParen:
                 mainStack.RotateUp();
+                break;
+            case sk_GraphVar:
+                if (Settings::GetSecondaryBase() != NO_BASE)
+                {
+                    auto x = Settings::GetSecondaryBase();
+                    Settings::SetSecondaryBase(Settings::GetPrimaryBase());
+                    Settings::SetPrimaryBase(x);
+                }
+                break;
+            case sk_Yequ:
+                MessageLoop::EnqueueMessage(
+                    { .Id = MESSAGE_GUI_MODAL_DIALOG, .DataPointer = (void*)&AboutDialog }
+                );
+                break;
+            case sk_Window:
+                if (secondary == BINARY)
+                    break;
+                Settings::SetPrimaryBase(BINARY);
+                break;
+            case sk_Zoom:
+                if (secondary == OCTAL)
+                    break;
+                Settings::SetPrimaryBase(OCTAL);
+                break;
+            case sk_Trace:
+                if (secondary == DECIMAL)
+                    break;
+                Settings::SetPrimaryBase(DECIMAL);
+                break;
+            case sk_Graph:
+                if (secondary == HEXADECIMAL)
+                    break;
+                Settings::SetPrimaryBase(HEXADECIMAL);
+                break;
+            case sk_2nd_Window:
+                if (primary == BINARY)
+                    break;
+                Settings::SetSecondaryBase(BINARY);
+                break;
+            case sk_2nd_Zoom:
+                if (primary == OCTAL)
+                    break;
+                Settings::SetSecondaryBase(OCTAL);
+                break;
+            case sk_2nd_Trace:
+                if (primary == DECIMAL)
+                    break;
+                Settings::SetSecondaryBase(DECIMAL);
+                break;
+            case sk_2nd_Graph:
+                if (primary == HEXADECIMAL)
+                    break;
+                Settings::SetSecondaryBase(HEXADECIMAL);
+                break;
+            case sk_2nd_Yequ:
+                Settings::SetSecondaryBase(NO_BASE);
+                break;
+            case sk_2nd_Clear:
+                mainStack.Flush();
                 break;
             case sk_Add:
             case sk_Sub:
@@ -247,4 +310,24 @@ void RPN_UI::Reset()
     stackDisplay.Reset();
     input.Reset();
     Layout();
+}
+
+
+extern "C" void AboutDialogLoader([[maybe_unused]] Forms::DialogBox& sender)
+{
+    Forms::Container& body = dynamic_cast<Forms::Container&>(sender.Get(1));
+    Forms::Label& label = dynamic_cast<Forms::Label&>(body.Get(0));
+    label.SetHeight(body.GetHeight());
+    label.SetText("by Dr. D'nar " CALC1252_EN_DASH " Version 1.0 20 July 2021\n"
+    "Keys:\n"
+    " " CALC1252_RADIO_CHECKED " Enter: Add input to stack\n"
+    " " CALC1252_RADIO_CHECKED " + " CALC1252_MINUS " " CALC1252_MULTIPLY " " CALC1252_DIVIDE ": Basic arithmetic\n"
+    " " CALC1252_RADIO_CHECKED " 2nd + " CALC1252_MULTIPLY "/" CALC1252_DIVIDE ": Remainder/R + quotient\n"
+    " " CALC1252_RADIO_CHECKED " Del/2nd + del: Delete/duplicate entry\n"
+    " " CALC1252_RADIO_CHECKED " , ( ): Swap top two, rotate up or down\n"
+    " " CALC1252_RADIO_CHECKED " (" CALC1252_MINUS ")/.: Negate/Bitwise NOT\n"
+    " " CALC1252_RADIO_CHECKED " " CALC1252_SUPERSCRIPT_2 "/Log/Ln: Shift left/right/signed right\n"
+    " " CALC1252_RADIO_CHECKED " ^/Tan: Bitwise AND/OR\n"
+    " " CALC1252_RADIO_CHECKED " 2nd+^/Tan: Bitwise NAND/XOR"
+    );
 }

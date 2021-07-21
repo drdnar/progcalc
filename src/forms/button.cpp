@@ -76,14 +76,12 @@ Status Button::Paint()
         fontlib_DrawGlyph(CALC1252_CURSOR_RIGHT_CHAR);
     else
         fontlib_DrawGlyph(CALC1252_CURSOR_BLANK_CHAR);
-        //fontlib_DrawGlyph(CALC1252_CURSOR_SHADED_CHAR);
     fontlib_DrawString(GetText());
     if (hasFocus && CursorBlinker::IsShowing())
         fontlib_DrawGlyph(CALC1252_CURSOR_LEFT_CHAR);
     else
         fontlib_DrawGlyph(CALC1252_CURSOR_BLANK_CHAR);
         //fontlib_DrawGlyph(CALC1252_CURSOR_SHADED_CHAR);
-    // Erase whitespace on right of text
     unsigned int xx = fontlib_GetCursorX();
     gfx_FillRectangle_NoClip(xx, ty, x + width - DrawBox_RightPadding - xx, height - DrawBox_VerticalPadding);
     return Status::Success;
@@ -95,4 +93,14 @@ void Button::Press()
     auto callback = ((Button_def*)definition)->OnPress;
     if (callback)
         callback(*this);
+}
+
+extern "C" void Forms_Button_HandleOKCancel(Forms::Button& sender)
+{
+    Forms::MessageCode code;
+    if (sender.GetID())
+        code = Forms::GUI_EVENT_OK;
+    else
+        code = Forms::GUI_EVENT_CANCEL;
+    Forms::MessageLoop::EnqueueMessage({ .Id = Forms::MESSAGE_GUI_EVENT, .ExtendedCode = code });
 }

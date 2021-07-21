@@ -11,6 +11,8 @@
 
 using namespace Forms;
 
+extern Forms::Widget_def AboutDialog;
+
 /* Main Function */
 int main(void) {
     Format_InitDisplaySizes();
@@ -20,7 +22,15 @@ int main(void) {
     FontManager::SetFont(FONT_LARGE_PROP);
     KeyboardEventSource::SetIndicatorLocation(LCD_WIDTH - fontlib_GetGlyphWidth(CALC1252_CURSOR_2ND_CHAR), 0);
 
-    MessageLoop::EnqueueMessage( 
+    if (Settings::IsFirstRun())
+    {
+        MessageLoop::EnqueueMessage(
+            { .Id = MESSAGE_GUI_CHANGE_DIALOG, .DataPointer = (void*)&AboutDialog }
+        );
+        MessageLoop::Begin();
+    }
+
+    MessageLoop::EnqueueMessage(
         { .Id = MESSAGE_GUI_CHANGE_DIALOG, .DataPointer = (void*)&RPN_UI_Dialog }
     );
     MessageLoop::Begin();

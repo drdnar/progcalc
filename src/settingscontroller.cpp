@@ -32,17 +32,6 @@ extern "C" bool SettingsController_HandleGuiEvent([[maybe_unused]] Forms::Widget
 }
 
 
-extern "C" void SettingsController_HandleOKCancel(Forms::Button& sender)
-{
-    Forms::MessageCode code;
-    if (sender.GetID())
-        code = Forms::GUI_EVENT_OK;
-    else
-        code = Forms::GUI_EVENT_CANCEL;
-    Forms::MessageLoop::EnqueueMessage({ .Id = Forms::MESSAGE_GUI_EVENT, .ExtendedCode = code });
-}
-
-
 extern "C" void SettingsController_LoadSettings([[maybe_unused]] Forms::DialogBox& sender)
 {
     Settings::CopyTo(TemporarySettings);

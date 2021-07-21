@@ -25,7 +25,8 @@ Settings_t Settings::settings
     .AlwaysShowDec = false,
     .AlwaysShowOct = false,
     .AlwaysShowBin = false,
-    .StatusBarEnabled = true
+    .StatusBarEnabled = true,
+    .FirstRun = true
 };
 
 
@@ -60,6 +61,7 @@ Settings::Settings()
 
 Settings::~Settings()
 {
+    settings.FirstRun = false;
     ti_var_t file;
     FileSettings_t *fileData;
     size_t size = sizeof(Settings_t);

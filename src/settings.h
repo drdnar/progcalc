@@ -48,6 +48,7 @@ struct Settings_t final
     bool AlwaysShowOct;
     bool AlwaysShowBin;
     bool StatusBarEnabled;
+    bool FirstRun;
 };
 
 
@@ -127,6 +128,7 @@ class Settings final
          * Enables/disables StatusBar.
          */
         static void SetStatusBar(bool value);
+        static bool IsFirstRun() { return settings.FirstRun; }
         /**
          * Applies changed settings.
          * @return Returns nullptr if the settings are valid.

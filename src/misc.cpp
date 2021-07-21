@@ -45,28 +45,3 @@ static Style gui_style
 };
 
 Style* const Forms::GUI_DefaultStyle = &gui_style;
-
-
-/******************************************************************************/
-
-/**
- * Magic class that ensures the special FONT_SMALL_PROP_ALIGNED gets initialized.
- */
-class FontInitHook final : FontManager
-{
-    private:
-        static FontInitHook instance;
-        FontInitHook()
-        {
-            /* This is bad but I dislike the alternatives more. */
-            FontDescriptor* const_hack = (FontDescriptor*)FontsList;
-            /*unsigned char big_height = FontManager::GetFont(FONT_LARGE_PROP)->height;
-            unsigned char small_height = FontManager::GetFont(FONT_SMALL_PROP)->height;
-            unsigned char delta_h = big_height - small_height;
-            const_hack[FONT_SMALL_PROP_ALIGNED].OverrideSpaceAbove = delta_h;
-            const_hack[FONT_SMALL_PROP_ALIGNED].OverrideSpaceBelow = big_height - delta_h - small_height;
-            FontManager::ReloadFonts();*/
-        }
-};
-
-FontInitHook FontInitHook::instance;

@@ -6,7 +6,7 @@
 # ----------------------------
 
 NAME        = PROGCALC
-COMPRESSED  ?= NO
+COMPRESSED  ?= YES
 ARCHIVED    ?= NO
 ICON        ?= iconc.png
 DESCRIPTION ?= "Programmer's Calculator"
