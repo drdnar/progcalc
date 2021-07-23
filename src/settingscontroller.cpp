@@ -25,6 +25,7 @@ extern "C" bool SettingsController_HandleGuiEvent([[maybe_unused]] Forms::Widget
 {
     if (id != Forms::GUI_EVENT_OK)
         return false;
+    
     if ((error_message = Settings::Apply(TemporarySettings)) == nullptr)
         return false;
     Forms::MessageLoop::EnqueueMessage({ .Id = Forms::MESSAGE_GUI_MODAL_DIALOG, .DataPointer = &ErrorDialog});

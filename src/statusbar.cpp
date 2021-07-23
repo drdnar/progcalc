@@ -125,7 +125,7 @@ Status StatusBar::Paint()
     fontlib_HomeUp();
     Style_SetSmallFontPropBold();
     fontlib_SetLineSpacing(1, 1);
-    fontlib_DrawString(" Programmer's Calculator v1.0");
+    fontlib_DrawString(" Programmer's Calculator v1.1");
     fontlib_ClearEOL();
     Style_SetSmallFontPropBold();
     fontlib_SetLineSpacing(1, 1);

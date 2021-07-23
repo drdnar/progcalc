@@ -189,6 +189,7 @@ static void unwindowize(void)
     uint8_t y = fontlib_GetCursorY();
     Style_RestoreTextWindow(&oldWindow);
     fontlib_SetCursorPosition(oldWindow.CursorX, y);
+    fontlib_SetForegroundColor(COLOR_FOREGROUND);
 }
 
 
@@ -208,22 +209,55 @@ static char* printBinCh[] =
 };
 
 
+bool zeros;
+static inline void resetZeros()
+{
+    zeros = true;
+    fontlib_SetForegroundColor(COLOR_ZERO);
+}
+
+static void printdigit(char d)
+{
+    if (zeros && d != '0')
+    {
+        zeros = true;
+        fontlib_SetForegroundColor(COLOR_FOREGROUND);
+    }
+    fontlib_DrawGlyph(d);
+}
+
+static const char* printdigits(const char* s, unsigned char count)
+{
+    while (count --> 0)
+    {
+        auto d = *s++;
+        if (zeros && d != '0')
+        {
+            zeros = true;
+            fontlib_SetForegroundColor(COLOR_FOREGROUND);
+        }
+        fontlib_DrawGlyph(d);
+    }
+    return s;
+}
+
+
 unsigned int Format_PrintBin(BigInt_t* n)
 {
     unsigned char h, i;
-    char* ch;
+    const char* ch;
     unsigned int xreturn;
     windowize(Format_BinSize.x);
     xreturn = PrintBaseLabel(BINARY, Format_BinSize.y);
     BigIntToStringBin(n, Format_NumberBuffer);
     /* Array indexing seems to produce less terrible output than if or switch. */
     ch = printBinCh[Settings::GetDisplayBits()];
+    resetZeros();
     for (h = Format_BinSize.y / CHAR_HEIGHT; h > 0; h--)
     {
         for (i = 4; i > 0; i--)
         {
-            fontlib_DrawStringL(ch, BIN_GROUPING);
-            ch = fontlib_GetLastCharacterRead() + 1;
+            ch = printdigits(ch, BIN_GROUPING);
             if (i != 1)
                 printNumSep();
         }
@@ -289,7 +323,7 @@ unsigned int Format_PrintDec(BigInt_t* n)
     expected = printDecExpectedSize[Settings::GetDisplayBits()];
     group = printDecGroups[Settings::GetDisplayBits()];
     subgroup = printDecInitialDigits[Settings::GetDisplayBits()];
-
+    fontlib_SetForegroundColor(COLOR_ZERO);
     if (Settings::GetDisplayBits() == SHOW_128)
     {
         fontlib_DrawString("   ");
@@ -308,6 +342,7 @@ unsigned int Format_PrintDec(BigInt_t* n)
         }
     }
     ch = Format_NumberBuffer;
+    fontlib_SetForegroundColor(COLOR_FOREGROUND);
     do
     {
         fontlib_DrawStringL(ch, subgroup);
@@ -340,15 +375,15 @@ static char* printHexCh[] =
 unsigned int Format_PrintHex(BigInt_t* n)
 {
     unsigned char i;
-    char* ch;
+    const char* ch;
     unsigned int xreturn;
     windowize(Format_HexSize.x);
     xreturn = PrintBaseLabel(HEXADECIMAL, Format_HexSize.y);
     BigIntToStringHex(n, Format_NumberBuffer);
+    resetZeros();
     for (i = printHexI[Settings::GetDisplayBits()], ch = printHexCh[Settings::GetDisplayBits()]; i > 0; i--)
     {
-        fontlib_DrawStringL(ch, HEX_GROUPING);
-        ch = fontlib_GetLastCharacterRead() + 1;
+        ch = printdigits(ch, HEX_GROUPING);
         if (i != 1)
             printNumSep();
     }
@@ -405,12 +440,13 @@ unsigned int Format_PrintOct(BigInt_t* n)
         g = 6;
     }
     
+    resetZeros();
     /* I stopped being clever when I wrote this routine and didn't bother with DrawStringL. */
     h = octFirstGroupDigits[bits];
     ch = printOctCh[bits];
     do
     {
-        fontlib_DrawGlyph(*ch);
+        printdigit(*ch);
         if (!(--h))
         {
             if (g--)

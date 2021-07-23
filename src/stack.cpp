@@ -9,7 +9,6 @@ BigIntStack::BigIntStack(unsigned int max_size)
     if (max_size == 0) /* ? ? ? */
         max_size = 16;
     stack = (BigInt_t*)calloc(max_size, sizeof(BigInt_t));
-/** TODO: Get angry and abort. */
     if (!stack)
         exit(1);
     maxSize = max_size;
@@ -20,6 +19,46 @@ BigIntStack::BigIntStack(unsigned int max_size)
 BigIntStack::~BigIntStack()
 {
     free(stack);
+}
+
+
+BigIntStack& BigIntStack::operator=(const BigIntStack& source)
+{
+    if (this == &source)
+        return *this;
+    if (source.maxSize > maxSize)
+        if (!(stack = (BigInt_t*)realloc(stack, sizeof(BigInt_t) * source.maxSize)))
+            exit(1);
+    maxSize = source.maxSize;
+    size = source.size;
+    memcpy(stack, source.stack, sizeof(BigInt_t) * size);
+    return *this;
+}
+
+
+void BigIntStack::SerializeTo(void* target)
+{
+    *((unsigned int*)target) = maxSize;
+    *((unsigned int*)target + 1) = size;
+    memcpy((unsigned int*)target + 2, stack, sizeof(BigInt_t) * size);
+}
+
+
+void BigIntStack::DeserializeFrom(const void* source)
+{
+    auto newmax = *((const unsigned int*)source);
+    if (newmax > maxSize)
+        if (!(stack = (BigInt_t*)realloc(stack, sizeof(BigInt_t) * newmax)))
+            exit(1);
+    maxSize = newmax;
+    size = *((const unsigned int*)source + 1);
+    memcpy(stack, (const unsigned int*)source + 2, sizeof(BigInt_t) * size);
+}
+
+
+size_t BigIntStack::GetSerializedSize()
+{
+    return sizeof(maxSize) + sizeof(size) + sizeof(BigInt_t) * size;
 }
 
 

@@ -26,7 +26,8 @@ Settings_t Settings::settings
     .AlwaysShowOct = false,
     .AlwaysShowBin = false,
     .StatusBarEnabled = true,
-    .FirstRun = true
+    .FirstRun = true,
+    .SaveStack = true
 };
 
 
@@ -83,7 +84,6 @@ Settings::~Settings()
         if (!ti_Delete(SETTINGS_FILE_NAME))
             return;
     } while (false);
-    ti_Close(file);
     file = ti_Open(SETTINGS_FILE_NAME, "w");
     do
     {
@@ -209,6 +209,7 @@ const char* Settings::Apply(Settings_t& newSettings)
         SetAlwaysShowDec(newSettings.AlwaysShowDec);
     if (newSettings.AlwaysShowHex != settings.AlwaysShowHex)
         SetAlwaysShowHex(newSettings.AlwaysShowHex);
+    settings.SaveStack = newSettings.SaveStack;
     return nullptr;
 }
 

@@ -16,7 +16,7 @@ AlwaysShowDec = 4
 AlwaysShowOct = 5
 AlwaysShowBin = 6
 StatusBarEnabled = 7
-
+SaveStack = 9
 
 public _SettingsDialog
 _SettingsDialog:
@@ -43,6 +43,9 @@ _SettingsDialog:
 			end RowItems
 			RowItems ROW_ITEMS_LEFT, 3
 				Checkbox strShowStatusBar, _TemporarySettings + StatusBarEnabled
+			end RowItems
+			RowItems ROW_ITEMS_LEFT, 3
+				Checkbox strSaveStack, _TemporarySettings + SaveStack
 			end RowItems
 		end RowList
 		RowList
@@ -107,6 +110,8 @@ strSecondaryBase:
 	db	"Secondary base:", 0
 strShowStatusBar:
 	db	"Show status bar", 0
+strSaveStack:
+	db	"Save stack on exit", 0
 strOK:
 	db	"OK", 0
 strCancel:

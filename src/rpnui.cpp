@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <tice.h>
 #include <fontlibc.h>
+#include <fileioc.h>
 #include <graphx.h>
 #include "rpnui.h"
 #include "settings.h"
@@ -18,6 +19,7 @@
 #include "forms/gui.h"
 #include "forms/calc1252.h"
 #include "forms/label.h"
+#include "forms/ignorewarning.h"
 
 using namespace Forms;
 
@@ -25,6 +27,7 @@ using namespace Forms;
 /******************************************************************************
  * Forms stuff
  ******************************************************************************/
+
 static Widget_def* GetNextItem(Widget_def* Template)
 {
     if (Template == nullptr)
@@ -57,6 +60,10 @@ extern "C" const Widget_desc RPN_UI_desc
  * Implementation stuff
  ******************************************************************************/
 
+#define STACK_FILE_HEADER "Programmer's Calculator stack"
+#define STACK_FILE_NAME "ProgStac"
+#define VERSION_ID 1
+
 BigInt_t RPN_UI::Temp1;
 
 BigInt_t RPN_UI::Temp2;
@@ -70,6 +77,46 @@ RPN_UI::RPN_UI()
     width = LCD_WIDTH;
     Add(stackDisplay);
     Add(input);
+    
+    ti_var_t file = ti_Open(STACK_FILE_NAME, "r");
+    do
+    {
+        if (!file)
+            break;
+        const char* data = (const char*)ti_GetDataPtr(file);
+        if (strncmp(data, STACK_FILE_HEADER, sizeof(STACK_FILE_HEADER)))
+            break;
+        mainStack.DeserializeFrom(data + sizeof(STACK_FILE_HEADER));
+    } while (false);
+    ti_Close(file);
+}
+
+
+RPN_UI::~RPN_UI()
+{
+    ti_Delete(STACK_FILE_NAME);
+    if (mainStack.GetSize() == 0)
+        return;
+    ti_var_t file = ti_Open(STACK_FILE_NAME, "w");
+    do
+    {
+        if (!file)
+        {
+            ti_Close(file);
+            return;
+        }
+        size_t space = mainStack.GetSerializedSize() + sizeof(STACK_FILE_HEADER);
+        IGNORE_WARNING("-Wsign-compare")
+        if (space != ti_Resize(space, file))
+        END_IGNORE_WARNING
+            break;
+        ti_Write(STACK_FILE_HEADER, sizeof(STACK_FILE_HEADER), 1, file);
+        mainStack.SerializeTo(ti_GetDataPtr(file));
+        ti_Close(file);
+        return;
+    } while (false);
+    ti_Close(file);
+    ti_Delete(STACK_FILE_NAME);
 }
 
 
@@ -318,7 +365,7 @@ extern "C" void AboutDialogLoader([[maybe_unused]] Forms::DialogBox& sender)
     Forms::Container& body = dynamic_cast<Forms::Container&>(sender.Get(1));
     Forms::Label& label = dynamic_cast<Forms::Label&>(body.Get(0));
     label.SetHeight(body.GetHeight());
-    label.SetText("by Dr. D'nar " CALC1252_EN_DASH " Version 1.0 21 July 2021\n"
+    label.SetText("by Dr. D'nar " CALC1252_EN_DASH " Version 1.1 22 July 2021\n"
     "Keys:\n"
     " " CALC1252_RADIO_CHECKED " Y=/Mode: Help/Settings\n"
     " " CALC1252_RADIO_CHECKED " + " CALC1252_MINUS " " CALC1252_MULTIPLY " " CALC1252_DIVIDE ": Basic arithmetic\n"

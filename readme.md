@@ -10,7 +10,7 @@ But I'm not rewriting the RPN stack input.
 
 To do a calculation, you enter a number, press enter, and then enter another number.
 Then you press an operation key to perform an operation on the two numbers.
-Previous calculation results are stored on a stack, and you can them to perform additional calculations.
+Previous calculation results are stored on a stack, and you can use them to perform additional calculations.
 
 Two bases can be used at the same time.
 The primary base is the base that is used for input.

@@ -13,7 +13,7 @@ class GraphX
             gfx_Begin();
             gfx_SetPalette(Palette_Global, sizeof_Palette_Global, 0);
             gfx_SetTransparentColor(COLOR_TRANSPARENT);
-            gfx_FillScreen(COLOR_ZERO);
+            gfx_FillScreen(COLOR_BACKGROUND);
         }
         ~GraphX() { gfx_End(); }
 } instance;

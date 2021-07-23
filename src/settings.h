@@ -49,6 +49,7 @@ struct Settings_t final
     bool AlwaysShowBin;
     bool StatusBarEnabled;
     bool FirstRun;
+    bool SaveStack;
 };
 
 
@@ -125,9 +126,21 @@ class Settings final
          */
         static bool GetStatusBar() { return settings.StatusBarEnabled; }
         /**
+         * Checks if the stack should be saved.
+         */
+        static bool SaveStack() { return settings.SaveStack; }
+        /**
+         * Controls whether the stack will be saved on quit and restored on
+         * resume.
+         */
+        static void SetSaveStack(bool value) { settings.SaveStack = value; }
+        /**
          * Enables/disables StatusBar.
          */
         static void SetStatusBar(bool value);
+        /**
+         * Check if this is the first time running the program.
+         */
         static bool IsFirstRun() { return settings.FirstRun; }
         /**
          * Applies changed settings.

@@ -7,7 +7,7 @@
 
 NAME        = PROGCALC
 COMPRESSED  ?= YES
-ARCHIVED    ?= NO
+ARCHIVED    ?= YES
 ICON        ?= iconc.png
 DESCRIPTION ?= "Programmer's Calculator"
 OUTPUT_MAP  ?= YES

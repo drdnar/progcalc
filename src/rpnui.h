@@ -42,11 +42,12 @@ class RPN_UI final : public Forms::Container
          */
         static Forms::Widget* RPN_UI_ctor(Forms::Widget_def* Template, Forms::Widget* parent, Forms::Widget_def** next);
         RPN_UI();
+        ~RPN_UI();
     private:
         /**
          * User's entry stack.
          */
-        BigIntStack mainStack { 99 };
+        BigIntStack mainStack { 100 };
         /**
          * Just fetches the entry stack.
          */
@@ -80,6 +81,7 @@ class RPN_UI final : public Forms::Container
          * Temporary value used in computations.
          */
         static BigInt_t Temp3;
+
     friend class StackDisplay;
     friend class BigIntInput;
 };
