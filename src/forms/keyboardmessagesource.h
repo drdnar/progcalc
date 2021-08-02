@@ -2,6 +2,7 @@
 #define FORMS_KEYBOARD_EVENT_SOURCE_H
 #include "messages.h"
 #include <graphx.h>
+#include "textmanager.h"
 
 extern "C" const unsigned int ApdDimTime;
 extern "C" const unsigned int ApdQuitTime;
@@ -64,6 +65,14 @@ class KeyboardEventSource final : public MessageSource, public MessageSink
          */
         static y_t GetIndicatorY() { return cursor_y; }
         /**
+         * Controls what font the indicator will use.
+         */
+        static void SetIndicatorFont(FontId font);
+        /**
+         * Controls what glyph is actually displayed as the indicator.
+         */
+        static void SetIndicatorChar(char c);
+        /**
          * Enables processing of dead keys (2nd, Alpha).
          */
         static void EnableModifiers();
@@ -105,10 +114,6 @@ class KeyboardEventSource final : public MessageSource, public MessageSink
          * This is magic hook that ensures this gets initialized.
          */
         static KeyboardEventSource instance;
-        /**
-         * Assumed height of the indicator cursor.
-         */
-        const unsigned char INDICATOR_HEIGHT = 14;
         KeyboardEventSource();
         /**
          * Controls whether a cursor indicator will be shown.
@@ -126,6 +131,14 @@ class KeyboardEventSource final : public MessageSource, public MessageSink
          * Cursor location.
          */
         static y_t cursor_y;
+        /**
+         * Cursor font.
+         */
+        static FontId cursor_font;
+        /**
+         * What to actually use as the cursor.
+         */
+        static char cursor_char;
         /**
          * Internal routine that draws the cursor.
          */
@@ -162,6 +175,10 @@ class KeyboardEventSource final : public MessageSource, public MessageSink
          * Caches state of capital alpha modifier.
          */
         //static bool ALPHA = false;
+        /**
+         * Handles some graphical details with the cursor.
+         */
+        static void redo_cursor();
         /**
          * Caches whatever was under the 2nd/alpha indicator.
          */

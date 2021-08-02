@@ -101,10 +101,7 @@ Settings::~Settings()
         if (!ti_Write(&settings, sizeof(Settings_t), 1, file))
             break;
         if (archived/* && ti_ArchiveHasRoom(sizeof(FileSettings_t))*/)
-        {
-            gfx_End();
             ti_SetArchiveStatus(true, file);
-        }
         ti_Close(file);
         return;
     } while (false);
@@ -119,7 +116,6 @@ void Settings::SetDisplayBits(uint8_t bits)
         return;
     settings.DisplayBits = bits;
     MessageLoop::EnqueueMessage({ .Id = MESSAGE_SETTINGS_CHANGE, .ExtendedCode = SETTINGS_DISPLAY_BITS_CHANGE });
-    /** TODO: These need to catch the settings change messages instead. */
     Format_ConfigureDisplaySizes();
 }
 

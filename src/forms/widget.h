@@ -302,6 +302,10 @@ enum MessageId
      */
     MESSAGE_SETTINGS_CHANGE_DATA,
     /**
+     * The entire screen must be fully repainted.
+     */
+    MESSAGE_REPAINT_ALL,
+    /**
      * Instructs the GUI manager to change to a new Form.
      * Any currently active Form is deleted.
      * DataPointer is a Form to construct.

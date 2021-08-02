@@ -17,11 +17,14 @@ extern Forms::Widget_def AboutDialog;
 int main(void) {
     Format_InitDisplaySizes();
     Format_ConfigureDisplaySizes();
+    FontManager::SetFont(FONT_LARGE_PROP);
+    fontlib_SetFirstPrintableCodePoint(12);
+    KeyboardEventSource::SetIndicatorFont(FONT_LARGE_PROP);
+    KeyboardEventSource::SetIndicatorChar(CALC1252_CURSOR_2ND_CHAR);
+    KeyboardEventSource::SetIndicatorLocation(LCD_WIDTH - fontlib_GetGlyphWidth(CALC1252_CURSOR_2ND_CHAR), 0);
     KeyboardEventSource::Enable2nd();
     KeyboardEventSource::EnableIndicator();
-    FontManager::SetFont(FONT_LARGE_PROP);
-    KeyboardEventSource::SetIndicatorLocation(LCD_WIDTH - fontlib_GetGlyphWidth(CALC1252_CURSOR_2ND_CHAR), 0);
-
+    
     if (Settings::IsFirstRun())
     {
         MessageLoop::EnqueueMessage(

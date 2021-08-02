@@ -41,6 +41,10 @@ class GUI : public MessageSink, public Widget
          */
         static Container* GetActiveDialog() { return active_dialog; }
         /**
+         * Forces full repainting of everything.
+         */
+        void ForceDirty();
+        /**
          * Returns the Style for the active dialog.
          */
         static const Style& GetActiveStyle();
@@ -74,6 +78,10 @@ class GUI : public MessageSink, public Widget
          * Internal routine that cleans up a closed dialog.
          */
         static void end_dialog();
+        /**
+         * Force full repaint of literally everything.
+         */
+        static bool super_dirty;
 };
 
 } /* namespace Forms */

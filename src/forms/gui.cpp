@@ -21,6 +21,8 @@ unsigned char GUI::dialog_count { 0 };
 
 Container* GUI::active_dialog { nullptr };
 
+bool GUI::super_dirty { false };
+
 
 GUI::GUI() : MessageSink(SINK_PRIORITY_NORMAL)
 {
@@ -41,7 +43,24 @@ GUI::GUI() : MessageSink(SINK_PRIORITY_NORMAL)
 Status GUI::Paint()
 {
     if (active_dialog)
-        return active_dialog->Paint();
+    {
+        dirty = false;
+        if (super_dirty)
+        {
+            super_dirty = false;
+            auto dialog = &dialogs[0];
+            for (unsigned char i = dialog_count - 1; i > 0; i--, dialog++)
+            {
+                (*dialog)->Focus();
+                (*dialog)->SetDirtyAll();
+                (*dialog)->Paint();
+                (*dialog)->Unfocus();
+            }
+            return (*dialog)->Paint();
+        }
+        else
+            return active_dialog->Paint();
+    }
     else
         return Status::Failure;
 }
@@ -75,6 +94,12 @@ bool GUI::SendMessage(Message& message)
             MessageLoop::EnqueueMessage( { .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = MESSAGE_NONE } );
         return true;
     }
+    else if (message.Id == MESSAGE_REPAINT_ALL)
+    {
+        SetDirty();
+        super_dirty = true;
+        return false;
+    }
     else
     {
         if (active_dialog)
@@ -106,6 +131,7 @@ void GUI::begin_dialog(Widget_def* widget)
     dialogs[dialog_count++] = active_dialog;
     active_dialog->Layout();
     active_dialog->Focus();
+    instance.dirty = true;
 }
 
 
@@ -124,6 +150,9 @@ void GUI::end_dialog()
     }
     else
         active_dialog = nullptr;
+    // I don't think it should be necessary to explicitly mark this as dirty;
+    // that should happen automatically when a child is set dirty.
+    instance.dirty = true;
 }
 
 

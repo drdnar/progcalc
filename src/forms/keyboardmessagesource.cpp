@@ -6,7 +6,7 @@
 #include "ez80.h"
 #include "calc1252.h"
 #include "textmanager.h"
-#include "../misc.h"
+//#include "../misc.h"
 #include "maptable.h"
 
 using namespace Forms;
@@ -22,19 +22,13 @@ bool KeyboardEventSource::second = 0;
 //bool KeyboardEventSource::alpha = false;
 //bool KeyboardEventSource::ALPHA = false;
 gfx_sprite_t* KeyboardEventSource::under_indicator = nullptr;
-
+FontId KeyboardEventSource::cursor_font { 0 };
+char KeyboardEventSource::cursor_char { 0 };
 
 
 KeyboardEventSource::KeyboardEventSource()
  : MessageSink(SINK_PRIORITY_MINIMAL)
 {
-    fontlib_font_t* font = fontlib_GetFontByStyle("DrSans", 14, 14, FONTLIB_BOLD, FONTLIB_BOLD, 0, 0);
-    if (font)
-    {
-        fontlib_SetFont(font, (fontlib_load_options_t)0);
-        under_indicator = gfx_MallocSprite(fontlib_GetGlyphWidth(CALC1252_CURSOR_2ND_CHAR), INDICATOR_HEIGHT);
-    }
-    /* Otherwise, initialization will fail later when trying to load fonts. */
     MessageLoop::RegisterSynchronousMessageSource(*this);
     MessageLoop::RegisterMessageSink(*this);
 }
@@ -180,12 +174,12 @@ void KeyboardEventSource::show_cursor()
         return;
     CursorSaver savedCursor;
     gfx_GetSprite(under_indicator, cursor_x, cursor_y);
-    FontManager::SetFont(FONT_LARGE_PROP);
+    FontManager::SetFont(cursor_font);
     fontlib_SetCursorPosition(cursor_x, cursor_y);
     /* Since the battery icon is updated by changing its palette entries,
      * there's no need to worry about the 2nd indicator being overwritten
      * when the battery icon is updated.*/
-    fontlib_DrawGlyph(CALC1252_CURSOR_2ND_CHAR);
+    fontlib_DrawGlyph(cursor_char);
     cursor_shown = true;
 }
 
@@ -240,4 +234,31 @@ void KeyboardEventSource::reset2nd()
         return;
     unshow_cursor();
     second = false;
+}
+
+
+void KeyboardEventSource::redo_cursor()
+{
+    unshow_cursor();
+    FontManager::SetFont(cursor_font);
+    auto w = fontlib_GetGlyphWidth(cursor_char);
+    auto h = fontlib_GetCurrentFontHeight();
+    if (under_indicator && under_indicator->width <= w && under_indicator->height <= h)
+        return;
+    free(under_indicator);    
+    under_indicator = gfx_MallocSprite(fontlib_GetGlyphWidth(cursor_char), h);
+}
+
+
+void KeyboardEventSource::SetIndicatorFont(FontId font)
+{
+    cursor_font = font;
+    redo_cursor();
+}
+
+
+void KeyboardEventSource::SetIndicatorChar(char c)
+{
+    cursor_char = c;
+    redo_cursor();
 }
