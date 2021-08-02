@@ -75,6 +75,8 @@ bool StatusBar::SendMessage(Message& message)
         else
             dirty = true;
     }
+    else if (message.Id == MESSAGE_REPAINT_ALL)
+        SetDirty();
     if (dirty)
         Paint();
     UpdateBatteryLevel();
@@ -125,7 +127,7 @@ Status StatusBar::Paint()
     fontlib_HomeUp();
     Style_SetSmallFontPropBold();
     fontlib_SetLineSpacing(1, 1);
-    fontlib_DrawString(" Programmer's Calculator v1.1");
+    fontlib_DrawString(" Programmer's Calculator v" VERSION_NUMBER);
     fontlib_ClearEOL();
     Style_SetSmallFontPropBold();
     fontlib_SetLineSpacing(1, 1);

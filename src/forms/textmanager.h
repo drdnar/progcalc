@@ -214,6 +214,22 @@ const char* PrintLine(const char* string, bool fake_print, x_t* final_x = nullpt
 const char* Print(const char* string);
 
 /**
+ * This is just like Print(), but also centers the text.
+ * @return Returns a pointer to the last character processed, which will either
+ * be '\0', an unprocessed control code, or the first character of the next
+ * line of text if the string was too big to fit in the current text window.
+ */
+const char* PrintCenter(const char* string);
+
+/**
+ * This is just like Print(), but the text is right-aligned.
+ * @return Returns a pointer to the last character processed, which will either
+ * be '\0', an unprocessed control code, or the first character of the next
+ * line of text if the string was too big to fit in the current text window.
+ */
+const char* PrintRight(const char* string);
+
+/**
  * Gets the width and height of a string printed using the current font and
  * window.
  * @note This also cares about cursor position.

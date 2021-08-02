@@ -55,6 +55,7 @@ void FontManager::load_fonts()
     initialized = true;
     if (FontsCount > MAX_FONTS)
         InitializationError("Configured Forms::FontsCount > Forms::FontManager::MAX_FONTS");
+    fontlib_SetNewlineCode(0);
     initial_loading = true;
     ReloadFonts();
     initial_loading = false;
@@ -115,7 +116,7 @@ void WordWrap::GetTextDimensions(const char* string, Coord& size, x_t max_width)
         ch = (unsigned char)*string;
         if (ch == '\n')
         {
-            string++;
+            ch = (unsigned char)(*++string);
             fontlib_SetCursorPosition(saver.Window.X, saver.Window.CursorY);
         }
     } while (ch != 0 && ch > first);
@@ -129,32 +130,77 @@ void WordWrap::GetTextDimensions(const char* string, Coord& size, x_t max_width)
  * failure.
  */
 #define fontlib_Newline (*(unsigned char (*)(void))&fontlib_Newline)
+/**
+ * Prints a line and also processes control codes.
+ * @return Returns true if printing should continue to next line.
+ */
+static bool print_line_processed(const char*& string)
+{
+    string = WordWrap::PrintLine(string, false);
+    unsigned char ch = (unsigned char)*string;
+    if (ch < fontlib_GetFirstPrintableCodePoint())
+    {
+        if (ch == '\n')
+        {
+            string++;
+            if (fontlib_Newline() > 0)
+                return false;
+        }
+        else
+            return false;
+    }
+    else if (ch == '\0')
+        return false;
+    else
+        if (fontlib_Newline() > 0)
+            return false;
+    return true;
+}
+
+
 const char* WordWrap::Print(const char* string)
 {
     auto nlopts = fontlib_GetNewlineOptions();
-    unsigned char first_printable = (unsigned char)fontlib_GetFirstPrintableCodePoint();
     fontlib_SetNewlineOptions(FONTLIB_AUTO_CLEAR_TO_EOL | FONTLIB_ENABLE_AUTO_WRAP);
-    unsigned char ch;
+    do ; while (print_line_processed(string));
+    fontlib_SetNewlineOptions(nlopts);
+    return string;
+}
+
+
+const char* WordWrap::PrintCenter(const char* string)
+{
+    auto nlopts = fontlib_GetNewlineOptions();
+    fontlib_SetNewlineOptions(FONTLIB_AUTO_CLEAR_TO_EOL | FONTLIB_ENABLE_AUTO_WRAP);
+    x_t half_width = fontlib_GetWindowWidth() / 2;
+    gfx_SetColor(fontlib_GetBackgroundColor());
     do
     {
-        string = PrintLine(string, false);
-        ch = (unsigned char)*string;
-        if (ch < first_printable)
-        {
-            if (ch == '\n')
-            {
-                string++;
-                if (fontlib_Newline() > 0)
-                    break;
-            }
-            else
-                break;
-        }
-        else
-            if (fontlib_Newline() > 0)
-                break;
-    } while (ch != 0 && ch >= first_printable);
+        // Get line width
+        x_t xx;
+        PrintLine(string, true, &xx);
+        xx = half_width - (xx - fontlib_GetCursorX()) / 2;
+        gfx_FillRectangle_NoClip(fontlib_GetWindowXMin(), fontlib_GetCursorY(), xx, fontlib_GetCurrentFontHeight());
+        fontlib_SetCursorPosition(fontlib_GetWindowXMin() + xx, fontlib_GetCursorY());
+    } while (print_line_processed(string));
     fontlib_SetNewlineOptions(nlopts);
+    return string;
+}
+
+
+const char* WordWrap::PrintRight(const char* string)
+{
+    x_t window_width = fontlib_GetWindowWidth();
+    gfx_SetColor(fontlib_GetBackgroundColor());
+    do
+    {
+        // Get line width
+        x_t xx;
+        PrintLine(string, true, &xx);
+        xx = window_width - (xx - fontlib_GetCursorX());
+        gfx_FillRectangle_NoClip(fontlib_GetWindowXMin(), fontlib_GetCursorY(), xx, fontlib_GetCurrentFontHeight());
+        fontlib_SetCursorPosition(fontlib_GetWindowXMin() + xx, fontlib_GetCursorY());
+    } while (print_line_processed(string));
     return string;
 }
 
