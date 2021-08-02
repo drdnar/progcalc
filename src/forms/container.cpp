@@ -145,6 +145,7 @@ bool Container::Broadcast(Message& message)
 
 void Container::SetDirtyAll()
 {
+    // GUI and GraphX require this to do nothing if GUI is uninitialized.
     SetDirty();
     really_dirty = true;
     if (!count)

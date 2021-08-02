@@ -4,7 +4,9 @@
 #include "forms/widget.h"
 #include "forms/gui.h"
 #include "forms/style.h"
+#include "forms/graphx.h"
 #include "style.h"
+#include "gfx/gfx.h"
 
 using namespace Forms;
 
@@ -33,7 +35,8 @@ const FontDescriptor (&Forms::FontsList)[] =
 extern const unsigned char Forms::FontsCount = 5;
 
 
-/******************************************************************************/
+GraphX graphx { Palette_Global, sizeof_Palette_Global, 0, COLOR_BACKGROUND, COLOR_TRANSPARENT };
+
 
 static Style gui_style
 {
