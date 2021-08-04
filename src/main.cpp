@@ -42,12 +42,6 @@ int main(void) {
 }
 
 
-void ExitClean(void)
-{
-    exit(0);
-}
-
-
 extern "C" void InitializationError(const char* message)
 {
     os_ClrHome();

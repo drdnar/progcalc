@@ -10,7 +10,7 @@
 	public _CheckIfOnKeyPressed
 	public _ClearOnKeyPressed
 	public _RtcTimer_Expired
-	extern _ExitClean
+	extern _exit
 ;	public _CallIfNotNull
 ;	public _CallIfNotNull8
 ;	public _CallIfNotNull24
@@ -115,7 +115,10 @@ _GetCSC_Breakable:
 	ld	hl, flags + 9	; onFlags
 	bit	4, (hl)		; onInterrupt
 	ret	z
-	jp	_ExitClean
+;	Uncomment this if there's ever anything that cares about the exit code.
+;	or	a, a
+;	sbc	hl, hl
+	jp	_exit
 
 
 _CheckIfOnKeyPressed:

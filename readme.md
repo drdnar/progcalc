@@ -17,7 +17,7 @@ The primary base is the base that is used for input.
 The secondary base, if enabled, is always displayed as well, providing for a sort of automatic base conversion.
 
 Keys:
- * Y=: Show about dialog and keys
+ * Vars: Show about dialog and keys
  * Mode: Open settings dialog
  * 2nd + mode or clear: Quit program
  * 0-9, math, apps, prgm, x^-1, sin, cos: Enter a digit or hexadecimal digit

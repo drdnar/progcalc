@@ -50,11 +50,12 @@ bool Button::SendInput(Message& message)
 //        return false;
     if (message.Id == MESSAGE_BLINK)
         SetDirty();
-    else if (message.Id == MESSAGE_KEY && message.ExtendedCode == sk_Enter)
-    {
-        Press();
-        return true;
-    }
+    else if (message.Id == MESSAGE_KEY)
+        if (message.ExtendedCode == sk_Enter || message.ExtendedCode == sk_Yequ)
+        {
+            Press();
+            return true;
+        }
     return false;
 }
 

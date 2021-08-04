@@ -129,7 +129,7 @@ Status RPN_UI::Paint()
     Coord size;
     WindowSaver saver;
     GetStyle().ActivateFont();
-    auto message = "Press Y= for help.\n"
+    auto message = "Press Vars for help.\n"
                    "Press Clear to quit.\n"
                    "Press Mode for settings.";
     WordWrap::GetTextDimensions(message, size, width - 40);
@@ -197,6 +197,7 @@ bool RPN_UI::SendInput(Message& message)
         switch ((sk_key_t)message.ExtendedCode)
         {
             case sk_Enter:
+            case sk_Yequ:
                 return AcquireInput();
             case sk_Del:
                 r = !!mainStack.PopStalePointer();
@@ -234,7 +235,7 @@ bool RPN_UI::SendInput(Message& message)
                     Settings::SetPrimaryBase(x);
                 }
                 break;
-            case sk_Yequ:
+            case sk_Vars:
                 MessageLoop::EnqueueMessage(
                     { .Id = MESSAGE_GUI_MODAL_DIALOG, .DataPointer = (void*)&AboutDialog }
                 );
