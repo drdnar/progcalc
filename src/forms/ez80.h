@@ -37,6 +37,13 @@ void Lcd_Dim(void);
 void Lcd_Bright(void);
 
 /**
+ * Requests the calculator turn off when the program ends.
+ * If run from a shell, this probably won't do anything, which is intentional
+ * behavior.
+ */
+void TurnOffOnExit(void);
+
+/**
  * Returns the number of seconds elapsed since the start of the hour.
  * Used by APD routines.
  */

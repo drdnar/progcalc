@@ -11,6 +11,7 @@
 	public _ClearOnKeyPressed
 	public _RtcTimer_Expired
 	extern _exit
+	public _TurnOffOnExit
 ;	public _CallIfNotNull
 ;	public _CallIfNotNull8
 ;	public _CallIfNotNull24
@@ -59,6 +60,14 @@ _Lcd_Bright:
 ; Restores the LCD brightness to the user's preference.
 	ld	iy, flags
 	jp	_RestoreLCDBrightness
+
+
+_TurnOffOnExit:
+; Sets apdTimer to 1, which will trigger the OS to APD quickly after the program
+; ends.
+	ld	a, 1
+	ld	(0D00591h), a
+	ret
 
 
 ;-------------------------------------------------------------------------------
@@ -125,10 +134,10 @@ _CheckIfOnKeyPressed:
 ; Returns 1 if the ON key has been pressed since the last time the
 ; ON-key-pressed flag was checked.
 ; Returns 0 if the ON key has not been pressed.
-	ld	hl, flags + 9
+	ld	a, (flags + 9)
 	and	10h
 	ret	z
-	inc	a
+	ld	a, 1
 	ret
 
 

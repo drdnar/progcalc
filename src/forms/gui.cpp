@@ -5,6 +5,7 @@
 #include <tice.h>
 #include <fontlibc.h>
 #include "style.h"
+#include "ez80.h"
 
 using namespace Forms;
 
@@ -99,6 +100,12 @@ bool GUI::SendMessage(Message& message)
         SetDirty();
         super_dirty = true;
         return false;
+    }
+    else if (message.Id == MESSAGE_KEY && message.ExtendedCode == sk_Off)
+    {
+        TurnOffOnExit();
+        MessageLoop::EnqueueMessage( { .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = MESSAGE_NONE } );
+        return true;
     }
     else
     {

@@ -55,6 +55,7 @@ bool APD::SendMessage(Message& message)
             {
                 apd_fired = true;
                 MessageLoop::EnqueueMessage({ .Id = MESSAGE_APD, .ExtendedCode = APD_TURN_OFF });
+                TurnOffOnExit();
             }
         }
     }

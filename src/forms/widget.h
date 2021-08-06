@@ -79,6 +79,7 @@ typedef uint8_t Color_t;
 #define sk_2nd_Tan          (sk_2nd_Modifier | sk_Tan       )
 #define sk_2nd_Vars         (sk_2nd_Modifier | sk_Vars      )
 #define sk_2nd_Power        (sk_2nd_Modifier | sk_Power     )
+#define sk_Off              (sk_2nd_Modifier | 0x29         ) /**< 2nd + On */
 
 
 class Widget;

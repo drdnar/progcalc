@@ -48,6 +48,11 @@ Message KeyboardEventSource::GetMessage()
         ClearOnKeyPressed();
         return { .Id = MESSAGE_RAW_KEY, .ExtendedCode = key };
     }
+    if (enable_modifiers && second_enabled && second && CheckIfOnKeyPressed())
+    {
+        reset2nd();
+        return { .Id = MESSAGE_KEY, .ExtendedCode = sk_Off };
+    }
     return { .Id = MESSAGE_NONE, .ExtendedCode = MESSAGE_NONE };
 }
 
