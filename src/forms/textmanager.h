@@ -28,9 +28,6 @@ struct Coord final
 {
     x_t x;
     y_t y;
-    Coord() = default;
-    Coord(Coord& c) = default;
-    Coord(Coord&& c) = default;
 };
 
 
@@ -44,16 +41,14 @@ struct CursorLoc final
     /**
      * Gets FontLib's cursor location.
      */
-    void Save() ;//{ x = fontlib_GetCursorX(); y = fontlib_GetCursorY(); }
+    void Save();//{ x = fontlib_GetCursorX(); y = fontlib_GetCursorY(); }
     /**
      * Sets FontLib's cursor location.
      */
-    void Restore() const ;//{ fontlib_SetCursorPosition(x, y); }
+    void Restore() const;// { fontlib_SetCursorPosition(x, y); }
+    CursorLoc(Coord c) : x(c.x), y(c.y) { }
+    CursorLoc(x_t x, y_t y) : x(x), y(y) { }
     CursorLoc() = default;
-    //CursorLoc(Coord c) : x(c.x), y(c.y) { }
-    //CursorLoc(x_t x, y_t y) : x(x), y(y) { }
-    CursorLoc(CursorLoc& c) = default;
-    CursorLoc(CursorLoc&& c) = default;
 };
 
 

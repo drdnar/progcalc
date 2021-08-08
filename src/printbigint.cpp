@@ -10,12 +10,17 @@
 char Format_NumberBuffer[MAX_FORMATTED_NUMBER_SIZE];
 BigInt_t tempn;
 
-Coord_t Format_HexSize;
-Coord_t Format_DecSize;
-Coord_t Format_OctSize;
-Coord_t Format_BinSize;
+Forms::Coord Format_HexSize;
+Forms::Coord Format_DecSize;
+Forms::Coord Format_OctSize;
+Forms::Coord Format_BinSize;
 
-static Coord_t displaySizes[3][4] = 
+/**
+ * Caches the width of a space in the large variable-width font.
+ */
+static unsigned int GroupDelimiterWidth;
+
+static Forms::Coord displaySizes[3][4] = 
 {
     // SHOW_32
     {
@@ -74,7 +79,7 @@ void Format_InitDisplaySizes(void)
     Forms::FontManager::SetFont(FONT_LARGE_PROP);
     GroupDelimiterWidth = fontlib_GetGlyphWidth(GROUP_DELIMITER);
     Forms::FontManager::SetFont(FONT_LARGE_MONO);
-    Coord_t* coord = &displaySizes[0][0];
+    Forms::Coord* coord = &displaySizes[0][0];
     for (i = 0; i < (SHOW_128 + 1) * (HEXADECIMAL + 1); i++, coord++, spacers++)
         coord->x += *spacers * GroupDelimiterWidth;
 }
@@ -89,7 +94,7 @@ void Format_ConfigureDisplaySizes(void)
     Format_HexSize = displaySizes[Settings.DisplayBits][HEXADECIMAL];
     and ZDS generated each array index separately instead of seeing they're related so now I'm doing this.
     */
-    Coord_t* ptr = &displaySizes[Settings::GetDisplayBits()][BINARY];
+    Forms::Coord* ptr = &displaySizes[Settings::GetDisplayBits()][BINARY];
     Format_BinSize = *ptr++;
     Format_OctSize = *ptr++;
     Format_DecSize = *ptr++;
@@ -107,9 +112,9 @@ unsigned char Format_GetNumberHeight(Base_t base)
 
 void Format_PrintInBase(BigInt_t* n, Base_t base)
 {
-    Coord_t home;
     unsigned int x = 0;
-    Style_SaveCursor(&home);
+    Forms::CursorLoc cursor;
+    cursor.Save();
     switch (base)
     {
         case BINARY:
@@ -126,11 +131,11 @@ void Format_PrintInBase(BigInt_t* n, Base_t base)
             break;
     }
     gfx_SetColor(fontlib_GetBackgroundColor());
-    gfx_FillRectangle_NoClip(home.x, home.y, x - home.x, fontlib_GetCursorY() - home.y + fontlib_GetCurrentFontHeight());
+    gfx_FillRectangle_NoClip(cursor.x, cursor.y, x - cursor.x, fontlib_GetCursorY() - cursor.y + fontlib_GetCurrentFontHeight());
 }
 
 
-static CharTextWindow_t oldWindow;
+static Forms::TextWindow oldWindow;
 
 
 /**
@@ -139,16 +144,9 @@ static CharTextWindow_t oldWindow;
  */
 static void windowize(unsigned int width)
 {
-/** TODO: Not sure which way to do this is better.
-    unsigned int x = fontlib_GetWindowXMin() + fontlib_GetWindowWidth() - width;
-    uint8_t y = fontlib_GetCursorY();
-    Style_SaveTextWindow(&oldWindow);
-    fontlib_SetWindow(x, y, fontlib_GetWindowWidth() - x, fontlib_GetWindowHeight() - y);
-    fontlib_HomeUp();
-*/
     unsigned int x;
     uint8_t y;
-    Style_SaveTextWindow(&oldWindow);
+    oldWindow.Save();
     x = oldWindow.X + oldWindow.Width - width;
     y = oldWindow.CursorY;
     fontlib_SetWindow(x, y, oldWindow.Width - x, oldWindow.Y + oldWindow.Height - y);
@@ -168,14 +166,18 @@ static unsigned int PrintBaseLabel(Base_t base, unsigned char height)
     }
     else
         baseName = BaseShortNames.Get(base);
-    Style_SetSmallFontPropAligned();
+    fontlib_font_t* big = Forms::FontManager::GetFont(FONT_LARGE_PROP);
+    fontlib_font_t* small = Forms::FontManager::GetFont(FONT_SMALL_PROP);
+    unsigned char dh = big->baseline_height - small->baseline_height;
+    Forms::FontManager::SetFont(FONT_SMALL_PROP);
+    fontlib_SetLineSpacing(dh, big->height - dh - small->height);
     fontlib_SetLineSpacing(fontlib_GetSpaceAbove(), height - fontlib_GetCurrentFontHeight() + fontlib_GetSpaceBelow());
     x = fontlib_GetCursorX() - fontlib_GetStringWidth(baseName) - (altHex ? 0 : fontlib_GetGlyphWidth(' '));
     fontlib_SetCursorPosition(x, fontlib_GetCursorY());
     fontlib_DrawString(baseName);
     if (!altHex)
         fontlib_DrawGlyph(' ');
-    Style_SetLargeFontMono();
+    Forms::FontManager::SetFont(FONT_LARGE_MONO);
     return x;
 }
 
@@ -187,7 +189,7 @@ static unsigned int PrintBaseLabel(Base_t base, unsigned char height)
 static void unwindowize(void)
 {
     uint8_t y = fontlib_GetCursorY();
-    Style_RestoreTextWindow(&oldWindow);
+    oldWindow.Restore();
     fontlib_SetCursorPosition(oldWindow.CursorX, y);
     fontlib_SetForegroundColor(COLOR_FOREGROUND);
 }
@@ -195,9 +197,9 @@ static void unwindowize(void)
 
 static void printNumSep(void)
 {
-    Style_SetLargeFontProp();
+    Forms::FontManager::SetFont(FONT_LARGE_PROP);
     fontlib_DrawGlyph(GROUP_DELIMITER);
-    Style_SetLargeFontMono();
+    Forms::FontManager::SetFont(FONT_LARGE_MONO);
 }
 
 

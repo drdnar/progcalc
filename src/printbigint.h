@@ -4,15 +4,16 @@
 #include "bigint.h"
 #include "settings.h"
 #include "style.h"
+#include "forms/textmanager.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern Coord_t Format_BinSize;
-extern Coord_t Format_OctSize;
-extern Coord_t Format_DecSize;
-extern Coord_t Format_HexSize;
+extern Forms::Coord Format_BinSize;
+extern Forms::Coord Format_OctSize;
+extern Forms::Coord Format_DecSize;
+extern Forms::Coord Format_HexSize;
 
 #define MAX_FORMATTED_NUMBER_SIZE 130
 #define MAX_HEX_DIGITS 32
@@ -25,6 +26,13 @@ extern Coord_t Format_HexSize;
 #define OCT_GROUPING 3
 #define BIN_GROUPING 8
 
+#define CHAR_WIDTH 8
+#define CHAR_HEIGHT 14
+
+#define BIG_FONT_HEIGHT 14
+#define SMALL_FONT_HEIGHT 10
+
+#define GROUP_DELIMITER ' '
 
 /**
  * Initializes some stuff.

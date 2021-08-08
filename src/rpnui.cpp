@@ -9,7 +9,6 @@
 #include "settings.h"
 #include "stack.h"
 #include "printbigint.h"
-#include "style.h"
 #include "inputbigint.h"
 #include "misc.h"
 #include "statusbar.h"

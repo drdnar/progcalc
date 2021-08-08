@@ -125,12 +125,10 @@ Status StatusBar::Paint()
     window.Restore();
     fontlib_SetColors(COLOR_STATUS_BAR_FOREGROUND, COLOR_STATUS_BAR_BACKGROUND);
     fontlib_HomeUp();
-    Style_SetSmallFontPropBold();
+    FontManager::SetFont(FONT_SMALL_PROP_BOLD);
     fontlib_SetLineSpacing(1, 1);
     fontlib_DrawString(" Programmer's Calculator v" VERSION_NUMBER);
     fontlib_ClearEOL();
-    Style_SetSmallFontPropBold();
-    fontlib_SetLineSpacing(1, 1);
     fontlib_SetCursorPosition(176, 0);
     fontlib_DrawString(DisplayBitsNames.Get(Settings::GetDisplayBits()));
     fontlib_DrawString(" bits");

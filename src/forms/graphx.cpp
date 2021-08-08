@@ -3,6 +3,7 @@
 #include "graphx.h"
 #include <fileioc.h>
 #include "messages.h"
+#include "textmanager.h"
 
 using namespace Forms;
 
@@ -35,6 +36,7 @@ void GraphX::Begin()
     if (!instance)
         return;
     instance->begin();
+    FontManager::ReloadFonts();
     MessageLoop::EnqueueMessage({ .Id = MESSAGE_REPAINT_ALL, .ExtendedCode = MESSAGE_NONE });
 }
 
