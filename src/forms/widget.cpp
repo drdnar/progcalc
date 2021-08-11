@@ -33,7 +33,7 @@ Widget::~Widget()
 Widget_def* Widget::GetNextItem(Widget_def* item, size_t size) 
 {
     if (item)
-        return Style::GetNextItem((Widget_def*)((unsigned char*)item + size));
+        return (Widget_def*)((unsigned char*)item + size);
     else
         return nullptr;
 }
