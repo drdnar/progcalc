@@ -2,7 +2,6 @@
 #include "settings.h"
 #include <fontlibc.h>
 #include <string.h>
-#include "style.h"
 #include "misc.h"
 #include "forms/textmanager.h"
 #include "forms/inlineoptimizations.h"

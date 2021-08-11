@@ -2,7 +2,6 @@
 #define RPN_UI_H
 #include <stdbool.h>
 #include <tice.h>
-#include "style.h"
 #include "forms/container.h"
 #include "stack.h"
 #include "stackdisplay.h"

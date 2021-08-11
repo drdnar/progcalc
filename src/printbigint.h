@@ -3,7 +3,6 @@
 
 #include "bigint.h"
 #include "settings.h"
-#include "style.h"
 #include "forms/textmanager.h"
 
 #ifdef __cplusplus

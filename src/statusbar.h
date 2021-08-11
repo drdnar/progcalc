@@ -1,7 +1,6 @@
 #ifndef STATUS_BAR_H
 #define STATUS_BAR_H
 #include <stdbool.h>
-#include "style.h"
 #include "forms/widget.h"
 #include "forms/textmanager.h"
 #include "forms/messages.h"

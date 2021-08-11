@@ -5,7 +5,6 @@
 #include "forms/gui.h"
 #include "forms/style.h"
 #include "forms/graphx.h"
-#include "style.h"
 #include "gfx/gfx.h"
 
 using namespace Forms;
@@ -29,7 +28,7 @@ const FontDescriptor (&Forms::FontsList)[] =
     {"DrMono", 14, 14, FONTLIB_BOLD, FONTLIB_BOLD, 0, 0, (unsigned char)-1, (unsigned char)-1},
     {"DrSans", 10, 10, FONTLIB_NORMAL, FONTLIB_NORMAL, 0, 0, (unsigned char)-1, (unsigned char)-1},
     {"DrSans", 10, 10, FONTLIB_BOLD, FONTLIB_BOLD, 0, 0, (unsigned char)-1, (unsigned char)-1},
-    {"DrSans", 10, 10, FONTLIB_NORMAL, FONTLIB_NORMAL, 0, 0, (unsigned char)-1, (unsigned char)-1},
+    {"DrSans", 14, 14, FONTLIB_NORMAL, FONTLIB_NORMAL, 0, 0, (unsigned char)-1, (unsigned char)-1},
 };
 
 extern const unsigned char Forms::FontsCount = 5;

@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <tice.h>
 #include "bigint.h"
-#include "style.h"
 
 #include "forms/widget.h"
 
