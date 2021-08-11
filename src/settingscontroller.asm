@@ -8,6 +8,12 @@ include 'widgets.inc'
 	extern _BaseLongNames
 	extern _DisplayBitsNames
 
+FONT_LARGE_PROP = 0
+FONT_LARGE_MONO = 1
+FONT_SMALL_PROP = 2
+FONT_SMALL_PROP_BOLD = 3
+FONT_LARGE_PROP_REGULAR = 4
+
 DisplayBits = 0
 PrimaryBase = 1
 SecondaryBase = 2
@@ -17,6 +23,7 @@ AlwaysShowOct = 5
 AlwaysShowBin = 6
 StatusBarEnabled = 7
 SaveStack = 9
+SignedMode = 10
 
 public _SettingsDialog
 _SettingsDialog:
@@ -41,12 +48,9 @@ _SettingsDialog:
 				Label strDisplayBits
 				EnumSelector _DisplayBitsNames, 1, _TemporarySettings + DisplayBits
 			end RowItems
-			RowItems ROW_ITEMS_LEFT, 3
-				Checkbox strShowStatusBar, _TemporarySettings + StatusBarEnabled
-			end RowItems
-			RowItems ROW_ITEMS_LEFT, 3
-				Checkbox strSaveStack, _TemporarySettings + SaveStack
-			end RowItems
+			Checkbox strSignedMode, _TemporarySettings + SignedMode
+			Checkbox strShowStatusBar, _TemporarySettings + StatusBarEnabled
+			Checkbox strSaveStack, _TemporarySettings + SaveStack
 		end RowList
 		RowList
 			RowItems ROW_ITEMS_RIGHT, 6
@@ -108,6 +112,8 @@ strPrimaryBase:
 	db	"Primary base:", 0
 strSecondaryBase:
 	db	"Secondary base:", 0
+strSignedMode:
+	db	"Signed mode", 0
 strShowStatusBar:
 	db	"Show status bar", 0
 strSaveStack:

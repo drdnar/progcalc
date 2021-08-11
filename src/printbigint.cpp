@@ -5,8 +5,11 @@
 #include "misc.h"
 #include "forms/textmanager.h"
 #include "forms/inlineoptimizations.h"
+#include "forms/calc1252.h"
 
 char Format_NumberBuffer[MAX_FORMATTED_NUMBER_SIZE];
+BigInt_t temp_sign;
+bool negative_number;
 BigInt_t tempn;
 
 Forms::Coord Format_HexSize;
@@ -139,9 +142,12 @@ static Forms::TextWindow oldWindow;
 
 /**
  * Creates a temporary text window of a given width, right-aligned to current window.
+ * Furthermore, if signed mode is active and the number is negative, then sets up
+ * stuff for displaying the number.
  * @param width Width of new window.
+ * @param n Number about to be displayed
  */
-static void windowize(unsigned int width)
+static void windowize(unsigned int width, BigInt_t* n)
 {
     unsigned int x;
     uint8_t y;
@@ -150,6 +156,15 @@ static void windowize(unsigned int width)
     y = oldWindow.CursorY;
     fontlib_SetWindow(x, y, oldWindow.Width - x, oldWindow.Y + oldWindow.Height - y);
     fontlib_HomeUp();
+    // Handle sign stuff
+    BigIntCopyFromTo(n, &temp_sign);
+    if (Settings::GetSignedMode() && BigIntGetSign(&temp_sign) < 0)
+    {
+        negative_number = true;
+        BigIntNegate(&temp_sign);
+    }
+    else
+        negative_number = false;
 }
 
 
@@ -168,14 +183,47 @@ static unsigned int PrintBaseLabel(Base_t base, unsigned char height)
     fontlib_font_t* big = Forms::FontManager::GetFont(FONT_LARGE_PROP);
     fontlib_font_t* small = Forms::FontManager::GetFont(FONT_SMALL_PROP);
     unsigned char dh = big->baseline_height - small->baseline_height;
+    unsigned int minus_width;
+    if (altHex)
+    {
+        Forms::FontManager::SetFont(FONT_LARGE_PROP);
+        minus_width = fontlib_GetGlyphWidth('-');
+    }
+    else
+    {
+        Forms::FontManager::SetFont(FONT_LARGE_MONO);
+        minus_width = fontlib_GetGlyphWidth(CALC1252_MINUS_CHAR);
+    }
     Forms::FontManager::SetFont(FONT_SMALL_PROP);
     fontlib_SetLineSpacing(dh, big->height - dh - small->height);
     fontlib_SetLineSpacing(fontlib_GetSpaceAbove(), height - fontlib_GetCurrentFontHeight() + fontlib_GetSpaceBelow());
-    x = fontlib_GetCursorX() - fontlib_GetStringWidth(baseName) - (altHex ? 0 : fontlib_GetGlyphWidth(' '));
+    x = fontlib_GetCursorX() - fontlib_GetStringWidth(baseName)
+        - (!altHex ? fontlib_GetGlyphWidth(' ') : 0)
+        - (Settings::GetSignedMode() && (!altHex || negative_number) ? minus_width : 0);
     fontlib_SetCursorPosition(x, fontlib_GetCursorY());
     fontlib_DrawString(baseName);
     if (!altHex)
         fontlib_DrawGlyph(' ');
+    if (Settings::GetSignedMode())
+    {
+        dh = fontlib_GetCurrentFontHeight();
+        if (altHex)
+            Forms::FontManager::SetFont(FONT_LARGE_PROP);
+        else
+            Forms::FontManager::SetFont(FONT_LARGE_MONO);
+        dh = dh - fontlib_GetCurrentFontHeight() + fontlib_GetSpaceBelow();
+        fontlib_SetLineSpacing(fontlib_GetSpaceAbove(), dh);
+        if (negative_number)
+        {
+            if (altHex)
+                fontlib_DrawGlyph('-');
+            else
+                fontlib_DrawGlyph(CALC1252_MINUS_CHAR);
+        }
+        else
+            if (!altHex)
+                fontlib_DrawGlyph(' ');
+    }
     Forms::FontManager::SetFont(FONT_LARGE_MONO);
     return x;
 }
@@ -248,9 +296,9 @@ unsigned int Format_PrintBin(BigInt_t* n)
     unsigned char h, i;
     const char* ch;
     unsigned int xreturn;
-    windowize(Format_BinSize.x);
+    windowize(Format_BinSize.x, n);
     xreturn = PrintBaseLabel(BINARY, Format_BinSize.y);
-    BigIntToStringBin(n, Format_NumberBuffer);
+    BigIntToStringBin(&temp_sign, Format_NumberBuffer);
     /* Array indexing seems to produce less terrible output than if or switch. */
     ch = printBinCh[Settings::GetDisplayBits()];
     resetZeros();
@@ -312,10 +360,10 @@ unsigned int Format_PrintDec(BigInt_t* n)
     unsigned char group, subgroup, actualDigits;
     char* ch, *src;
     unsigned int xreturn;
-    windowize(Format_DecSize.x);
+    windowize(Format_DecSize.x, n);
     xreturn = PrintBaseLabel(DECIMAL, Format_DecSize.y);
     
-    partialCopy(n);
+    partialCopy(&temp_sign);
 
     src = BigIntToString(&tempn, Format_NumberBuffer);
     /* Somewhat dubious pointer arithmetic, but should be well-defined since
@@ -378,9 +426,9 @@ unsigned int Format_PrintHex(BigInt_t* n)
     unsigned char i;
     const char* ch;
     unsigned int xreturn;
-    windowize(Format_HexSize.x);
+    windowize(Format_HexSize.x, n);
     xreturn = PrintBaseLabel(HEXADECIMAL, Format_HexSize.y);
-    BigIntToStringHex(n, Format_NumberBuffer);
+    BigIntToStringHex(&temp_sign, Format_NumberBuffer);
     resetZeros();
     for (i = printHexI[Settings::GetDisplayBits()], ch = printHexCh[Settings::GetDisplayBits()]; i > 0; i--)
     {
@@ -425,10 +473,10 @@ unsigned int Format_PrintOct(BigInt_t* n)
     unsigned int xreturn;
     lines = 1;
     bits = Settings::GetDisplayBits();
-    windowize(Format_OctSize.x);
+    windowize(Format_OctSize.x, n);
     xreturn = PrintBaseLabel(OCTAL, Format_OctSize.y);
     
-    partialCopy(n);
+    partialCopy(&temp_sign);
     
     BigIntToStringOct(&tempn, Format_NumberBuffer);
 

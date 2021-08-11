@@ -18,6 +18,7 @@ enum SettingsMessageIds
     SETTINGS_ALWAYS_SHOW_OCT_CHANGE,
     SETTINGS_ALWAYS_SHOW_BIN_CHANGE,
     SETTINGS_STATUS_BAR_CHANGE,
+    SETTINGS_SIGNED_MODE_CHANGE,
 };
 
 enum Bases_t
@@ -50,6 +51,7 @@ struct Settings_t final
     bool StatusBarEnabled;
     bool FirstRun;
     bool SaveStack;
+    bool SignedMode;
 };
 
 
@@ -142,6 +144,14 @@ class Settings final
          * Check if this is the first time running the program.
          */
         static bool IsFirstRun() { return settings.FirstRun; }
+        /**
+         * Checks if numbers should be displayed as signed.
+         */
+        static bool GetSignedMode() { return settings.SignedMode; }
+        /**
+         * Sets whether numbers are displayed as signed.
+         */
+        static void SetSignedMode(bool value);
         /**
          * Applies changed settings.
          * @return Returns nullptr if the settings are valid.

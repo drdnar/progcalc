@@ -27,7 +27,8 @@ Settings_t Settings::settings
     .AlwaysShowBin = false,
     .StatusBarEnabled = true,
     .FirstRun = true,
-    .SaveStack = true
+    .SaveStack = true,
+    .SignedMode = false
 };
 
 
@@ -183,28 +184,30 @@ void Settings::SetStatusBar(bool value)
 }
 
 
+void Settings::SetSignedMode(bool value)
+{
+    if (value == settings.SignedMode)
+        return;
+    settings.SignedMode = value;
+    MessageLoop::EnqueueMessage({ .Id = MESSAGE_SETTINGS_CHANGE, .ExtendedCode = SETTINGS_SIGNED_MODE_CHANGE });
+}
+
+
 const char* Settings::Apply(Settings_t& newSettings)
 {
     if (newSettings.PrimaryBase == NO_BASE)
         return "Primary base cannot be set to Off.";
     if (newSettings.PrimaryBase == newSettings.SecondaryBase)
         return "Primary and secondary base cannot be the same.";
-    if (newSettings.StatusBarEnabled != settings.StatusBarEnabled)
-        SetStatusBar(newSettings.StatusBarEnabled);
-    if (newSettings.PrimaryBase != settings.PrimaryBase)
-        SetPrimaryBase(newSettings.PrimaryBase);
-    if (newSettings.SecondaryBase != settings.SecondaryBase)
-        SetSecondaryBase(newSettings.SecondaryBase);
-    if (newSettings.DisplayBits != settings.DisplayBits)
-        SetDisplayBits(newSettings.DisplayBits);
-    if (newSettings.AlwaysShowBin != settings.AlwaysShowBin)
-        SetAlwaysShowBin(newSettings.AlwaysShowBin);
-    if (newSettings.AlwaysShowOct != settings.AlwaysShowOct)
-        SetAlwaysShowOct(newSettings.AlwaysShowOct);
-    if (newSettings.AlwaysShowDec != settings.AlwaysShowDec)
-        SetAlwaysShowDec(newSettings.AlwaysShowDec);
-    if (newSettings.AlwaysShowHex != settings.AlwaysShowHex)
-        SetAlwaysShowHex(newSettings.AlwaysShowHex);
+    SetStatusBar(newSettings.StatusBarEnabled);
+    SetPrimaryBase(newSettings.PrimaryBase);
+    SetSecondaryBase(newSettings.SecondaryBase);
+    SetDisplayBits(newSettings.DisplayBits);
+    SetAlwaysShowBin(newSettings.AlwaysShowBin);
+    SetAlwaysShowOct(newSettings.AlwaysShowOct);
+    SetAlwaysShowDec(newSettings.AlwaysShowDec);
+    SetAlwaysShowHex(newSettings.AlwaysShowHex);
+    SetSignedMode(newSettings.SignedMode);
     settings.SaveStack = newSettings.SaveStack;
     return nullptr;
 }
