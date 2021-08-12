@@ -37,6 +37,12 @@ class BigIntInput final : public Forms::Widget
          */
         bool EntryActive() const { return entryActive; }
         /**
+         * Sets the current entry number to a given value.
+         * @param n Number to edit
+         * @return Returns false on failure.
+         */
+        bool SetEntry(BigInt_t* n);
+        /**
          * Resets input routines to no-input status.
          */
         void Reset();

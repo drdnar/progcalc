@@ -198,6 +198,10 @@ bool RPN_UI::SendInput(Message& message)
             case sk_Enter:
             case sk_Yequ:
                 return AcquireInput();
+            case sk_2nd_Enter:
+                if (mainStack.IsEmpty())
+                    return false;
+                return input.SetEntry(mainStack.Peek(0));
             case sk_Del:
                 r = !!mainStack.PopStalePointer();
                 stackDisplay.SetDirty();

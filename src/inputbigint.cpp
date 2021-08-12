@@ -234,6 +234,18 @@ void BigIntInput::endEntry()
 }
 
 
+bool BigIntInput::SetEntry(BigInt_t* n)
+{
+    if (entryActive
+        || (Settings::GetDisplayBits() == SHOW_32 && BigIntCompare(n, &MaxShow32) > 0)
+        || (Settings::GetDisplayBits() == SHOW_64 && BigIntCompare(n, &MaxShow64) > 0))
+        return false;
+    beginEntry();
+    BigIntCopyFromTo(n, &CurrentInput);
+    return true;
+}
+
+
 void BigIntInput::Reset()
 {
     BigIntSetToZero(&CurrentInput);
