@@ -391,7 +391,8 @@ unsigned int Format_PrintDec(BigInt_t* n)
         }
     }
     ch = Format_NumberBuffer;
-    fontlib_SetForegroundColor(COLOR_FOREGROUND);
+    if (BigIntIsNonZero(&temp_sign))
+        fontlib_SetForegroundColor(COLOR_FOREGROUND);
     do
     {
         fontlib_DrawStringL(ch, subgroup);

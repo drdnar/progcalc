@@ -127,7 +127,7 @@ Status RPN_UI::Paint()
         return Status::Success;
     Coord size;
     WindowSaver saver;
-    GetStyle().ActivateFont();
+    FontManager::SetFont(FONT_LARGE_PROP_REGULAR);
     auto message = "Press Vars for help.\n"
                    "Press Clear to quit.\n"
                    "Press Mode for settings.";

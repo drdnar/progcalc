@@ -57,7 +57,7 @@ Status StackDisplay::Paint()
     {
         if (!rpnui.input.EntryActive())
         {
-            FontManager::SetFont(FONT_LARGE_PROP);
+            FontManager::SetFont(FONT_LARGE_PROP_REGULAR);
             topUsed -= fontlib_GetCurrentFontHeight();
             fontlib_SetCursorPosition(x, topUsed);
             fontlib_DrawString("(Stack is empty.)");
