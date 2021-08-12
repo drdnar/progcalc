@@ -129,8 +129,8 @@ Status RPN_UI::Paint()
     WindowSaver saver;
     FontManager::SetFont(FONT_LARGE_PROP_REGULAR);
     auto message = "Press Vars for help.\n"
-                   "Press Clear to quit.\n"
-                   "Press Mode for settings.";
+                   "Press Mode for settings.\n"
+                   "Press Clear to quit.";
     WordWrap::GetTextDimensions(message, size, width - 40);
     fontlib_SetWindow(
         x + (width / 2) - (size.x / 2),
