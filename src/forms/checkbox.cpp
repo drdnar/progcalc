@@ -74,7 +74,7 @@ bool Checkbox::SendInput(Message& message)
 {
     if (message.Id == MESSAGE_BLINK)
         SetDirty();
-    else if (message.Id == MESSAGE_KEY && (message.ExtendedCode == sk_Enter || message.ExtendedCode == sk_2nd))
+    else if (message.Id == MESSAGE_KEY && (message.ExtendedCode == sk_Enter || message.ExtendedCode == sk_Yequ))
     {
         CursorBlinker::Restart();
         dirty = true;
