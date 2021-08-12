@@ -112,6 +112,55 @@ unsigned char Format_GetNumberHeight(Base_t base)
 }
 
 
+static void print_in_base(BigInt_t* n, Base_t base)
+{
+    auto x = fontlib_GetCursorX();
+    auto y = fontlib_GetCursorY();
+    Format_PrintInBase(n, base);
+    fontlib_SetCursorPosition(x, y + Format_GetNumberHeight(base));
+}
+
+
+unsigned char Format_GetEntryHeight()
+{
+    return Format_GetNumberHeight(Settings::GetPrimaryBase())
+        + Format_GetNumberHeight(Settings::GetSecondaryBase());
+}
+
+void Format_PrintEntry(BigInt_t* n)
+{
+    print_in_base(n, Settings::GetPrimaryBase());
+    if (Settings::GetSecondaryBase() != NO_BASE)
+        print_in_base(n, Settings::GetSecondaryBase());
+}
+
+
+static bool base_used(Base_t base)
+{
+    return Settings::GetPrimaryBase() == base || Settings::GetSecondaryBase() == base;
+}
+
+
+unsigned char Format_GetEntryWithAlwaysShowsHeight()
+{
+    unsigned char height = Format_GetNumberHeight(Settings::GetPrimaryBase())
+        + Format_GetNumberHeight(Settings::GetSecondaryBase());
+    for (unsigned char i = 0; i < NO_BASE; i++)
+        if (!base_used(i) && Settings::AlwaysShow(i))
+            height += Format_GetNumberHeight(i);
+    return height;
+}
+
+
+void Format_PrintEntryWithAlwaysShows(BigInt_t* n)
+{
+    Format_PrintEntry(n);
+    for (unsigned char i = 0; i < NO_BASE; i++)
+        if (!base_used(i) && Settings::AlwaysShow(i))
+            print_in_base(n, i);
+}
+
+
 void Format_PrintInBase(BigInt_t* n, Base_t base)
 {
     unsigned int x = 0;

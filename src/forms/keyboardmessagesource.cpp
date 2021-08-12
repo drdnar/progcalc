@@ -68,6 +68,7 @@ static const MapTableEntry GuiKeyMappingsTable[] =
     { sk_Up, { GUI_EVENT_UP } },
     { sk_Enter, { GUI_EVENT_ENTER } },
     { sk_Clear, { GUI_EVENT_EXIT } },
+    { sk_Yequ, { GUI_EVENT_ENTER } },
     { sk_Down | sk_2nd_Modifier, { GUI_EVENT_PAGE_DOWN } },
     { sk_Left | sk_2nd_Modifier, { GUI_EVENT_HOME } },
     { sk_Right | sk_2nd_Modifier, { GUI_EVENT_END } },

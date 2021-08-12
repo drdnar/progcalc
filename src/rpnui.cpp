@@ -392,7 +392,7 @@ extern "C" void AboutDialogLoader([[maybe_unused]] Forms::DialogBox& sender)
     label.SetHeight(body.GetHeight());
     label.SetText("by Dr. D'nar " CALC1252_EN_DASH " Version " VERSION_NUMBER " " VERSION_DATE "\n"
     "Keys:\n"
-    " " CALC1252_RADIO_CHECKED " Y=/Mode: Help/Settings\n"
+    " " CALC1252_RADIO_CHECKED " Vars/Mode: Help/Settings\n"
     " " CALC1252_RADIO_CHECKED " + " CALC1252_MINUS " " CALC1252_MULTIPLY " " CALC1252_DIVIDE ": Basic arithmetic\n"
     " " CALC1252_RADIO_CHECKED " 2nd + " CALC1252_MULTIPLY "/" CALC1252_DIVIDE ": Remainder/R + quotient\n"
     " " CALC1252_RADIO_CHECKED " Del/2nd + del: Delete/duplicate entry\n"

@@ -51,7 +51,7 @@ bool Button::SendInput(Message& message)
     if (message.Id == MESSAGE_BLINK)
         SetDirty();
     else if (message.Id == MESSAGE_KEY)
-        if (message.ExtendedCode == sk_Enter || message.ExtendedCode == sk_Yequ)
+        if (message.ExtendedCode == sk_Enter)
         {
             Press();
             return true;

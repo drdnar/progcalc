@@ -44,10 +44,20 @@ struct Settings_t final
     uint8_t DisplayBits;
     Base_t PrimaryBase;
     Base_t SecondaryBase;
-    bool AlwaysShowHex;
-    bool AlwaysShowDec;
-    bool AlwaysShowOct;
-    bool AlwaysShowBin;
+    union
+    {
+        /**
+         * Array of { AlwaysShowBin, AlwaysShowOct, . . . } via a union.
+         */
+        bool AlwaysShow[4];
+        struct
+        {
+            bool AlwaysShowBin;
+            bool AlwaysShowOct;
+            bool AlwaysShowDec;
+            bool AlwaysShowHex;    
+        };
+    };
     bool StatusBarEnabled;
     bool FirstRun;
     bool SaveStack;
@@ -91,6 +101,10 @@ class Settings final
          * Setter for SecondaryBase.
          */
         static void SetSecondaryBase(Base_t base);
+        /**
+         * AlwaysShow base getter for an indexed base
+         */
+        static bool AlwaysShow(Base_t base) { return settings.AlwaysShow[base]; }
         /**
          * AlwaysShow base getter
          */

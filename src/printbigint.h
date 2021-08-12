@@ -56,6 +56,32 @@ extern char Format_NumberBuffer[];
 unsigned char Format_GetNumberHeight(Base_t base);
 
 /**
+ * Gets the height of an entry, taking into account both primary and secondary
+ * base settings.
+ * @return Height in pixels.
+ */
+unsigned char Format_GetEntryHeight();
+
+/**
+ * Prints a number using current settings for bits and primary/secondary base.
+ * @param n Pointer to number to print.
+ */
+void Format_PrintEntry(BigInt_t* n);
+
+/**
+ * Gets the height of an entry, taking into account both primary and secondary
+ * base settings, as well as AlwaysShow settings.
+ * @return Height in pixels.
+ */
+unsigned char Format_GetEntryWithAlwaysShowsHeight();
+
+/**
+ * Like Format_PrintEntry() but also handles AlwaysShow settings.
+ * @param n Pointer to number to print.
+ */
+void Format_PrintEntryWithAlwaysShows(BigInt_t* n);
+
+/**
  * Prints a number, right-aligned, in a given base at the current FontLib cursor location using current formatting settings,
  * and also erases the space to the left.
  * @param n Pointer to number to display.

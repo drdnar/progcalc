@@ -70,14 +70,20 @@ Status StackDisplay::Paint()
         unsigned int index = scrollIndex;
         for (unsigned char i = displayableEntries; i > 0; i--, number--, index++)
         {
-            topUsed -= entryHeight;
-            fontlib_SetCursorPosition(x, topUsed);
-            Format_PrintInBase(number, Settings::GetPrimaryBase());
-            if (Settings::GetSecondaryBase() != NO_BASE)
+            if (!rpnui.input.EntryActive() && index == 0)
             {
-                fontlib_SetCursorPosition(x, topUsed + primary_height);
-                Format_PrintInBase(number, Settings::GetSecondaryBase());
-            }   
+                topUsed -= Format_GetEntryWithAlwaysShowsHeight();
+                fontlib_SetCursorPosition(x, topUsed);
+                Format_PrintEntryWithAlwaysShows(number);
+            }
+            else
+            {
+                if ((signed short)topUsed - entryHeight < y)
+                    break;
+                topUsed -= entryHeight;
+                fontlib_SetCursorPosition(x, topUsed);
+                Format_PrintEntry(number);
+            }
             FontManager::SetFont(FONT_LARGE_PROP);
             fontlib_SetCursorPosition(x, topUsed);
             fontlib_DrawUInt(index, 2);

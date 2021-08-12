@@ -17,10 +17,10 @@ FONT_LARGE_PROP_REGULAR = 4
 DisplayBits = 0
 PrimaryBase = 1
 SecondaryBase = 2
-AlwaysShowHex = 3
-AlwaysShowDec = 4
-AlwaysShowOct = 5
-AlwaysShowBin = 6
+AlwaysShowBin = 3
+AlwaysShowOct = 4
+AlwaysShowDec = 5
+AlwaysShowHex = 6
 StatusBarEnabled = 7
 SaveStack = 9
 SignedMode = 10
@@ -48,6 +48,17 @@ _SettingsDialog:
 				Label strDisplayBits
 				EnumSelector _DisplayBitsNames, 1, _TemporarySettings + DisplayBits
 			end RowItems
+			RowItems ROW_ITEMS_LEFT, 3
+				Label strAlwaysShow
+				RowList
+					Checkbox strBinary, _TemporarySettings + AlwaysShowBin
+					Checkbox strDecimal, _TemporarySettings + AlwaysShowDec
+				end RowList
+				RowList
+					Checkbox strOctal, _TemporarySettings + AlwaysShowOct
+					Checkbox strHex, _TemporarySettings + AlwaysShowHex
+				end RowList
+				end RowItems
 			Checkbox strSignedMode, _TemporarySettings + SignedMode
 			Checkbox strShowStatusBar, _TemporarySettings + StatusBarEnabled
 			Checkbox strSaveStack, _TemporarySettings + SaveStack
@@ -118,6 +129,16 @@ strShowStatusBar:
 	db	"Show status bar", 0
 strSaveStack:
 	db	"Save stack on exit", 0
+strAlwaysShow:
+	db	"Always show", 0
+strBinary:
+	db	"Binary", 0
+strOctal:
+	db	"Octal", 0
+strDecimal:
+	db	"Decimal", 0
+strHex:
+	db	"Hex", 0
 strOK:
 	db	"OK", 0
 strCancel:

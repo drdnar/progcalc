@@ -190,12 +190,7 @@ Status BigIntInput::Paint()
         return Status::Success;
     fontlib_SetWindow(x, y, width, height);
     fontlib_HomeUp();
-    Format_PrintInBase(&CurrentInput, Settings::GetPrimaryBase());
-    if (Settings::GetSecondaryBase() != NO_BASE)
-    {
-        fontlib_SetCursorPosition(x, y + Format_GetNumberHeight(Settings::GetPrimaryBase()));
-        Format_PrintInBase(&CurrentInput, Settings::GetSecondaryBase());
-    }
+    Format_PrintEntryWithAlwaysShows(&CurrentInput);
     fontlib_HomeUp();
     fontlib_DrawString("#");
     return Status::Success;
@@ -207,7 +202,7 @@ void BigIntInput::Layout()
     if (entryActive)
     {
         width = rpnui.GetWidth();
-        height = Format_GetNumberHeight(Settings::GetPrimaryBase()) + Format_GetNumberHeight(Settings::GetSecondaryBase());
+        height = Format_GetEntryWithAlwaysShowsHeight();
         x = rpnui.GetX();
         y = rpnui.GetY() + rpnui.GetHeight() - height;
     }
