@@ -19,6 +19,7 @@ enum SettingsMessageIds
     SETTINGS_ALWAYS_SHOW_BIN_CHANGE,
     SETTINGS_STATUS_BAR_CHANGE,
     SETTINGS_SIGNED_MODE_CHANGE,
+    SETTINGS_GRAY_LEADING_ZEROS_CHANGE,
 };
 
 enum Bases_t
@@ -62,6 +63,7 @@ struct Settings_t final
     bool FirstRun;
     bool SaveStack;
     bool SignedMode;
+    bool GrayLeadingZeros;
 };
 
 
@@ -137,6 +139,14 @@ class Settings final
          * AlwaysShow base setter
          */
         static void SetAlwaysShowBin(bool value);
+        /**
+         * Checks if leading zeros should be grayed out.
+         */
+        static bool GrayLeadingZeros() { return settings.GrayLeadingZeros; }
+        /**
+         * Sets whether leading zeros should be grayed out.
+         */
+        static void SetGrayLeadingZeros(bool value);
         /**
          * Checks for StatusBar display
          */

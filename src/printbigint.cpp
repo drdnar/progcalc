@@ -311,7 +311,8 @@ bool zeros;
 static inline void resetZeros()
 {
     zeros = true;
-    fontlib_SetForegroundColor(COLOR_ZERO);
+    if (Settings::GrayLeadingZeros())
+        fontlib_SetForegroundColor(COLOR_ZERO);
 }
 
 static void printdigit(char d)
@@ -421,7 +422,8 @@ unsigned int Format_PrintDec(BigInt_t* n)
     expected = printDecExpectedSize[Settings::GetDisplayBits()];
     group = printDecGroups[Settings::GetDisplayBits()];
     subgroup = printDecInitialDigits[Settings::GetDisplayBits()];
-    fontlib_SetForegroundColor(COLOR_ZERO);
+    if (Settings::GrayLeadingZeros())
+        fontlib_SetForegroundColor(COLOR_ZERO);
     if (Settings::GetDisplayBits() == SHOW_128)
     {
         fontlib_DrawString("   ");

@@ -24,6 +24,7 @@ AlwaysShowHex = 6
 StatusBarEnabled = 7
 SaveStack = 9
 SignedMode = 10
+GrayLeadingZeros = 11
 
 public _SettingsDialog
 _SettingsDialog:
@@ -60,6 +61,7 @@ _SettingsDialog:
 				end RowList
 				end RowItems
 			Checkbox strSignedMode, _TemporarySettings + SignedMode
+			Checkbox strGrayLeadingZeros, _TemporarySettings + GrayLeadingZeros
 			Checkbox strShowStatusBar, _TemporarySettings + StatusBarEnabled
 			Checkbox strSaveStack, _TemporarySettings + SaveStack
 		end RowList
@@ -125,6 +127,8 @@ strSecondaryBase:
 	db	"Secondary base:", 0
 strSignedMode:
 	db	"Signed mode", 0
+strGrayLeadingZeros:
+	db	"Gray leading zeros", 0
 strShowStatusBar:
 	db	"Show status bar", 0
 strSaveStack:

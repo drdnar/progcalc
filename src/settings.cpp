@@ -28,7 +28,8 @@ Settings_t Settings::settings
     .StatusBarEnabled = true,
     .FirstRun = true,
     .SaveStack = true,
-    .SignedMode = false
+    .SignedMode = false,
+    .GrayLeadingZeros = true
 };
 
 
@@ -193,6 +194,15 @@ void Settings::SetSignedMode(bool value)
 }
 
 
+void Settings::SetGrayLeadingZeros(bool value)
+{
+    if (value == settings.GrayLeadingZeros)
+        return;
+    settings.GrayLeadingZeros = value;
+    MessageLoop::EnqueueMessage({ .Id = MESSAGE_SETTINGS_CHANGE, .ExtendedCode = SETTINGS_GRAY_LEADING_ZEROS_CHANGE });
+}
+
+
 const char* Settings::Apply(Settings_t& newSettings)
 {
     if (newSettings.PrimaryBase == NO_BASE)
@@ -208,6 +218,7 @@ const char* Settings::Apply(Settings_t& newSettings)
     SetAlwaysShowDec(newSettings.AlwaysShowDec);
     SetAlwaysShowHex(newSettings.AlwaysShowHex);
     SetSignedMode(newSettings.SignedMode);
+    SetGrayLeadingZeros(newSettings.GrayLeadingZeros);
     settings.SaveStack = newSettings.SaveStack;
     return nullptr;
 }

@@ -12,7 +12,7 @@ ICON        ?= iconc.png
 DESCRIPTION ?= "Programmer's Calculator"
 OUTPUT_MAP  ?= YES
 #OPT_MODE    ?= -Oz
-VERSION_NUMBER = "1.2"
+VERSION_NUMBER = "1.21"
 VERSION_DATE = "12 August 2021"
 
 CFLAGS ?= -Wall -Wextra -Oz
