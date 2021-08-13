@@ -13,6 +13,8 @@ Message MessageSource::GetMessage()
 
 
 bool MessageLoop::quitting { false };
+MessageCode MessageLoop::quitReason;
+
 
 MessageSource *MessageLoop::synchronousMessageSources[MAX_SYNCHRONOUS_MESSAGE_SOURCES]
 {
@@ -127,7 +129,7 @@ bool MessageLoop::sinkEvent(Message& message)
 }
 
 
-void MessageLoop::Begin()
+MessageCode MessageLoop::Begin()
 {
     Message message;
     quitting = false;
@@ -161,6 +163,7 @@ void MessageLoop::Begin()
             #endif
         }
     } while (!quitting);
+    return quitReason;
 }
 
 
@@ -191,7 +194,10 @@ void MessageLoop::processPendingMessages()
         if (message.Id == MESSAGE_APD && message.ExtendedCode == APD_TURN_OFF)
             EnqueueMessage( { .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = MESSAGE_NONE } );
         if (message.Id == MESSAGE_EXIT_EVENT_LOOP)
+        {
             quitting = true;
+            quitReason = message.ExtendedCode;
+        }
         sinkEvent(message);
         pendingMessagesRead = incrementMessageQueueIndex(pendingMessagesRead);
         pendingMessagesCount--;

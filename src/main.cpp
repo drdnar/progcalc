@@ -30,7 +30,8 @@ int main(void) {
         MessageLoop::EnqueueMessage(
             { .Id = MESSAGE_GUI_CHANGE_DIALOG, .DataPointer = (void*)&AboutDialog }
         );
-        MessageLoop::Begin();
+        if (MessageLoop::Begin() == EventLoopExitReason::EVENT_LOOP_TURNING_OFF)
+            return 0;
     }
 
     MessageLoop::EnqueueMessage(

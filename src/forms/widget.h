@@ -326,6 +326,16 @@ enum MessageId
 
 
 /**
+ * Reasons for why the event loop should terminate.
+ */
+enum EventLoopExitReason
+{
+    EVENT_LOOP_EXIT_FORM,
+    EVENT_LOOP_TURNING_OFF,
+};
+
+
+/**
  * Special GUI key-based events.
  */
 enum GuiEvent

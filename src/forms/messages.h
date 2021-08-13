@@ -152,9 +152,10 @@ class MessageLoop final
          */
         static bool RegisterMessageSink(MessageSink& sink);
         /**
-         * Begins pumping message.
+         * Begins pumping messages.
+         * @return Reason why the event loop exited.
          */
-        static void Begin();
+        static MessageCode Begin();
         /**
          * Adds a message to the end of the pending message queue.
          * @return Returns false if the queue is full, causing the message to be ignored.
@@ -218,6 +219,10 @@ class MessageLoop final
          * Flag to exit processing loop.
          */
         static bool quitting;
+        /**
+         * Return code for Begin().
+         */
+        static MessageCode quitReason;
 };
 
 } /* namespace Forms */

@@ -92,7 +92,7 @@ bool GUI::SendMessage(Message& message)
         if (dialog_count > 1)
             end_dialog();
         else
-            MessageLoop::EnqueueMessage( { .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = MESSAGE_NONE } );
+            MessageLoop::EnqueueMessage( { .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = EVENT_LOOP_EXIT_FORM } );
         return true;
     }
     else if (message.Id == MESSAGE_REPAINT_ALL)
@@ -104,7 +104,7 @@ bool GUI::SendMessage(Message& message)
     else if (message.Id == MESSAGE_KEY && message.ExtendedCode == sk_Off)
     {
         TurnOffOnExit();
-        MessageLoop::EnqueueMessage( { .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = MESSAGE_NONE } );
+        MessageLoop::EnqueueMessage( { .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = EVENT_LOOP_TURNING_OFF } );
         return true;
     }
     else
@@ -118,7 +118,7 @@ bool GUI::SendMessage(Message& message)
                 if (dialog_count > 1)
                     MessageLoop::EnqueueMessage( { .Id = MESSAGE_GUI_MODAL_END, .ExtendedCode = MESSAGE_NONE } );
                 else
-                    MessageLoop::EnqueueMessage( { .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = MESSAGE_NONE } );
+                    MessageLoop::EnqueueMessage( { .Id = MESSAGE_EXIT_EVENT_LOOP, .ExtendedCode = EVENT_LOOP_EXIT_FORM } );
                 return true;
             }
         }
